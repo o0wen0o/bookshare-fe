@@ -34,7 +34,7 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url))
+            '@': fileURLToPath(new URL('./src', import.meta.url)) // import.meta.url provides the URL of the current module
         }
     }
 })

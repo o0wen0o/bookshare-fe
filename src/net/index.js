@@ -9,65 +9,67 @@ const accessHeader = () => {
 }
 
 const defaultError = (error) => {
-    console.error(error)
-    ElMessage.error('发生了一些错误，请联系管理员')
+    console.error(error);
+    ElMessage.error('发生了一些错误，请联系管理员');
 }
 
 const defaultFailure = (message, status, url) => {
-    console.warn(`请求地址: ${url}, 状态码: ${status}, 错误信息: ${message}`)
-    ElMessage.warning(message)
+    console.warn(`请求地址: ${url}, 状态码: ${status}, 错误信息: ${message}`);
+    ElMessage.warning(message);
 }
 
 function internalPost(url, data, headers, success, failure, error = defaultError) {
     axios.post(url, data, { headers: headers }).then(({ data }) => {
         if (data.code === 200)
-            success(data.data)
+            success(data.data); // data after 'then' is the response data
         else
-            failure(data.message, data.code, url)
-    }).catch(err => error(err))
+            failure(data.message, data.code, url);
+    }).catch(err => error(err));
 }
 
 function internalGet(url, headers, success, failure, error = defaultError) {
     axios.get(url, { headers: headers }).then(({ data }) => {
         if (data.code === 200)
-            success(data.data)
+            success(data.data);
         else
-            failure(data.message, data.code, url)
-    }).catch(err => error(err))
+            failure(data.message, data.code, url);
+    }).catch(err => error(err));
 }
 
 function post(url, data, success, failure = defaultFailure) {
-    internalPost(url, data, accessHeader(), success, failure)
+    internalPost(url, data, accessHeader(), success, failure);
 }
 
 function get(url, success, failure = defaultFailure) {
-    internalGet(url, accessHeader(), success, failure)
-}
-
-function unauthorized() {
-    return !takeAccessToken()
+    internalGet(url, accessHeader(), success, failure);
 }
 
 // remember is the checkbox
-function login(username, password, remember, success, failure = defaultFailure) {
+function login(email, password, remember, success, failure = defaultFailure) {
     internalPost('/api/auth/login', {
-        username: username,
+        // username and password for SpringSecurity
+        username: email,
         password: password
     }, {
         'Content-Type': 'application/x-www-form-urlencoded'
     }, (data) => {
-        storeAccessToken(remember, data.token, data.expire)
-        ElMessage.success(`登录成功，欢迎 ${data.username} 来到我们的系统`)
-        success(data)
-    }, failure)
+        console.log(data);
+        storeAccessToken(remember, data.token, data.expire);
+        ElMessage.success(`Login successful, welcome ${data.username} to our system!`);
+        success();
+    }, failure);
 }
 
 function logout(success, failure = defaultFailure) {
     get('/api/auth/logout', () => {
-        deleteAccessToken()
-        ElMessage.success(`退出登录成功，欢迎您再次使用`)
-        success()
-    }, failure)
+        deleteAccessToken();
+        ElMessage.success(`Logout successfully, welcome again!`);
+        success();
+    }, failure);
+}
+
+function unauthorized() {
+    return !takeAccessToken();
 }
 
 export { post, get, login, logout, unauthorized }
