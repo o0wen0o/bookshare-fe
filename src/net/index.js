@@ -53,10 +53,9 @@ function login(email, password, remember, success, failure = defaultFailure) {
     }, {
         'Content-Type': 'application/x-www-form-urlencoded'
     }, (data) => {
-        console.log(data);
         storeAccessToken(remember, data.token, data.expire);
         ElMessage.success(`Login successful, welcome ${data.username} to our system!`);
-        success();
+        success(data.roles);
     }, failure);
 }
 

@@ -9,27 +9,28 @@ const router = createRouter({
             name: 'welcome',
             component: () => import('@/views/WelcomeView.vue'),
             children: [
-                {
-                    path: '',
-                    name: 'welcome-login',
-                    component: () => import('@/views/welcome/LoginPage.vue')
-                }, {
-                    path: 'register',
-                    name: 'welcome-register',
-                    component: () => import('@/views/welcome/RegisterPage.vue')
-                }, {
-                    path: 'forget',
-                    name: 'welcome-forget',
-                    component: () => import('@/views/welcome/ForgetPage.vue')
-                }
+                { path: '', name: 'login', component: () => import('@/views/welcome/LoginPage.vue') },
+                { path: 'register', name: 'register', component: () => import('@/views/welcome/RegisterPage.vue') },
+                { path: 'forget', name: 'forget', component: () => import('@/views/welcome/ForgetPage.vue') }
             ]
         }, {
             path: '/index',
             name: 'index',
             component: () => import('@/views/IndexView.vue'),
+        }, {
+            path: '/admin',
+            name: 'admin',
+            component: () => import('@/views/AdminPanelView.vue'),
+            children: [
+                { path: '', redirect: 'users' }, // Redirect from /admin to /admin/users
+                { path: '/users', name: 'users', component: () => import('@/views/admin/users/Browse.vue') },
+                { path: '/roles', name: 'roles', component: () => import('@/views/admin/roles/Browse.vue') },
+                { path: '/books', name: 'books', component: () => import('@/views/admin/books/Browse.vue') },
+                { path: '/book-comments', name: 'book-comments', component: () => import('@/views/admin/book-comments/Browse.vue') },
+            ]
         }
     ]
-})
+});
 
 router.beforeEach((to, from, next) => {
     const isUnauthorized = unauthorized();
