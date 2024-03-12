@@ -1,0 +1,30 @@
+.page_header {
+    padding: 20px 0 40px 20px;
+    display: flex;
+    align-items: center;
+}
+
+.page_title {
+    margin: 0 20px 0 50px;
+}
+
+.page_actions button {
+    margin-right: 5px;
+}
+
+.page_body {
+    padding: 20px;
+}
+
+.search_field {
+    width: 500px;
+    margin-left: auto;
+    margin-bottom: 20px;
+}
+
+.action_buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px 0;
+}

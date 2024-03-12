@@ -1,50 +1,64 @@
 <template>
   <div>
     <h1>Books</h1>
-    <el-button type="primary" @click="handleAddNew">Add New</el-button>
-    <el-button type="danger" @click="handleBulkDelete">Bulk Delete</el-button>
-    <el-table :data="tableData">
-      <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="name" label="Name" sortable></el-table-column>
-      <el-table-column prop="displayName" label="Display Name"></el-table-column>
-      <el-table-column label="Actions">
-        <template #default="{ row }">
-          <el-button size="small" @click="handleView(row)">View</el-button>
-          <el-button size="small" @click="handleEdit(row)">Edit</el-button>
-          <el-button size="small" @click="handleDelete(row)">Delete</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <v-btn color="primary" @click="">Add New</v-btn>
+    <v-btn color="red" @click="">Bulk Delete</v-btn>
+
+    <v-card>
+      <!-- Added input fields for filters -->
+      <!-- <input type="text" placeholder="Filter by title" v-model="titleFilter" /> -->
+      <!-- <input type="text" placeholder="Filter by status" v-model="statusFilter" /> -->
+
+      <v-data-table :headers="headers" :items="serverItems" :loading="loading" :items-per-page="itemsPerPage"
+        :server-items-length="totalItems" @update:pagination="fetchItems">
+      </v-data-table>
+    </v-card>
   </div>
 </template>
 
-<script>
-export default {
-  name: "DataTable",
-  data() {
-    return {
-      tableData: [
-        { name: "Membership Admin", displayName: "Membership Admin" },
-        // ... more data
-      ],
-    };
-  },
-  methods: {
-    handleAddNew() {
-      // Logic for adding a new entry
-    },
-    handleBulkDelete() {
-      // Logic for bulk deletion
-    },
-    handleView(row) {
-      // Logic for viewing details
-    },
-    handleEdit(row) {
-      // Logic for editing an entry
-    },
-    handleDelete(row) {
-      // Logic for deleting an entry
-    },
-  },
-};
+<script setup>
+import { ref, onMounted } from 'vue';
+import { get } from '@/net/index.js';
+
+const serverItems = ref([]);
+const loading = ref(false);
+const totalItems = ref(0);
+const itemsPerPage = ref(5);
+const headers = ref([
+  { text: 'ID', value: 'id' },
+  { text: 'Username', value: 'username' },
+  { text: 'Email', value: 'email' },
+  { text: 'Phone Number', value: 'phoneNumber' },
+  { text: 'Bookshelf Visibility', value: 'bookshelfVisible' },
+  { text: 'Review Visibility', value: 'reviewVisible' },
+  { text: 'Contribution Visibility', value: 'contributionVisible' },
+  { text: 'Created Date', value: 'createdDate' },
+  { text: 'Actions' },
+]);
+
+function fetchItems({ page, itemsPerPage }) {
+  loading.value = true;
+  const url = '/api/users/';
+  const params = {
+    page,
+    size: itemsPerPage,
+  };
+
+  get(url, (data) => {
+    serverItems.value = data.records;
+    totalItems.value = data.total;
+    loading.value = false;
+
+  }, (error) => {
+    console.error('Fetch error:', error);
+    loading.value = false;
+  }, params);
+}
+
+onMounted(() => {
+  fetchItems({ page: 1, itemsPerPage: itemsPerPage.value });
+});
+
 </script>
+
+<style></style>
