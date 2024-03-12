@@ -127,7 +127,7 @@ import { EditPen, Lock, Message, User } from "@element-plus/icons-vue";
 import router from "@/router";
 import { reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
-import { get, post } from "@/net";
+import { get, post } from "@/net/index.js";
 
 const form = reactive({
   username: "",
@@ -257,7 +257,6 @@ const validateEmail = () => {
         }
       }, 1000);
     },
-    undefined,
     (message) => {
       ElMessage.warning(message);
       coldTime.value = 0;

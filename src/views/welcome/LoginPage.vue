@@ -11,7 +11,12 @@
     <div style="margin-top: 50px">
       <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item prop="email">
-          <el-input v-model="form.email" maxlength="50" type="text" placeholder="Email">
+          <el-input
+            v-model="form.email"
+            maxlength="50"
+            type="text"
+            placeholder="Email"
+          >
             <template #prefix>
               <el-icon>
                 <Message />
@@ -73,11 +78,13 @@
 </template>
 
 <script setup>
-import { Message, Lock } from "@element-plus/icons-vue";
 import router from "@/router";
+import { useStore } from "vuex";
 import { reactive, ref } from "vue";
-import { login } from "@/net";
+import { login } from "@/net/index.js";
+import { Message, Lock } from "@element-plus/icons-vue";
 
+const store = useStore();
 const formRef = ref();
 const form = reactive({
   email: "",
@@ -103,9 +110,16 @@ const rules = {
 function userLogin() {
   formRef.value.validate((isValid) => {
     if (isValid) {
-      login(form.email, form.password, form.remember, (roles) => {
+      login(form.email, form.password, form.remember, (data) => {
+        // Store user data in Vuex
+        store.dispatch("loginUser", {
+          username: data.username,
+          email: data.email,
+          roles: data.roles,
+        });
+
         // Check if the user has an admin role
-        if (roles && roles.includes("Admin")) {
+        if (data.roles && data.roles.includes("Admin")) {
           router.push("/admin");
         } else {
           router.push("/index");

@@ -32,6 +32,7 @@ function storeAccessToken(remember, token, expire) {
 
 function deleteAccessToken() {
     localStorage.removeItem(authItemName);
+    localStorage.removeItem('loginInfo');
     sessionStorage.removeItem(authItemName);
 }
 

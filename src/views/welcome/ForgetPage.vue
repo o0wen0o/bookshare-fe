@@ -139,7 +139,7 @@
 <script setup>
 import { reactive, ref } from "vue";
 import { EditPen, Lock, Message } from "@element-plus/icons-vue";
-import { get, post } from "@/net";
+import { get, post } from "@/net/index.js";
 import { ElMessage } from "element-plus";
 import router from "@/router";
 
