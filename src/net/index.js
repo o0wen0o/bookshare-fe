@@ -27,8 +27,15 @@ function internalPost(url, data, headers, success, failure, error = defaultError
     }).catch(err => error(err));
 }
 
-function internalGet(url, headers, success, failure, error = defaultError) {
-    axios.get(url, { headers: headers }).then(({ data }) => {
+function post(url, data, success, failure = defaultFailure) {
+    internalPost(url, data, accessHeader(), success, failure);
+}
+
+function internalGet(url, success, failure, params, error = defaultError) {
+    axios.get(url, {
+        headers: accessHeader(),
+        params: params
+    }).then(({ data }) => {
         if (data.code === 200)
             success(data.data);
         else
@@ -36,12 +43,24 @@ function internalGet(url, headers, success, failure, error = defaultError) {
     }).catch(err => error(err));
 }
 
-function post(url, data, success, failure = defaultFailure) {
-    internalPost(url, data, accessHeader(), success, failure);
+function get(url, success, failure = defaultFailure, params = {}) {
+    internalGet(url, success, failure, params);
 }
 
-function get(url, success, failure = defaultFailure) {
-    internalGet(url, accessHeader(), success, failure);
+function internalDelete(url, ids, success, failure, error = defaultError) {
+    axios.delete(url, {
+        headers: accessHeader(),
+        ids: ids
+    }).then(({ data }) => {
+        if (data.code === 200)
+            success();
+        else
+            failure(data.message, data.code, url);
+    }).catch(err => error(err));
+}
+
+function _delete(url, ids, success, failure = defaultFailure) {
+    internalDelete(url, ids, success, failure);
 }
 
 // remember is the checkbox
@@ -53,9 +72,11 @@ function login(email, password, remember, success, failure = defaultFailure) {
     }, {
         'Content-Type': 'application/x-www-form-urlencoded'
     }, (data) => {
+        // Store the access token to the local/session storage
         storeAccessToken(remember, data.token, data.expire);
+
         ElMessage.success(`Login successful, welcome ${data.username} to our system!`);
-        success(data.roles);
+        success(data);
     }, failure);
 }
 
@@ -71,4 +92,4 @@ function unauthorized() {
     return !takeAccessToken();
 }
 
-export { post, get, login, logout, unauthorized }
+export { post, get, _delete, login, logout, unauthorized }

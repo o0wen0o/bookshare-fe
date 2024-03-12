@@ -1,37 +1,70 @@
 <template>
   <el-header class="admin_header">
     <div>
-      <el-dropdown>
-        <div class="admin_account">
-          <el-avatar :size="32" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-          <span class="admin_info">
-            Admin
-            <el-icon>
-              <ArrowDownBold />
-            </el-icon>
-          </span>
-        </div>
-
-        <template #dropdown>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>
-              <el-button type="danger" @click="userLogout">Logout</el-button>
-            </el-dropdown-item>
-          </el-dropdown-menu>
+      <v-menu min-width="400px" rounded>
+        <template v-slot:activator="{ props }">
+          <v-btn icon v-bind="props">
+            <v-avatar size="48px">
+              <v-img
+                alt="Avatar"
+                src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
+              ></v-img>
+            </v-avatar>
+          </v-btn>
         </template>
-      </el-dropdown>
+
+        <v-card>
+          <v-card-text>
+            <div class="mx-auto text-center">
+              <v-avatar size="40px">
+                <v-img
+                  alt="Avatar"
+                  src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
+                ></v-img>
+              </v-avatar>
+
+              <h3>{{ userData.username || "John" }}</h3>
+
+              <p class="text-caption mt-1">
+                {{ userData.email || "john@hotmail.com" }}
+              </p>
+
+              <v-divider class="my-3"></v-divider>
+              <v-btn variant="text" rounded @click="profileInfo">
+                Profile Info
+              </v-btn>
+
+              <v-divider class="my-3"></v-divider>
+              <v-btn variant="text" rounded color="red" @click="logoutAccount">
+                Logout Account
+              </v-btn>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-menu>
     </div>
   </el-header>
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { logout } from "@/net";
 import router from "@/router";
-import { ArrowDownBold } from "@element-plus/icons-vue";
-import { ElDropdown, ElDropdownMenu, ElDropdownItem, ElButton } from "element-plus";
+import { useStore } from "vuex";
 
-function userLogout() {
-  logout(() => router.push("/"));
+const store = useStore();
+const userData = computed(() => store.state.user || {});
+
+function profileInfo() {
+  console.log(userData.value.username);
+  console.log(userData.value.email);
+  console.log(userData.value.roles);
+}
+
+function logoutAccount() {
+  logout(() => {
+    router.push("/");
+  });
 }
 </script>
 
@@ -40,16 +73,6 @@ function userLogout() {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 0 20px;
   border-bottom: 1px solid #e6e6e6;
-}
-
-.admin_account {
-  display: flex;
-  align-items: center;
-}
-
-.admin_info {
-  margin-left: 8px;
 }
 </style>

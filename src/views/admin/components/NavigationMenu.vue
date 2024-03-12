@@ -2,7 +2,7 @@
   <el-row class="nav_row">
     <el-col>
       <div class="nav_header">
-        <h1 style="text-align: center" v-if="!isCollapsed">Admin Panel</h1>
+        <h1 class="nav_title" v-if="!isCollapsed">Admin Panel</h1>
       </div>
 
       <el-menu default-active="1" class="navigation_menu" :collapse="isCollapsed" @mouseenter="isCollapsed = false"
@@ -61,6 +61,11 @@ function navigateTo(route) {
   border: 1px solid #e6e6e6;
   background-image: url("https://bookshare-fyp.oss-ap-southeast-3.aliyuncs.com/mapple_leaf_background.jpg");
   background-size: cover;
+}
+
+.nav_title {
+  text-align: center;
+  line-height: 58.4px;
 }
 
 .navigation_menu {
