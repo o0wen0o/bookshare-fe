@@ -14,10 +14,5 @@
 
 .page_body {
     padding: 20px;
-}
-
-.search_field {
-    width: 500px;
-    margin-left: auto;
-    margin-bottom: 20px;
+    width: 100%;
 }

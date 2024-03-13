@@ -7,7 +7,7 @@
             <v-avatar size="48px">
               <v-img
                 alt="Avatar"
-                src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
+                src="https://bookshare-fyp.oss-ap-southeast-3.aliyuncs.com/default_avatar.png"
               ></v-img>
             </v-avatar>
           </v-btn>
@@ -19,7 +19,7 @@
               <v-avatar size="40px">
                 <v-img
                   alt="Avatar"
-                  src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
+                  src="https://bookshare-fyp.oss-ap-southeast-3.aliyuncs.com/default_avatar.png"
                 ></v-img>
               </v-avatar>
 

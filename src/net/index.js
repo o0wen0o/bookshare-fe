@@ -18,19 +18,7 @@ const defaultFailure = (message, status, url) => {
     ElMessage.warning(message);
 }
 
-function internalPost(url, data, headers, success, failure, error = defaultError) {
-    axios.post(url, data, { headers: headers }).then(({ data }) => {
-        if (data.code === 200)
-            success(data.data); // data after 'then' is the response data
-        else
-            failure(data.message, data.code, url);
-    }).catch(err => error(err));
-}
-
-function post(url, data, success, failure = defaultFailure) {
-    internalPost(url, data, accessHeader(), success, failure);
-}
-
+// Get Method
 function internalGet(url, success, failure, params, error = defaultError) {
     axios.get(url, {
         headers: accessHeader(),
@@ -47,10 +35,38 @@ function get(url, success, failure = defaultFailure, params = {}) {
     internalGet(url, success, failure, params);
 }
 
+// Post Method
+function internalPost(url, data, headers, success, failure, error = defaultError) {
+    axios.post(url, data, { headers: headers }).then(({ data }) => {
+        if (data.code === 200)
+            success(data.data); // data after 'then' is the response data
+        else
+            failure(data.message, data.code, url);
+    }).catch(err => error(err));
+}
+
+function post(url, data, success, failure = defaultFailure) {
+    internalPost(url, data, accessHeader(), success, failure);
+}
+
+// Put Method
+function internalPut(url, data, headers, success, failure, error = defaultError) {
+    axios.put(url, data, { headers: headers }).then(({ data }) => {
+        if (data.code === 200)
+            success(data.data); // data after 'then' is the response data
+        else
+            failure(data.message, data.code, url);
+    }).catch(err => error(err));
+}
+
+function put(url, data, success, failure = defaultFailure) {
+    internalPut(url, data, accessHeader(), success, failure);
+}
+
+// Delete Method
 function internalDelete(url, ids, success, failure, error = defaultError) {
-    axios.delete(url, {
-        headers: accessHeader(),
-        ids: ids
+    axios.delete(`${url}/${ids}`, {
+        headers: accessHeader()
     }).then(({ data }) => {
         if (data.code === 200)
             success();
@@ -92,4 +108,4 @@ function unauthorized() {
     return !takeAccessToken();
 }
 
-export { post, get, _delete, login, logout, unauthorized }
+export { get, post, put, _delete, login, logout, unauthorized }

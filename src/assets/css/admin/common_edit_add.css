@@ -14,10 +14,11 @@
 
 .page_body {
     padding: 20px;
+    width: 100%;
 }
 
-.search_field {
-    width: 500px;
-    margin-left: auto;
-    margin-bottom: 20px;
+.preview_image {
+    margin-top: 10px;
+    max-width: 200px;
+    max-height: 200px;
 }

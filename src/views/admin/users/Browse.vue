@@ -3,10 +3,15 @@
     <div class="page_header">
       <h1 class="page_title">Users</h1>
       <div class="page_actions">
-        <v-btn color="primary" prepend-icon="mdi-plus" @click="createItem()">
-          Add New
-        </v-btn>
-        <v-btn color="red" prepend-icon="mdi-delete" @click="bulkDelete()">
+        <router-link :to="`${$route.path}/create`">
+          <v-btn color="primary" prepend-icon="mdi-plus">Add New</v-btn>
+        </router-link>
+
+        <v-btn
+          color="red"
+          prepend-icon="mdi-delete"
+          @click="prepareDeleteItem(selected)"
+        >
           Bulk Delete
         </v-btn>
       </div>
@@ -76,93 +81,39 @@
         <!-- Created Date -->
         <template #item.createdDate="{ item }">
           <div>
-            {{ formatDate(item.createdDate) }}
+            {{ formatDatetime(item.createdDate) }}
           </div>
         </template>
 
         <!-- Actions -->
         <template #item.actions="{ item }">
-          <div class="action_buttons">
-            <v-btn
-              color="warning"
-              prepend-icon="mdi-eye"
-              size="small"
-              width="90%"
-              @click="viewItem(item.id)"
-            >
-              View
-            </v-btn>
-
-            <v-btn
-              color="blue"
-              prepend-icon="mdi-pencil"
-              size="small"
-              width="90%"
-              @click="editItem(item.id)"
-            >
-              Edit
-            </v-btn>
-
-            <v-btn
-              color="red"
-              prepend-icon="mdi-delete"
-              size="small"
-              width="90%"
-              @click="prepareDeleteItem(item.id)"
-            >
-              Delete
-            </v-btn>
-          </div>
+          <DataTableActions
+            :item="item"
+            @prepare-delete-item="prepareDeleteItem(ids)"
+          ></DataTableActions>
         </template>
       </v-data-table-server>
     </v-card>
 
     <!-- Delete Confirmation -->
-    <v-dialog v-model="dialog" max-width="350">
-      <v-card
-        max-width="400"
-        prepend-icon="mdi-alert-circle"
-        text="Are you sure you want to delete it?"
-        title="Confirm Delete"
-      >
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn class="text-none" rounded="xl" @click="dialog = false">
-            Cancel
-          </v-btn>
-          <v-btn
-            class="text-none"
-            color="red"
-            rounded="xl"
-            variant="flat"
-            @click="bulkDelete(deleteItemId)"
-          >
-            Delete
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DeleteConfirmationDialog
+      v-model="dialog"
+      @confirm-delete="bulkDelete"
+    ></DeleteConfirmationDialog>
   </div>
 </template>
 
 <script setup>
+import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { get, _delete } from "@/net/index.js";
-import { formatDate } from "@/assets/js/admin/common_dataTable.js";
-import * as useTableActions from "@/assets/js/admin/common_dataTable.js";
-import { ElMessage } from "element-plus";
+import { formatDatetime } from "@/assets/js/admin/common_browse.js";
+import * as useTableActions from "@/assets/js/admin/common_browse.js";
+import DataTableActions from "@/views/admin/components/DataTableActions.vue";
+import DeleteConfirmationDialog from "@/views/admin/components/DeleteConfirmationDialog.vue";
 
-const router = useRouter();
+const route = useRoute();
 const dialog = ref(false); // Controls the visibility of the dialog
-const deleteItemId = ref();
-
-// Wrap the functions to pass the router instance
-const createItem = () => useTableActions.createItem(router);
-const viewItem = (id) => useTableActions.viewItem(router, id);
-const editItem = (id) => useTableActions.editItem(router, id);
-const prepareDeleteItem = (id) =>
-  useTableActions.prepareDeleteItem(deleteItemId, dialog, id);
+const deleteItemId = ref([]);
 
 const selected = ref([]);
 const search = ref([]);
@@ -192,57 +143,35 @@ const headers = ref([
   { title: "Actions", value: "actions", sortable: false },
 ]);
 
-function fetchItems() {
-  loading.value = true;
-  const url = "/api/users/";
-  const params = {
-    current: page.value,
-    size: itemsPerPage.value,
-    filter: search.value,
-  };
+// Wrap the functions to pass the router instance
+const prepareDeleteItem = (id) =>
+  useTableActions.prepareDeleteItem(deleteItemId, dialog, id);
 
-  get(
-    url,
-    (data) => {
-      items.value = data.records;
-      totalItems.value = data.total;
-      loading.value = false;
-    },
-    (message) => {
-      ElMessage.warning(message);
-    },
-    params
+const performSearch = () => useTableActions.performSearch(page, fetchItems);
+
+const updateItemsPerPage = (newItemsPerPage) =>
+  useTableActions.updateItemsPerPage(itemsPerPage, newItemsPerPage, fetchItems);
+
+const updatePage = (newPage) =>
+  useTableActions.updatePage(page, newPage, fetchItems);
+
+const fetchItems = () =>
+  useTableActions.fetchItems(
+    loading,
+    items,
+    totalItems,
+    page,
+    itemsPerPage,
+    search,
+    route
   );
-}
+
+const bulkDelete = (ids = selected.value) =>
+  useTableActions.bulkDelete(route, ids, dialog, fetchItems);
 
 onMounted(() => {
   fetchItems();
 });
-
-const performSearch = () => {
-  page.value = 1; // Reset to first page
-  fetchItems();
-};
-
-// Update the items per page for data table
-const updateItemsPerPage = (newItemsPerPage) => {
-  itemsPerPage.value = newItemsPerPage;
-  fetchItems();
-};
-
-// Update the page for data table
-const updatePage = (newPage) => {
-  page.value = newPage;
-  fetchItems();
-};
-
-const bulkDelete = (ids = selected.value) => {
-  _delete("/api/users/bulk-delete", ids, () => {
-    ElMessage.success("Items deleted successfully");
-  });
-
-  dialog.value = false; // Close the dialog
-};
 </script>
 
 <style scoped>

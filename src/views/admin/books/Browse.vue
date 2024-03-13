@@ -1,64 +1,159 @@
 <template>
   <div>
-    <h1>Books</h1>
-    <v-btn color="primary" @click="">Add New</v-btn>
-    <v-btn color="red" @click="">Bulk Delete</v-btn>
+    <div class="page_header">
+      <h1 class="page_title">Books</h1>
 
-    <v-card>
-      <!-- Added input fields for filters -->
-      <!-- <input type="text" placeholder="Filter by title" v-model="titleFilter" /> -->
-      <!-- <input type="text" placeholder="Filter by status" v-model="statusFilter" /> -->
+      <div class="page_actions">
+        <router-link :to="`${$route.path}/create`">
+          <v-btn color="primary" prepend-icon="mdi-plus">Add New</v-btn>
+        </router-link>
 
-      <v-data-table :headers="headers" :items="serverItems" :loading="loading" :items-per-page="itemsPerPage"
-        :server-items-length="totalItems" @update:pagination="fetchItems">
-      </v-data-table>
+        <v-btn
+          color="red"
+          prepend-icon="mdi-delete"
+          @click="prepareDeleteItem(selected)"
+        >
+          Bulk Delete
+        </v-btn>
+      </div>
+    </div>
+
+    <v-card class="page_body" elevation="3">
+      <v-text-field
+        class="search_field"
+        v-model="search"
+        density="compact"
+        label="Search"
+        prepend-inner-icon="mdi-magnify"
+        variant="solo-filled"
+        hide-details
+        @keyup.enter="performSearch"
+      ></v-text-field>
+
+      <v-data-table-server
+        class="data_table"
+        v-model="selected"
+        :headers="headers"
+        :loading="loading"
+        :items="items"
+        :items-length="totalItems"
+        :items-per-page="itemsPerPage"
+        :items-per-page-options="itemsPerPageOptions"
+        @update:items-per-page="updateItemsPerPage"
+        @update:page="updatePage"
+        show-select
+        show-current-page
+        hover
+      >
+        <!-- Publication Date -->
+        <template #item.publicationDate="{ item }">
+          <div>
+            {{ formatDate(item.publicationDate) }}
+          </div>
+        </template>
+
+        <!-- Rating -->
+        <template v-slot:item.rating="{ item }">
+          <v-rating
+            :model-value="item.rating"
+            color="orange-darken-2"
+            density="compact"
+            size="small"
+            readonly
+          ></v-rating>
+        </template>
+
+        <!-- Actions -->
+        <template #item.actions="{ item }">
+          <DataTableActions
+            :item="item"
+            @prepare-delete-item="prepareDeleteItem(ids)"
+          ></DataTableActions>
+        </template>
+      </v-data-table-server>
     </v-card>
+
+    <!-- Delete Confirmation -->
+    <DeleteConfirmationDialog
+      v-model="dialog"
+      @confirm-delete="bulkDelete"
+    ></DeleteConfirmationDialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { get } from '@/net/index.js';
+import { useRoute } from "vue-router";
+import { ref, onMounted } from "vue";
+import { formatDate } from "@/assets/js/admin/common_browse.js";
+import * as useTableActions from "@/assets/js/admin/common_browse.js";
+import DataTableActions from "@/views/admin/components/DataTableActions.vue";
+import DeleteConfirmationDialog from "@/views/admin/components/DeleteConfirmationDialog.vue";
 
-const serverItems = ref([]);
+const route = useRoute();
+const dialog = ref(false); // Controls the visibility of the dialog
+const deleteItemId = ref([]);
+
+const selected = ref([]);
+const search = ref([]);
 const loading = ref(false);
+const items = ref([]);
 const totalItems = ref(0);
+const page = ref(1);
 const itemsPerPage = ref(5);
-const headers = ref([
-  { text: 'ID', value: 'id' },
-  { text: 'Username', value: 'username' },
-  { text: 'Email', value: 'email' },
-  { text: 'Phone Number', value: 'phoneNumber' },
-  { text: 'Bookshelf Visibility', value: 'bookshelfVisible' },
-  { text: 'Review Visibility', value: 'reviewVisible' },
-  { text: 'Contribution Visibility', value: 'contributionVisible' },
-  { text: 'Created Date', value: 'createdDate' },
-  { text: 'Actions' },
+
+const itemsPerPageOptions = ref([
+  { value: 5, title: "5" },
+  { value: 10, title: "10" },
+  { value: 25, title: "25" },
+  { value: 50, title: "50" },
+  // { value: -1, title: "$vuetify.dataFooter.itemsPerPageAll" },
 ]);
 
-function fetchItems({ page, itemsPerPage }) {
-  loading.value = true;
-  const url = '/api/users/';
-  const params = {
+const headers = ref([
+  { title: "ID", value: "id" },
+  { title: "Title", value: "title" },
+  { title: "Author", value: "author" },
+  { title: "Publisher", value: "publisher" },
+  { title: "ISBN", value: "isbn" },
+  { title: "Publication Date", value: "publicationDate" },
+  { title: "Language", value: "language" },
+  { title: "Rating", value: "rating" },
+  { title: "Favourite", value: "favourite" },
+  { title: "Review", value: "review" },
+  { title: "Actions", value: "actions", sortable: false },
+]);
+
+// Wrap the functions to pass the router instance
+const prepareDeleteItem = (ids) =>
+  useTableActions.prepareDeleteItem(deleteItemId, dialog, ids);
+
+const performSearch = () => useTableActions.performSearch(page, fetchItems);
+
+const updateItemsPerPage = (newItemsPerPage) =>
+  useTableActions.updateItemsPerPage(itemsPerPage, newItemsPerPage, fetchItems);
+
+const updatePage = (newPage) =>
+  useTableActions.updatePage(page, newPage, fetchItems);
+
+const fetchItems = () =>
+  useTableActions.fetchItems(
+    loading,
+    items,
+    totalItems,
     page,
-    size: itemsPerPage,
-  };
+    itemsPerPage,
+    search,
+    route
+  );
 
-  get(url, (data) => {
-    serverItems.value = data.records;
-    totalItems.value = data.total;
-    loading.value = false;
-
-  }, (error) => {
-    console.error('Fetch error:', error);
-    loading.value = false;
-  }, params);
-}
+const bulkDelete = (ids = selected.value) =>
+  useTableActions.bulkDelete(route, ids, dialog, fetchItems);
 
 onMounted(() => {
-  fetchItems({ page: 1, itemsPerPage: itemsPerPage.value });
+  fetchItems();
 });
-
 </script>
 
-<style></style>
+<style scoped>
+@import "@/assets/css/admin/common_browse.css";
+</style>

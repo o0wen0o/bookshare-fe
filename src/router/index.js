@@ -34,7 +34,12 @@ const router = createRouter({
                 { path: '/users/:id/edit', name: 'users-edit', component: () => import('@/views/admin/users/EditAdd.vue') },
 
                 { path: '/roles', name: 'roles', component: () => import('@/views/admin/roles/Browse.vue') },
+                
                 { path: '/books', name: 'books', component: () => import('@/views/admin/books/Browse.vue') },
+                { path: '/books/:id', name: 'books-read', component: () => import('@/views/admin/books/Read.vue') },
+                { path: '/books/create', name: 'books-create', component: () => import('@/views/admin/books/EditAdd.vue') },
+                { path: '/books/:id/edit', name: 'books-edit', component: () => import('@/views/admin/books/EditAdd.vue') },
+                
                 { path: '/book-comments', name: 'book-comments', component: () => import('@/views/admin/book-comments/Browse.vue') },
             ]
         }

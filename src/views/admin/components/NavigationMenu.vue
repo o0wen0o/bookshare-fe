@@ -5,9 +5,16 @@
         <h1 class="nav_title" v-if="!isCollapsed">Admin Panel</h1>
       </div>
 
-      <el-menu default-active="1" class="navigation_menu" :collapse="isCollapsed" @mouseenter="isCollapsed = false"
-        @mouseleave="isCollapsed = true" background-color="rgb(180, 60, 0)" text-color="#fff"
-        active-text-color="#ffd04b">
+      <el-menu
+        default-active="1"
+        class="navigation_menu"
+        :collapse="isCollapsed"
+        @mouseenter="isCollapsed = false"
+        @mouseleave="isCollapsed = true"
+        background-color="rgb(180, 60, 0)"
+        text-color="#fff"
+        active-text-color="#ffd04b"
+      >
         <el-sub-menu index="1">
           <template #title>
             <el-icon>
@@ -16,12 +23,16 @@
             <span>User</span>
           </template>
 
-          <el-menu-item index="1-1" @click="navigateTo('/users')">Users</el-menu-item>
-          <el-menu-item index="1-2" @click="navigateTo('/roles')">Roles</el-menu-item>
+          <el-menu-item index="1-1" @click="navigateTo('/users')">
+            Users
+          </el-menu-item>
+          
+          <el-menu-item index="1-2" @click="navigateTo('/roles')">
+            Roles
+          </el-menu-item>
         </el-sub-menu>
 
         <el-sub-menu index="2">
-
           <template #title>
             <el-icon>
               <icon-menu />
@@ -29,8 +40,12 @@
             <span>Book</span>
           </template>
 
-          <el-menu-item index="2-1" @click="navigateTo('/books')">Books</el-menu-item>
-          <el-menu-item index="2-2" @click="navigateTo('/book-comments')">Book Comments</el-menu-item>
+          <el-menu-item index="2-1" @click="navigateTo('/books')">
+            Books
+          </el-menu-item>
+          <el-menu-item index="2-2" @click="navigateTo('/book-comments')">
+            Book Comments
+          </el-menu-item>
         </el-sub-menu>
       </el-menu>
     </el-col>
@@ -39,10 +54,10 @@
 
 <script setup>
 import { ref } from "vue";
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 import { Menu as IconMenu, Location } from "@element-plus/icons-vue";
 
-const router = useRouter()
+const router = useRouter();
 const isCollapsed = ref(true);
 
 function navigateTo(route) {
