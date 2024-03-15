@@ -2,15 +2,15 @@
   <el-row class="nav_row">
     <el-col>
       <div class="nav_header">
-        <h1 class="nav_title" v-if="!isCollapsed">Admin Panel</h1>
+        <h1 class="nav_title" v-if="menuCollapsed ? !isCollapsed : true">Admin Panel</h1>
       </div>
 
       <el-menu
         default-active="1"
         class="navigation_menu"
-        :collapse="isCollapsed"
-        @mouseenter="isCollapsed = false"
-        @mouseleave="isCollapsed = true"
+        :collapse="menuCollapsed ? isCollapsed : menuCollapsed"
+        @mouseenter="menuCollapsed ? isCollapsed = false : false"
+        @mouseleave="menuCollapsed ? isCollapsed = true : false"
         background-color="rgb(180, 60, 0)"
         text-color="#fff"
         active-text-color="#ffd04b"
@@ -26,7 +26,7 @@
           <el-menu-item index="1-1" @click="navigateTo('/users')">
             Users
           </el-menu-item>
-          
+
           <el-menu-item index="1-2" @click="navigateTo('/roles')">
             Roles
           </el-menu-item>
@@ -53,12 +53,15 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 import { Menu as IconMenu, Location } from "@element-plus/icons-vue";
 
 const router = useRouter();
-const isCollapsed = ref(true);
+const store = useStore();
+const menuCollapsed = computed(() => store.state.menuCollapsed); // control by header
+const isCollapsed = ref(true); // use for current file
 
 function navigateTo(route) {
   router.push(route);

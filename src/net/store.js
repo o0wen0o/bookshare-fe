@@ -12,16 +12,23 @@ const store = createStore({
     state() {
         return {
             user: null, // This will hold our user data
+            menuCollapsed: true, // navigation menu
         };
     },
     mutations: {
         setUser(state, userData) {
             state.user = userData;
         },
+        toggleMenuCollapse(state) {
+            state.menuCollapsed = !state.menuCollapsed;
+        },
     },
     actions: {
         loginUser({ commit }, userData) {
             commit('setUser', userData);
+        },
+        toggleMenuCollapse({ commit }) {
+            commit('toggleMenuCollapse');
         },
     },
     getters: {

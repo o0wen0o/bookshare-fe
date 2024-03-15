@@ -2,16 +2,12 @@
   <div>
     <el-container class="admin_container">
       <el-aside width="auto">
-        <navigation-menu />
+        <navigation-menu :menuStatus="menuStatus" />
       </el-aside>
 
       <el-container style="flex-direction: column;">
         <div>
-          <!-- <el-breadcrumb separator-class="el-icon-arrow-right">
-            <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
-            <el-breadcrumb-item v-text="this.$router.currentRoute.name"></el-breadcrumb-item>
-          </el-breadcrumb> -->
-          <admin-header />
+          <admin-header :menuStatus="menuStatus" />
         </div>
 
         <el-main>
@@ -27,8 +23,11 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import NavigationMenu from "@/views/admin/components/NavigationMenu.vue";
 import AdminHeader from "@/views/admin/components/AdminHeader.vue";
+
+const menuStatus = ref(true);
 </script>
 
 <style scoped>
