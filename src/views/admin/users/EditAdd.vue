@@ -27,19 +27,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page_header {
-  padding: 20px 0 40px 20px;
-  display: flex;
-  align-items: center;
-}
-
-.page_title {
-  margin: 0 20px 0 50px;
-}
-
-.page_body {
-  padding: 20px;
-  height: 500px;
-  width: 100%;
-}
+@import "@/assets/css/admin/common_edit_add.css";
 </style>

@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title">{{ isEdit ? "Edit" : "Add" }} Book</h1>
+      <h1 class="page_title">
+        {{ isEdit ? "Edit" : "Add" }} {{ capitalizeRouteName($route.name) }}
+      </h1>
 
       <div class="page_actions">
         <router-link :to="{ path: '/books' }">
@@ -85,7 +87,13 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
-import { get, post, put } from "@/net/index.js";
+import { get } from "@/net/index.js";
+import {
+  capitalizeRouteName,
+  getRouteNameForApi,
+  getTextRequiredRule,
+} from "@/assets/js/admin/common_edit_add.js";
+import * as commonEditAddFunction from "@/assets/js/admin/common_edit_add.js";
 
 const router = useRouter();
 const route = useRoute();
@@ -115,24 +123,12 @@ const book = ref({
 });
 
 const rules = {
-  title: [
-    { required: true, message: "Please enter the title", trigger: "blur" },
-  ],
-  author: [
-    { required: true, message: "Please enter the author", trigger: "blur" },
-  ],
-  description: [
-    {
-      required: true,
-      message: "Please enter the description",
-      trigger: "blur",
-    },
-  ],
-  publisher: [
-    { required: true, message: "Please enter the publisher", trigger: "blur" },
-  ],
+  title: [getTextRequiredRule("Please enter the title")],
+  author: [getTextRequiredRule("Please enter the author")],
+  description: [getTextRequiredRule("Please enter the description")],
+  publisher: [getTextRequiredRule("Please enter the publisher")],
   isbn: [
-    { required: true, message: "Please enter the ISBN", trigger: "blur" },
+    getTextRequiredRule("Please enter the ISBN"),
     {
       pattern: /^\d{10}(\d{3})?$/,
       message: "Please enter a valid ISBN",
@@ -140,32 +136,28 @@ const rules = {
     },
   ],
   publicationDate: [
-    {
-      required: true,
-      message: "Please select the publication date",
-      trigger: "change",
-    },
+    getTextRequiredRule("Please select the publication date", "change"),
   ],
   page: [
-    { required: true, message: "Please enter the page count", trigger: "blur" },
+    getTextRequiredRule("Please enter the page count"),
     {
       pattern: /^[1-9]\d*$/, // Positive integers greater than zero
       message: "Page count must greater than zero",
       trigger: "blur",
     },
   ],
-  language: [
-    {
-      required: true,
-      message: "Please select the language",
-      trigger: "change",
-    },
-  ],
+  language: [getTextRequiredRule("Please select the language", "change")],
   imgUrl: [
-    { required: true, message: "Please enter the image URL", trigger: "blur" },
+    getTextRequiredRule("Please enter the image url"),
     { type: "url", message: "Please enter a valid URL", trigger: "blur" },
   ],
 };
+
+const previewImage = () =>
+  commonEditAddFunction.previewImage(imagePreview, book.value.imgUrl);
+
+const submitForm = () =>
+  commonEditAddFunction.submitForm(bookForm, book, id, isEdit, router, route);
 
 onMounted(() => {
   id.value = route.params.id;
@@ -174,10 +166,10 @@ onMounted(() => {
   if (isEdit.value) {
     // Fetch book data based on id
     get(
-      `/api/books/${id.value}`,
+      `/api/${getRouteNameForApi(route.name)}/${id.value}`,
       (data) => {
         book.value = data;
-        imagePreview.value = book.value.imgUrl; // Update the image preview
+        previewImage(); // Update the image preview
       },
       (error) => {
         ElMessage.error(error);
@@ -185,40 +177,6 @@ onMounted(() => {
     );
   }
 });
-
-function submitForm() {
-  bookForm.value.validate((valid) => {
-    if (valid) {
-      const successCallback = () => {
-        ElMessage.success("Saved successfully");
-        router.push(`/books/${id.value}`);
-      };
-
-      const errorCallback = (error) => {
-        ElMessage.error(error);
-      };
-
-      if (isEdit.value) {
-        put(
-          `/api/books/${id.value}/update`,
-          book.value,
-          successCallback,
-          errorCallback
-        );
-      } else {
-        post("/api/books/create", book.value, successCallback, errorCallback);
-      }
-    } else {
-      ElMessage.error("Please correct the errors in the form");
-      return false;
-    }
-  });
-}
-
-function previewImage() {
-  // Set imagePreview to the URL entered by the user
-  imagePreview.value = book.value.imgUrl;
-}
 </script>
 
 <style scoped>

@@ -28,6 +28,7 @@ const router = createRouter({
             meta: { requiresAuth: true, requiresAdmin: true },
             redirect: 'users',
             children: [
+                // User
                 { path: '/users', name: 'users', component: () => import('@/views/admin/users/Browse.vue') },
                 { path: '/users/:id', name: 'users-read', component: () => import('@/views/admin/users/Read.vue') },
                 { path: '/users/create', name: 'users-create', component: () => import('@/views/admin/users/EditAdd.vue') },
@@ -35,12 +36,37 @@ const router = createRouter({
 
                 { path: '/roles', name: 'roles', component: () => import('@/views/admin/roles/Browse.vue') },
                 
+                // Book
                 { path: '/books', name: 'books', component: () => import('@/views/admin/books/Browse.vue') },
                 { path: '/books/:id', name: 'books-read', component: () => import('@/views/admin/books/Read.vue') },
                 { path: '/books/create', name: 'books-create', component: () => import('@/views/admin/books/EditAdd.vue') },
                 { path: '/books/:id/edit', name: 'books-edit', component: () => import('@/views/admin/books/EditAdd.vue') },
                 
-                { path: '/book-comments', name: 'book-comments', component: () => import('@/views/admin/book-comments/Browse.vue') },
+                { path: '/genres', name: 'genres', component: () => import('@/views/admin/genres/Browse.vue') },
+                { path: '/genres/:id', name: 'genres-read', component: () => import('@/views/admin/genres/Read.vue') },
+                { path: '/genres/create', name: 'genres-create', component: () => import('@/views/admin/genres/EditAdd.vue') },
+                { path: '/genres/:id/edit', name: 'genres-edit', component: () => import('@/views/admin/genres/EditAdd.vue') },
+                
+                // { path: '/book-submissions', name: 'book-submissions', component: () => import('@/views/admin/book-submissions/Browse.vue') },
+                // { path: '/book-submissions/:id', name: 'book-submissions-read', component: () => import('@/views/admin/book-submissions/Read.vue') },
+                
+                // // Post
+                // { path: '/posts', name: 'posts', component: () => import('@/views/admin/posts/Browse.vue') },
+                // { path: '/posts/:id', name: 'posts-read', component: () => import('@/views/admin/posts/Read.vue') },
+
+                // // Fundraising
+                // { path: '/fundraising-organizers', name: 'fundraising-organizers', component: () => import('@/views/admin/fundraising-organizers/Browse.vue') },
+                // { path: '/fundraising-organizers/:id', name: 'fundraising-organizers-read', component: () => import('@/views/admin/fundraising-organizers/Read.vue') },
+                // { path: '/fundraising-organizers/create', name: 'fundraising-organizers-create', component: () => import('@/views/admin/fundraising-organizers/EditAdd.vue') },
+                // { path: '/fundraising-organizers/:id/edit', name: 'fundraising-organizers-edit', component: () => import('@/views/admin/fundraising-organizers/EditAdd.vue') },
+
+                // { path: '/fundraising-projects', name: 'fundraising-projects', component: () => import('@/views/admin/fundraising-projects/Browse.vue') },
+                // { path: '/fundraising-projects/:id', name: 'fundraising-projects-read', component: () => import('@/views/admin/fundraising-projects/Read.vue') },
+                // { path: '/fundraising-projects/create', name: 'fundraising-projects-create', component: () => import('@/views/admin/fundraising-projects/EditAdd.vue') },
+                // { path: '/fundraising-projects/:id/edit', name: 'fundraising-projects-edit', component: () => import('@/views/admin/fundraising-projects/EditAdd.vue') },
+
+                // { path: '/donations', name: 'donations', component: () => import('@/views/admin/donations/Browse.vue') },
+                // { path: '/donations/:id', name: 'donations-read', component: () => import('@/views/admin/donations/Read.vue') },
             ]
         }
     ]

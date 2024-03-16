@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title">Books</h1>
+      <h1 class="page_title" :style="{ textTransform: 'capitalize' }">{{ $route.name }}</h1>
 
       <div class="page_actions">
         <router-link :to="`${$route.path}/create`">
@@ -31,7 +31,6 @@
       ></v-text-field>
 
       <v-data-table-server
-        class="data_table"
         v-model="selected"
         :headers="headers"
         :loading="loading"
@@ -85,7 +84,7 @@
 import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
 import { formatDate } from "@/assets/js/admin/common_browse.js";
-import * as useTableActions from "@/assets/js/admin/common_browse.js";
+import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
 import DataTableActions from "@/views/admin/components/DataTableActions.vue";
 import DeleteConfirmationDialog from "@/views/admin/components/DeleteConfirmationDialog.vue";
 
@@ -125,18 +124,18 @@ const headers = ref([
 
 // Wrap the functions to pass the router instance
 const prepareDeleteItem = (ids) =>
-  useTableActions.prepareDeleteItem(deleteItemId, dialog, ids);
+  commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, ids);
 
-const performSearch = () => useTableActions.performSearch(page, fetchItems);
+const performSearch = () => commonBrowseFunction.performSearch(page, fetchItems);
 
 const updateItemsPerPage = (newItemsPerPage) =>
-  useTableActions.updateItemsPerPage(itemsPerPage, newItemsPerPage, fetchItems);
+  commonBrowseFunction.updateItemsPerPage(itemsPerPage, newItemsPerPage, fetchItems);
 
 const updatePage = (newPage) =>
-  useTableActions.updatePage(page, newPage, fetchItems);
+  commonBrowseFunction.updatePage(page, newPage, fetchItems);
 
 const fetchItems = () =>
-  useTableActions.fetchItems(
+  commonBrowseFunction.fetchItems(
     loading,
     items,
     totalItems,
@@ -147,7 +146,7 @@ const fetchItems = () =>
   );
 
 const bulkDelete = (ids = selected.value) =>
-  useTableActions.bulkDelete(route, ids, dialog, fetchItems);
+  commonBrowseFunction.bulkDelete(route, ids, dialog, fetchItems);
 
 onMounted(() => {
   fetchItems();
