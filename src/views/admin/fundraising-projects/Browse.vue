@@ -2,7 +2,7 @@
   <div>
     <div class="page_header">
       <h1 class="page_title" :style="{ textTransform: 'capitalize' }">{{ $route.name }}</h1>
-      
+
       <div class="page_actions">
         <router-link :to="`${$route.path}/create`">
           <v-btn color="primary" prepend-icon="mdi-plus">Add New</v-btn>
@@ -44,40 +44,6 @@
         show-current-page
         hover
       >
-        <!-- Visiblity -->
-        <template #item.bookshelfVisible="{ item }">
-          <div>
-            <v-chip
-              variant="tonal"
-              :color="item.bookshelfVisible ? 'success' : 'primary'"
-            >
-              {{ item.bookshelfVisible ? "Public" : "Private" }}
-            </v-chip>
-          </div>
-        </template>
-
-        <template #item.reviewVisible="{ item }">
-          <div>
-            <v-chip
-              variant="tonal"
-              :color="item.reviewVisible ? 'success' : 'primary'"
-            >
-              {{ item.reviewVisible ? "Public" : "Private" }}
-            </v-chip>
-          </div>
-        </template>
-
-        <template #item.contributionVisible="{ item }">
-          <div>
-            <v-chip
-              variant="tonal"
-              :color="item.contributionVisible ? 'success' : 'primary'"
-            >
-              {{ item.contributionVisible ? "Public" : "Private" }}
-            </v-chip>
-          </div>
-        </template>
-
         <!-- Created Date -->
         <template #item.createdDate="{ item }">
           <div>
@@ -106,7 +72,7 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
-import { formatDatetime } from "@/assets/js/admin/common_browse.js";
+import { formatDatetime, formatDate } from "@/assets/js/admin/common_browse.js";
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
 import DataTableActions from "@/views/admin/components/DataTableActions.vue";
 import DeleteConfirmationDialog from "@/views/admin/components/DeleteConfirmationDialog.vue";
@@ -133,19 +99,21 @@ const itemsPerPageOptions = ref([
 
 const headers = ref([
   { title: "ID", value: "id" },
-  { title: "Username", value: "username" },
-  { title: "Email", value: "email" },
-  { title: "Phone Number", value: "phoneNumber" },
-  { title: "Bookshelf Visibility", value: "bookshelfVisible" },
-  { title: "Review Visibility", value: "reviewVisible" },
-  { title: "Contribution Visibility", value: "contributionVisible" },
+  { title: "Project Name", value: "projectName" },
+  { title: "Description", value: "description" },
+  { title: "Start Date", value: "startDate" },
+  { title: "End Date", value: "endDate" },
+  { title: "Goal Amount", value: "goalAmount" },
+  { title: "Current Amount", value: "currentAmount" },
+  { title: "Status", value: "status" },
+  { title: "Organizer ID", value: "organizerId" },
   { title: "Created Date", value: "createdDate" },
   { title: "Actions", value: "actions", sortable: false },
 ]);
 
 // Wrap the functions to pass the router instance
-const prepareDeleteItem = (id) =>
-  commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, id);
+const prepareDeleteItem = (ids) =>
+  commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, ids);
 
 const performSearch = () => commonBrowseFunction.performSearch(page, fetchItems);
 

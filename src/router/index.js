@@ -47,26 +47,26 @@ const router = createRouter({
                 { path: '/genres/create', name: 'genres-create', component: () => import('@/views/admin/genres/EditAdd.vue') },
                 { path: '/genres/:id/edit', name: 'genres-edit', component: () => import('@/views/admin/genres/EditAdd.vue') },
                 
-                // { path: '/book-submissions', name: 'book-submissions', component: () => import('@/views/admin/book-submissions/Browse.vue') },
-                // { path: '/book-submissions/:id', name: 'book-submissions-read', component: () => import('@/views/admin/book-submissions/Read.vue') },
+                { path: '/book-submissions', name: 'book-submissions', component: () => import('@/views/admin/book-submissions/Browse.vue') },
+                { path: '/book-submissions/:id', name: 'book-submissions-read', component: () => import('@/views/admin/book-submissions/Read.vue') },
                 
-                // // Post
-                // { path: '/posts', name: 'posts', component: () => import('@/views/admin/posts/Browse.vue') },
-                // { path: '/posts/:id', name: 'posts-read', component: () => import('@/views/admin/posts/Read.vue') },
+                // Post
+                { path: '/posts', name: 'posts', component: () => import('@/views/admin/posts/Browse.vue') },
+                { path: '/posts/:id', name: 'posts-read', component: () => import('@/views/admin/posts/Read.vue') },
 
-                // // Fundraising
-                // { path: '/fundraising-organizers', name: 'fundraising-organizers', component: () => import('@/views/admin/fundraising-organizers/Browse.vue') },
-                // { path: '/fundraising-organizers/:id', name: 'fundraising-organizers-read', component: () => import('@/views/admin/fundraising-organizers/Read.vue') },
-                // { path: '/fundraising-organizers/create', name: 'fundraising-organizers-create', component: () => import('@/views/admin/fundraising-organizers/EditAdd.vue') },
-                // { path: '/fundraising-organizers/:id/edit', name: 'fundraising-organizers-edit', component: () => import('@/views/admin/fundraising-organizers/EditAdd.vue') },
+                // Fundraising
+                { path: '/fundraising-organizers', name: 'fundraising-organizers', component: () => import('@/views/admin/fundraising-organizers/Browse.vue') },
+                { path: '/fundraising-organizers/:id', name: 'fundraising-organizers-read', component: () => import('@/views/admin/fundraising-organizers/Read.vue') },
+                { path: '/fundraising-organizers/create', name: 'fundraising-organizers-create', component: () => import('@/views/admin/fundraising-organizers/EditAdd.vue') },
+                { path: '/fundraising-organizers/:id/edit', name: 'fundraising-organizers-edit', component: () => import('@/views/admin/fundraising-organizers/EditAdd.vue') },
 
-                // { path: '/fundraising-projects', name: 'fundraising-projects', component: () => import('@/views/admin/fundraising-projects/Browse.vue') },
-                // { path: '/fundraising-projects/:id', name: 'fundraising-projects-read', component: () => import('@/views/admin/fundraising-projects/Read.vue') },
-                // { path: '/fundraising-projects/create', name: 'fundraising-projects-create', component: () => import('@/views/admin/fundraising-projects/EditAdd.vue') },
-                // { path: '/fundraising-projects/:id/edit', name: 'fundraising-projects-edit', component: () => import('@/views/admin/fundraising-projects/EditAdd.vue') },
+                { path: '/fundraising-projects', name: 'fundraising-projects', component: () => import('@/views/admin/fundraising-projects/Browse.vue') },
+                { path: '/fundraising-projects/:id', name: 'fundraising-projects-read', component: () => import('@/views/admin/fundraising-projects/Read.vue') },
+                { path: '/fundraising-projects/create', name: 'fundraising-projects-create', component: () => import('@/views/admin/fundraising-projects/EditAdd.vue') },
+                { path: '/fundraising-projects/:id/edit', name: 'fundraising-projects-edit', component: () => import('@/views/admin/fundraising-projects/EditAdd.vue') },
 
-                // { path: '/donations', name: 'donations', component: () => import('@/views/admin/donations/Browse.vue') },
-                // { path: '/donations/:id', name: 'donations-read', component: () => import('@/views/admin/donations/Read.vue') },
+                { path: '/donations', name: 'donations', component: () => import('@/views/admin/donations/Browse.vue') },
+                { path: '/donations/:id', name: 'donations-read', component: () => import('@/views/admin/donations/Read.vue') },
             ]
         }
     ]

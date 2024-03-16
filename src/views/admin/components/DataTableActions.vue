@@ -1,13 +1,13 @@
 <template>
   <div class="action_buttons">
     <router-link :to="`${routePath}/${item.id}`">
-      <v-btn color="warning" prepend-icon="mdi-eye" size="small" width="90%">
+      <v-btn color="warning" prepend-icon="mdi-eye" size="small">
         View
       </v-btn>
     </router-link>
 
     <router-link :to="`${routePath}/${item.id}/edit`">
-      <v-btn color="blue" prepend-icon="mdi-pencil" size="small" width="90%">
+      <v-btn color="blue" prepend-icon="mdi-pencil" size="small">
         Edit
       </v-btn>
     </router-link>
@@ -16,7 +16,6 @@
       color="red"
       prepend-icon="mdi-delete"
       size="small"
-      width="90%"
       @click="onDeleteClick"
     >
       Delete
@@ -53,5 +52,9 @@ function onDeleteClick() {
   flex-direction: column;
   gap: 5px;
   padding: 10px 0;
+}
+
+.v-btn {
+  width: 120px;
 }
 </style>

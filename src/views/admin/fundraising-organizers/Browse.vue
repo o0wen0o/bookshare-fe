@@ -1,8 +1,10 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title" :style="{ textTransform: 'capitalize' }">{{ $route.name }}</h1>
-      
+      <h1 class="page_title" :style="{ textTransform: 'capitalize' }">
+        {{ $route.name }}
+      </h1>
+
       <div class="page_actions">
         <router-link :to="`${$route.path}/create`">
           <v-btn color="primary" prepend-icon="mdi-plus">Add New</v-btn>
@@ -44,40 +46,6 @@
         show-current-page
         hover
       >
-        <!-- Visiblity -->
-        <template #item.bookshelfVisible="{ item }">
-          <div>
-            <v-chip
-              variant="tonal"
-              :color="item.bookshelfVisible ? 'success' : 'primary'"
-            >
-              {{ item.bookshelfVisible ? "Public" : "Private" }}
-            </v-chip>
-          </div>
-        </template>
-
-        <template #item.reviewVisible="{ item }">
-          <div>
-            <v-chip
-              variant="tonal"
-              :color="item.reviewVisible ? 'success' : 'primary'"
-            >
-              {{ item.reviewVisible ? "Public" : "Private" }}
-            </v-chip>
-          </div>
-        </template>
-
-        <template #item.contributionVisible="{ item }">
-          <div>
-            <v-chip
-              variant="tonal"
-              :color="item.contributionVisible ? 'success' : 'primary'"
-            >
-              {{ item.contributionVisible ? "Public" : "Private" }}
-            </v-chip>
-          </div>
-        </template>
-
         <!-- Created Date -->
         <template #item.createdDate="{ item }">
           <div>
@@ -136,21 +104,23 @@ const headers = ref([
   { title: "Username", value: "username" },
   { title: "Email", value: "email" },
   { title: "Phone Number", value: "phoneNumber" },
-  { title: "Bookshelf Visibility", value: "bookshelfVisible" },
-  { title: "Review Visibility", value: "reviewVisible" },
-  { title: "Contribution Visibility", value: "contributionVisible" },
   { title: "Created Date", value: "createdDate" },
   { title: "Actions", value: "actions", sortable: false },
 ]);
 
 // Wrap the functions to pass the router instance
-const prepareDeleteItem = (id) =>
-  commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, id);
+const prepareDeleteItem = (ids) =>
+  commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, ids);
 
-const performSearch = () => commonBrowseFunction.performSearch(page, fetchItems);
+const performSearch = () =>
+  commonBrowseFunction.performSearch(page, fetchItems);
 
 const updateItemsPerPage = (newItemsPerPage) =>
-  commonBrowseFunction.updateItemsPerPage(itemsPerPage, newItemsPerPage, fetchItems);
+  commonBrowseFunction.updateItemsPerPage(
+    itemsPerPage,
+    newItemsPerPage,
+    fetchItems
+  );
 
 const updatePage = (newPage) =>
   commonBrowseFunction.updatePage(page, newPage, fetchItems);

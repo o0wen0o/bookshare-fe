@@ -1,21 +1,9 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title" :style="{ textTransform: 'capitalize' }">{{ $route.name }}</h1>
-      
-      <div class="page_actions">
-        <router-link :to="`${$route.path}/create`">
-          <v-btn color="primary" prepend-icon="mdi-plus">Add New</v-btn>
-        </router-link>
-
-        <v-btn
-          color="red"
-          prepend-icon="mdi-delete"
-          @click="prepareDeleteItem(selected)"
-        >
-          Bulk Delete
-        </v-btn>
-      </div>
+      <h1 class="page_title" :style="{ textTransform: 'capitalize' }">
+        {{ $route.name }}
+      </h1>
     </div>
 
     <v-card class="page_body" elevation="3">
@@ -40,44 +28,9 @@
         :items-per-page-options="itemsPerPageOptions"
         @update:items-per-page="updateItemsPerPage"
         @update:page="updatePage"
-        show-select
         show-current-page
         hover
       >
-        <!-- Visiblity -->
-        <template #item.bookshelfVisible="{ item }">
-          <div>
-            <v-chip
-              variant="tonal"
-              :color="item.bookshelfVisible ? 'success' : 'primary'"
-            >
-              {{ item.bookshelfVisible ? "Public" : "Private" }}
-            </v-chip>
-          </div>
-        </template>
-
-        <template #item.reviewVisible="{ item }">
-          <div>
-            <v-chip
-              variant="tonal"
-              :color="item.reviewVisible ? 'success' : 'primary'"
-            >
-              {{ item.reviewVisible ? "Public" : "Private" }}
-            </v-chip>
-          </div>
-        </template>
-
-        <template #item.contributionVisible="{ item }">
-          <div>
-            <v-chip
-              variant="tonal"
-              :color="item.contributionVisible ? 'success' : 'primary'"
-            >
-              {{ item.contributionVisible ? "Public" : "Private" }}
-            </v-chip>
-          </div>
-        </template>
-
         <!-- Created Date -->
         <template #item.createdDate="{ item }">
           <div>
@@ -87,19 +40,14 @@
 
         <!-- Actions -->
         <template #item.actions="{ item }">
-          <DataTableActions
-            :item="item"
-            @prepare-delete-item="prepareDeleteItem(ids)"
-          ></DataTableActions>
+          <router-link :to="`${route.path}/${item.id}`">
+            <v-btn color="warning" prepend-icon="mdi-eye" size="small">
+              View
+            </v-btn>
+          </router-link>
         </template>
       </v-data-table-server>
     </v-card>
-
-    <!-- Delete Confirmation -->
-    <DeleteConfirmationDialog
-      v-model="dialog"
-      @confirm-delete="bulkDelete"
-    ></DeleteConfirmationDialog>
   </div>
 </template>
 
@@ -108,8 +56,6 @@ import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
 import { formatDatetime } from "@/assets/js/admin/common_browse.js";
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
-import DataTableActions from "@/views/admin/components/DataTableActions.vue";
-import DeleteConfirmationDialog from "@/views/admin/components/DeleteConfirmationDialog.vue";
 
 const route = useRoute();
 const dialog = ref(false); // Controls the visibility of the dialog
@@ -133,24 +79,28 @@ const itemsPerPageOptions = ref([
 
 const headers = ref([
   { title: "ID", value: "id" },
-  { title: "Username", value: "username" },
-  { title: "Email", value: "email" },
-  { title: "Phone Number", value: "phoneNumber" },
-  { title: "Bookshelf Visibility", value: "bookshelfVisible" },
-  { title: "Review Visibility", value: "reviewVisible" },
-  { title: "Contribution Visibility", value: "contributionVisible" },
+  { title: "Content", value: "content" },
   { title: "Created Date", value: "createdDate" },
+  { title: "Likes", value: "Likes" },
+  { title: "Shares", value: "Shares" },
+  { title: "User ID", value: "userId" },
+  { title: "Book ID", value: "bookId" },
   { title: "Actions", value: "actions", sortable: false },
 ]);
 
 // Wrap the functions to pass the router instance
-const prepareDeleteItem = (id) =>
-  commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, id);
+const prepareDeleteItem = (ids) =>
+  commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, ids);
 
-const performSearch = () => commonBrowseFunction.performSearch(page, fetchItems);
+const performSearch = () =>
+  commonBrowseFunction.performSearch(page, fetchItems);
 
 const updateItemsPerPage = (newItemsPerPage) =>
-  commonBrowseFunction.updateItemsPerPage(itemsPerPage, newItemsPerPage, fetchItems);
+  commonBrowseFunction.updateItemsPerPage(
+    itemsPerPage,
+    newItemsPerPage,
+    fetchItems
+  );
 
 const updatePage = (newPage) =>
   commonBrowseFunction.updatePage(page, newPage, fetchItems);

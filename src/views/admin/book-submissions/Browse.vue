@@ -28,9 +28,32 @@
         :items-per-page-options="itemsPerPageOptions"
         @update:items-per-page="updateItemsPerPage"
         @update:page="updatePage"
+        show-select
         show-current-page
         hover
       >
+        <!-- Publication Date -->
+        <template #item.publicationDate="{ item }">
+          <div>
+            {{ formatDate(item.publicationDate) }}
+          </div>
+        </template>
+
+        <!-- Created Date -->
+        <template #item.createdDate="{ item }">
+          <div>
+            {{ formatDatetime(item.createdDate) }}
+          </div>
+        </template>
+
+        <!-- Actions -->
+        <template #item.actions="{ item }">
+          <router-link :to="`${route.path}/${item.id}`">
+            <v-btn color="warning" prepend-icon="mdi-eye" size="small">
+              View
+            </v-btn>
+          </router-link>
+        </template>
       </v-data-table-server>
     </v-card>
   </div>
@@ -39,6 +62,7 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
+import { formatDatetime, formatDate } from "@/assets/js/admin/common_browse.js";
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
 
 const route = useRoute();
@@ -63,10 +87,20 @@ const itemsPerPageOptions = ref([
 
 const headers = ref([
   { title: "ID", value: "id" },
-  { title: "Name", value: "name" },
+  { title: "Title", value: "title" },
+  { title: "Author", value: "author" },
+  { title: "Publisher", value: "publisher" },
+  { title: "ISBN", value: "isbn" },
+  { title: "Publication Date", value: "publicationDate" },
+  { title: "Language", value: "language" },
+  { title: "Created Date", value: "createdDate" },
+  { title: "Status", value: "status" },
+  { title: "User ID", value: "userId" },
+  { title: "Actions", value: "actions", sortable: false },
 ]);
 
 // Wrap the functions to pass the router instance
+
 const performSearch = () =>
   commonBrowseFunction.performSearch(page, fetchItems);
 

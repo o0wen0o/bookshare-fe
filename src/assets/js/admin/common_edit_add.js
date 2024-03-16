@@ -35,9 +35,14 @@ const previewImage = (imagePreview, imgUrl) => {
 function submitForm(bookForm, book, id, isEdit, router, route) {
     bookForm.value.validate((valid) => {
         if (valid) {
-            const successCallback = () => {
-                ElMessage.success("Saved successfully");
+            const successCallbackForEdit = () => {
+                ElMessage.success("Updated successfully");
                 router.push(`/${getRouteNameForApi(route.name)}/${id.value}`);
+            };
+
+            const successCallbackForAdd = () => {
+                ElMessage.success("Created successfully");
+                router.push(`/${getRouteNameForApi(route.name)}`);
             };
 
             const errorCallback = (error) => {
@@ -48,11 +53,16 @@ function submitForm(bookForm, book, id, isEdit, router, route) {
                 put(
                     `/api/${getRouteNameForApi(route.name)}/${id.value}/update`,
                     book.value,
-                    successCallback,
+                    successCallbackForEdit,
                     errorCallback
                 );
             } else {
-                post(`/api/${getRouteNameForApi(route.name)}/create`, book.value, successCallback, errorCallback);
+                post(
+                    `/api/${getRouteNameForApi(route.name)}/create`,
+                    book.value,
+                    successCallbackForAdd,
+                    errorCallback
+                );
             }
         } else {
             ElMessage.error("Please correct the errors in the form");

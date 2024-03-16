@@ -31,6 +31,21 @@
         show-current-page
         hover
       >
+        <!-- Contribution Date -->
+        <template #item.contributionDate="{ item }">
+          <div>
+            {{ formatDatetime(item.publicationDate) }}
+          </div>
+        </template>
+
+        <!-- Actions -->
+        <template #item.actions="{ item }">
+          <router-link :to="`${route.path}/${item.id}`">
+            <v-btn color="warning" prepend-icon="mdi-eye" size="small">
+              View
+            </v-btn>
+          </router-link>
+        </template>
       </v-data-table-server>
     </v-card>
   </div>
@@ -39,6 +54,7 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
+import { formatDatetime } from "@/assets/js/admin/common_browse.js";
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
 
 const route = useRoute();
@@ -63,7 +79,11 @@ const itemsPerPageOptions = ref([
 
 const headers = ref([
   { title: "ID", value: "id" },
-  { title: "Name", value: "name" },
+  { title: "Donation Amount", value: "donationAmount" },
+  { title: "Contribution Date", value: "contributionDate" },
+  { title: "User ID", value: "userId" },
+  { title: "Fundraising Project ID", value: "fundraisingProjectId" },
+  { title: "Actions", value: "actions", sortable: false },
 ]);
 
 // Wrap the functions to pass the router instance
