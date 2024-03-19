@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title">View Book</h1>
+      <h1 class="page_title">View {{ capitalizeRouteName(route.name) }}</h1>
       <div class="page_actions">
         <router-link :to="{ path: `/${getRouteNameForApi(route.name)}` }">
           <v-btn color="warning" prepend-icon="mdi-menu">Return to list</v-btn>
@@ -12,68 +12,57 @@
     <v-card class="page_body" elevation="3">
       <v-tabs v-model="tab" align-tabs="start" color="deep-purple-accent-4">
         <v-tab :value="1">General</v-tab>
-        <v-tab :value="2">Book Comment</v-tab>
       </v-tabs>
 
       <v-window v-model="tab">
         <v-window-item :key="1" :value="1">
           <v-container fluid>
             <v-row>
-              <v-col cols="12" sm="4">
-                <v-img :src="book.imgUrl"></v-img>
+              <v-col cols="12" sm="3">
+                <v-img :src="user.avatar || defaultAvatar"></v-img>
               </v-col>
 
-              <v-col cols="12" sm="8">
-                <div>
-                  <v-card-title>{{ book.title }}</v-card-title>
-                  <v-card-subtitle>{{ book.author }}</v-card-subtitle>
-                </div>
-
+              <v-col cols="12" sm="9">
                 <div class="details">
                   <v-card-text>
                     <div class="form_group">
-                      <strong>Publisher:</strong>
-                      {{ book.publisher }}
+                      <strong>ID:</strong>
+                      {{ user.id }}
                     </div>
 
                     <div class="form_group">
-                      <strong>ISBN:</strong>
-                      {{ book.isbn }}
+                      <strong>Username:</strong>
+                      {{ user.username }}
                     </div>
 
                     <div class="form_group">
-                      <strong>Publication Date:</strong>
-                      {{ book.publicationDate }}
+                      <strong>Email:</strong>
+                      {{ user.email }}
                     </div>
 
                     <div class="form_group">
-                      <strong>Pages:</strong>
-                      {{ book.page }}
+                      <strong>Phone Number:</strong>
+                      {{ user.phoneNumber }}
                     </div>
 
                     <div class="form_group">
-                      <strong>Language:</strong>
-                      {{ book.language }}
+                      <strong>Is Bookshelf Visible:</strong>
+                      {{ user.isBookshelfVisible ? "Public" : "Private" }}
                     </div>
 
                     <div class="form_group">
-                      <strong>Rating:</strong>
-                      {{ book.rating }}
+                      <strong>Is Review Visible:</strong>
+                      {{ user.isReviewVisible ? "Public" : "Private" }}
                     </div>
 
                     <div class="form_group">
-                      <strong>Favourite:</strong>
-                      {{ book.favourite }}
+                      <strong>Is Contribution Visible:</strong>
+                      {{ user.isContributionVisible ? "Public" : "Private" }}
                     </div>
 
                     <div class="form_group">
-                      <strong>Review:</strong>
-                      {{ book.review }}
-                    </div>
-
-                    <div class="form_group">
-                      <strong>Book Description:</strong>
-                      {{ book.description }}
+                      <strong>Created Date:</strong>
+                      {{ formatDatetime(user.createdDate) }}
                     </div>
                   </v-card-text>
                 </div>
@@ -81,8 +70,6 @@
             </v-row>
           </v-container>
         </v-window-item>
-
-        <v-window-item :key="2" :value="2"></v-window-item>
       </v-window>
     </v-card>
   </div>
@@ -95,26 +82,26 @@ import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { get } from "@/net/index.js";
 import {
+  capitalizeRouteName,
   getRouteNameForApi,
+  formatDatetime
 } from "@/assets/js/admin/common_read.js";
 
 const route = useRoute();
 const id = ref(null);
 const tab = ref(null);
 
-const book = ref({
-  title: "",
-  author: "",
-  description: "",
-  publisher: "",
-  isbn: "",
-  publicationDate: "",
-  page: 0,
-  language: "",
-  imgUrl: "",
-  rating: 0,
-  favourite: 0,
-  review: 0,
+const defaultAvatar = "https://bookshare-fyp.oss-ap-southeast-3.aliyuncs.com/default_avatar.png";
+const user = ref({
+  id: "",
+  username: "",
+  email: "",
+  phoneNumber: "",
+  isBookshelfVisible: "",
+  isReviewVisible: "",
+  isContributionVisible: "",
+  createdDate: "",
+  avatar: "",
 });
 
 onMounted(() => {
@@ -124,7 +111,7 @@ onMounted(() => {
   get(
     `/api/${getRouteNameForApi(route.name)}/${id.value}`,
     (data) => {
-      book.value = data;
+      user.value = data;
     },
     (error) => {
       ElMessage.error(error);
@@ -137,7 +124,7 @@ onMounted(() => {
 @import "@/assets/css/admin/common_read.css";
 
 .v-img {
-  height: 300px;
+  height: 150px;
   margin-top: 50px;
 }
 
@@ -155,7 +142,7 @@ onMounted(() => {
 }
 
 .form_group > strong {
-  /* display: block; */
+  display: block;
   margin-bottom: 4px;
 }
 </style>

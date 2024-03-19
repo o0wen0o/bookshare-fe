@@ -17,61 +17,46 @@
     <v-card class="page_body" elevation="3">
       <v-container>
         <el-form
-          :model="book"
-          ref="bookForm"
+          :model="user"
+          ref="userForm"
           :rules="rules"
           label-position="top"
         >
-          <el-form-item label="Title" prop="title">
-            <el-input v-model="book.title"></el-input>
+          <el-form-item label="Username" prop="username">
+            <el-input v-model="user.username"></el-input>
           </el-form-item>
 
-          <el-form-item label="Author" prop="author">
-            <el-input v-model="book.author"></el-input>
+          <el-form-item label="Email" prop="email">
+            <el-input v-model="user.email"></el-input>
           </el-form-item>
 
-          <el-form-item label="Description" prop="description">
-            <el-input type="textarea" v-model="book.description"></el-input>
+          <el-form-item label="Password" prop="password">
+            <el-input v-model="user.password" type="password"></el-input>
+            <template v-if="isEdit">
+              <div style="color: #888">
+                Leave blank to use the current password.
+              </div>
+            </template>
           </el-form-item>
 
-          <el-form-item label="Publisher" prop="publisher">
-            <el-input v-model="book.publisher"></el-input>
+          <el-form-item label="Phone Number" prop="phoneNumber">
+            <el-input v-model="user.phoneNumber"></el-input>
           </el-form-item>
 
-          <el-form-item label="ISBN" prop="isbn">
-            <el-input v-model="book.isbn"></el-input>
+          <el-form-item label="Bookshelf Visible" prop="bookshelfVisible">
+            <el-switch v-model="user.bookshelfVisible"></el-switch>
           </el-form-item>
 
-          <el-form-item label="Publication Date" prop="publicationDate">
-            <el-date-picker
-              v-model="book.publicationDate"
-              type="date"
-            ></el-date-picker>
+          <el-form-item label="Review Visible" prop="reviewVisible">
+            <el-switch v-model="user.reviewVisible"></el-switch>
           </el-form-item>
 
-          <el-form-item label="Page Count" prop="page">
-            <el-input v-model="book.page" type="number"></el-input>
+          <el-form-item label="Contribution Visible" prop="contributionVisible">
+            <el-switch v-model="user.contributionVisible"></el-switch>
           </el-form-item>
 
-          <el-form-item label="Language" prop="language">
-            <el-select v-model="book.language" placeholder="Select Language">
-              <el-option
-                v-for="item in languages"
-                :key="item"
-                :label="item"
-                :value="item"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-
-          <el-form-item label="Image URL" prop="imgUrl">
-            <el-input v-model="book.imgUrl" @change="previewImage"></el-input>
-            <img
-              v-if="imagePreview"
-              :src="imagePreview"
-              alt="Image Preview"
-              class="preview_image"
-            />
+          <el-form-item label="Avatar" prop="avatar">
+            <el-input v-model="user.avatar"></el-input>
           </el-form-item>
 
           <el-form-item>
@@ -92,6 +77,7 @@ import {
   capitalizeRouteName,
   getRouteNameForApi,
   getTextRequiredRule,
+  validateNumber,
 } from "@/assets/js/admin/common_edit_add.js";
 import * as commonEditAddFunction from "@/assets/js/admin/common_edit_add.js";
 
@@ -99,77 +85,79 @@ const router = useRouter();
 const route = useRoute();
 const isEdit = ref(false);
 const id = ref(null);
-const bookForm = ref(null);
-const imagePreview = ref("");
+const userForm = ref(null);
 
-const languages = [
-  "English",
-  "Spanish",
-  "French",
-  "German",
-  "Chinese",
-  "Japanese",
-];
-
-const book = ref({
-  title: "",
-  author: "",
-  publisher: "",
-  isbn: "",
-  publicationDate: "",
-  page: 0,
-  language: "",
-  imgUrl: "",
+const user = ref({
+  id: "",
+  username: "",
+  email: "",
+  password: "",
+  phoneNumber: "",
+  bookshelfVisible: false,
+  reviewVisible: false,
+  contributionVisible: false,
+  avatar: "",
 });
 
 const rules = {
-  title: [getTextRequiredRule("Please enter the title")],
-  author: [getTextRequiredRule("Please enter the author")],
-  description: [getTextRequiredRule("Please enter the description")],
-  publisher: [getTextRequiredRule("Please enter the publisher")],
-  isbn: [
-    getTextRequiredRule("Please enter the ISBN"),
-    {
-      pattern: /^\d{10}(\d{3})?$/,
-      message: "Please enter a valid ISBN",
-      trigger: "blur",
-    },
+  username: [getTextRequiredRule("Please enter the username")],
+  email: [
+    getTextRequiredRule("Please enter the email"),
+    { type: "email", message: "Please enter a valid email", trigger: "blur" },
   ],
-  publicationDate: [
-    getTextRequiredRule("Please select the publication date", "change"),
+  password: [
+    getPasswordRules(),
   ],
-  page: [
-    getTextRequiredRule("Please enter the page count"),
-    {
-      pattern: /^[1-9]\d*$/, // Positive integers greater than zero
-      message: "Page count must greater than zero",
-      trigger: "blur",
-    },
-  ],
-  language: [getTextRequiredRule("Please select the language", "change")],
-  imgUrl: [
-    getTextRequiredRule("Please enter the image url"),
-    { type: "url", message: "Please enter a valid URL", trigger: "blur" },
+  phoneNumber: [
+    getTextRequiredRule("Please enter the phone number"),
+    { validator: validateNumber, trigger: "blur" },
   ],
 };
 
-const previewImage = () =>
-  commonEditAddFunction.previewImage(imagePreview, book.value.imgUrl);
+function getPasswordRules() {
+  if (isEdit.value) {
+    // Rules for editing
+    return [
+      {
+        validator: (rule, value, callback) => {
+          if (!value) {
+            callback(); // Accepts empty value, meaning use the old password
+          } else if (value.length < 6) {
+            callback(new Error("The password must be at least 6 characters"));
+          } else {
+            callback(); // Passes validation
+          }
+        },
+        trigger: "blur",
+      },
+    ];
+  } else {
+    // Rules for adding new entry
+    return [
+      getTextRequiredRule("Please enter the password"),
+      {
+        min: 6,
+        message: "The password must be at least 6 characters",
+        trigger: "blur",
+      },
+    ];
+  }
+}
 
 const submitForm = () =>
-  commonEditAddFunction.submitForm(bookForm, book, id, isEdit, router, route);
+  commonEditAddFunction.submitForm(userForm, user, id, isEdit, router, route);
 
 onMounted(() => {
   id.value = route.params.id;
   isEdit.value = Boolean(id.value);
 
   if (isEdit.value) {
-    // Fetch book data based on id
+    // Fetch user data based on id
     get(
       `/api/${getRouteNameForApi(route.name)}/${id.value}`,
       (data) => {
-        book.value = data;
-        previewImage(); // Update the image preview
+        user.value = data;
+        console.log(user.value);
       },
       (error) => {
         ElMessage.error(error);

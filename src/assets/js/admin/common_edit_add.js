@@ -27,6 +27,15 @@ const getTextRequiredRule = (message, triggers = ['blur']) => {
     };
 }
 
+const validateNumber = (rule, value, callback) => {
+    const phoneNumberRegex = /^\d+$/;
+    if (!phoneNumberRegex.test(value)) {
+        callback(new Error('Please enter a valid phone number'));
+    } else {
+        callback();
+    }
+}
+
 const previewImage = (imagePreview, imgUrl) => {
     // Set imagePreview to the URL entered by the user
     imagePreview.value = imgUrl;
@@ -75,6 +84,7 @@ export {
     capitalizeRouteName,
     getRouteNameForApi,
     getTextRequiredRule,
+    validateNumber,
     previewImage,
     submitForm
 };
