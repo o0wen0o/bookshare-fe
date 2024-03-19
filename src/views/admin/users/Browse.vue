@@ -89,7 +89,7 @@
         <template #item.actions="{ item }">
           <DataTableActions
             :item="item"
-            @prepare-delete-item="prepareDeleteItem(ids)"
+            @prepare-delete-item="prepareDeleteItem"
           ></DataTableActions>
         </template>
       </v-data-table-server>
@@ -98,7 +98,7 @@
     <!-- Delete Confirmation -->
     <DeleteConfirmationDialog
       v-model="dialog"
-      @confirm-delete="bulkDelete"
+      @confirm-delete="bulkDelete(deleteItemId)"
     ></DeleteConfirmationDialog>
   </div>
 </template>
