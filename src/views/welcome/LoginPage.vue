@@ -113,6 +113,7 @@ function userLogin() {
       login(form.email, form.password, form.remember, (data) => {
         // Store user data in Vuex
         store.dispatch("loginUser", {
+          id: data.id,
           username: data.username,
           email: data.email,
           roles: data.roles,

@@ -66,9 +66,11 @@ function toggleMenuCollapse() {
 }
 
 function profileInfo() {
-  console.log(userData.value.username);
-  console.log(userData.value.email);
-  console.log(userData.value.roles);
+  router.push(`/users/${userData.value.id}`);
+  // console.log(userData.value.id);
+  // console.log(userData.value.username);
+  // console.log(userData.value.email);
+  // console.log(userData.value.roles);
 }
 
 function logoutAccount() {
