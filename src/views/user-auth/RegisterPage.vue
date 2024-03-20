@@ -3,12 +3,18 @@
     <div style="margin-top: 100px">
       <div style="font-size: 25px; font-weight: bold">Register new account</div>
       <div style="font-size: 14px; color: grey">
-        Welcome to register BookShare, please fill in the relevant information below
+        Welcome to register BookShare, please fill in the relevant information
+        below
       </div>
     </div>
 
     <div style="margin-top: 50px">
-      <el-form :model="form" :rules="rules" @validate="onValidate" ref="formRef">
+      <el-form
+        :model="form"
+        :rules="rules"
+        @validate="onValidate"
+        ref="formRef"
+      >
         <el-form-item prop="username">
           <el-input
             v-model="form.username"
@@ -115,7 +121,10 @@
       <span style="font-size: 14px; line-height: 15px; color: grey"
         >Have an account?
       </span>
-      <el-link type="primary" style="translate: 0 -2px" @click="router.push('/')"
+      <el-link
+        type="primary"
+        style="translate: 0 -2px"
+        @click="router.push('/user-auth')"
         >Sign In</el-link
       >
     </div>
@@ -231,7 +240,7 @@ const register = () => {
         },
         () => {
           ElMessage.success("Registration successful, welcome to join us!");
-          router.push("/");
+          router.push("/user-auth");
         }
       );
     } else {

@@ -9,7 +9,7 @@ import { logout } from "@/net";
 import router from "@/router";
 
 function userLogout() {
-  logout(() => router.push("/"));
+  logout(() => router.push("/user-auth"));
 }
 </script>
 

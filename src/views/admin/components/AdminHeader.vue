@@ -75,7 +75,7 @@ function profileInfo() {
 
 function logoutAccount() {
   logout(() => {
-    router.push("/");
+    router.push("/user-auth");
   });
 }
 </script>

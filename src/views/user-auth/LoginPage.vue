@@ -123,7 +123,7 @@ function userLogin() {
         if (data.roles && data.roles.includes("Admin")) {
           router.push("/admin");
         } else {
-          router.push("/index");
+          router.push("/");
         }
       });
     }

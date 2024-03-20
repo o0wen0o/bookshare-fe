@@ -8,19 +8,22 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
-            path: '/',
-            name: 'welcome',
-            component: () => import('@/views/WelcomeView.vue'),
+            path: '/user-auth',
+            name: 'user-auth',
+            component: () => import('@/views/UserAuthView.vue'),
+            meta: { requiresAuth: false },
+            redirect: 'login',
             children: [
-                { path: '', name: 'welcome-login', component: () => import('@/views/welcome/LoginPage.vue') },
-                { path: 'register', name: 'welcome-register', component: () => import('@/views/welcome/RegisterPage.vue') },
-                { path: 'forget', name: 'welcome-forget', component: () => import('@/views/welcome/ForgetPage.vue') }
+                { path: '/login', name: 'user-auth-login', component: () => import('@/views/user-auth/LoginPage.vue') },
+                { path: '/register', name: 'user-auth-register', component: () => import('@/views/user-auth/RegisterPage.vue') },
+                { path: '/forget', name: 'user-auth-forget', component: () => import('@/views/user-auth/ForgetPage.vue') }
             ]
         }, {
-            path: '/index',
+            path: '/',
             name: 'index',
             component: () => import('@/views/IndexView.vue'),
             meta: { requiresAuth: true },
+            children: []
         }, {
             path: '/admin',
             name: 'admin',
@@ -82,12 +85,12 @@ router.beforeEach((to, from, next) => {
         // If the route requires authentication and user is unauthorized
         deleteAccessToken();
         ElMessage.warning('Please log in to continue.');
-        next('/');
+        next('/user-auth');
         return;
     }
 
     // Redirect logic for authorized access
-    if (to.name?.startsWith('welcome')) {
+    if (to.name?.startsWith('user-auth')) {
         if (!isUnauthorized) {
             // If coming from an admin route and user is authorized, redirect to /admin
             if (store.getters.userRoles.includes("Admin")) {
@@ -95,7 +98,7 @@ router.beforeEach((to, from, next) => {
                 return;
             } else {
                 // If authorized but not coming from an admin route, redirect to /index
-                next('/index');
+                next('/');
                 return;
             }
         }
@@ -105,7 +108,7 @@ router.beforeEach((to, from, next) => {
     if (requiresAdmin && !store.getters.userRoles.includes("Admin")) {
         // If the route requires an Admin role and the user does not have it
         ElMessage.warning('You do not have permission to access this page');
-        next(isUnauthorized ? '/' : '/index'); // Redirect to home if unauthorized, else to index
+        next(isUnauthorized ? '/user-auth' : '/'); // Redirect to home if unauthorized, else to index
         return;
     }
 

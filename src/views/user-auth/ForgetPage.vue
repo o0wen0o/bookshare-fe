@@ -9,7 +9,10 @@
 
     <!-- Verify email -->
     <transition name="el-fade-in-linear" mode="out-in">
-      <div style="text-align: center; margin: 0 20px; height: 100%" v-if="active === 0">
+      <div
+        style="text-align: center; margin: 0 20px; height: 100%"
+        v-if="active === 0"
+      >
         <div style="margin-top: 80px">
           <div style="font-size: 25px; font-weight: bold">Reset Password</div>
           <div style="font-size: 14px; color: grey">
@@ -18,9 +21,18 @@
         </div>
 
         <div style="margin-top: 50px">
-          <el-form :model="form" :rules="rules" @validate="onValidate" ref="formRef">
+          <el-form
+            :model="form"
+            :rules="rules"
+            @validate="onValidate"
+            ref="formRef"
+          >
             <el-form-item prop="email">
-              <el-input v-model="form.email" type="email" placeholder="Email address">
+              <el-input
+                v-model="form.email"
+                type="email"
+                placeholder="Email address"
+              >
                 <template #prefix>
                   <el-icon>
                     <Message />
@@ -66,7 +78,12 @@
         </div>
 
         <div style="margin-top: 70px">
-          <el-button @click="confirmReset()" style="width: 270px" type="warning" plain>
+          <el-button
+            @click="confirmReset()"
+            style="width: 270px"
+            type="warning"
+            plain
+          >
             Next
           </el-button>
         </div>
@@ -75,7 +92,10 @@
           <span style="font-size: 14px; line-height: 15px; color: grey"
             >Have an account?
           </span>
-          <el-link type="primary" style="translate: 0 -2px" @click="router.push('/')"
+          <el-link
+            type="primary"
+            style="translate: 0 -2px"
+            @click="router.push('/user-auth')"
             >Sign In</el-link
           >
         </div>
@@ -84,16 +104,25 @@
 
     <!-- Reset password -->
     <transition name="el-fade-in-linear" mode="out-in">
-      <div style="text-align: center; margin: 0 20px; height: 100%" v-if="active === 1">
+      <div
+        style="text-align: center; margin: 0 20px; height: 100%"
+        v-if="active === 1"
+      >
         <div style="margin-top: 80px">
           <div style="font-size: 25px; font-weight: bold">Reset Password</div>
           <div style="font-size: 14px; color: grey">
-            Please fill in your new password and be sure to remember it to prevent loss
+            Please fill in your new password and be sure to remember it to
+            prevent loss
           </div>
         </div>
 
         <div style="margin-top: 50px">
-          <el-form :model="form" :rules="rules" @validate="onValidate" ref="formRef">
+          <el-form
+            :model="form"
+            :rules="rules"
+            @validate="onValidate"
+            ref="formRef"
+          >
             <el-form-item prop="password">
               <el-input
                 v-model="form.password"
@@ -262,7 +291,7 @@ const doReset = () => {
         },
         () => {
           ElMessage.success("Password reset successful, please login again");
-          router.push("/");
+          router.push("/user-auth");
         }
       );
     }
