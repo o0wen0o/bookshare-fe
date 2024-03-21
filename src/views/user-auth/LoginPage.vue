@@ -116,6 +116,7 @@ function userLogin() {
           id: data.id,
           username: data.username,
           email: data.email,
+          avatar: data.avatar,
           roles: data.roles,
         });
 

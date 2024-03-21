@@ -8,10 +8,7 @@
       <template v-slot:activator="{ props }">
         <v-btn icon v-bind="props">
           <v-avatar size="48px">
-            <v-img
-              alt="Avatar"
-              src="https://bookshare-fyp.oss-ap-southeast-3.aliyuncs.com/default_avatar.png"
-            ></v-img>
+            <v-img alt="Avatar" :src="avatar"></v-img>
           </v-avatar>
         </v-btn>
       </template>
@@ -20,10 +17,7 @@
         <v-card-text>
           <div class="mx-auto text-center">
             <v-avatar size="40px">
-              <v-img
-                alt="Avatar"
-                src="https://bookshare-fyp.oss-ap-southeast-3.aliyuncs.com/default_avatar.png"
-              ></v-img>
+              <v-img alt="Avatar" :src="avatar"></v-img>
             </v-avatar>
 
             <h3>{{ userData.username || "John" }}</h3>
@@ -60,6 +54,9 @@ const { menuStatus } = defineProps({
 
 const store = useStore();
 const userData = computed(() => store.state.user || {});
+
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
+const avatar = ossEndpoint + userData.value.avatar;
 
 function toggleMenuCollapse() {
   store.dispatch("toggleMenuCollapse");
