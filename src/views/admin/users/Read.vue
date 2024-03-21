@@ -19,7 +19,7 @@
           <v-container fluid>
             <v-row>
               <v-col cols="12" sm="3">
-                <v-img :src="user.avatar || defaultAvatar"></v-img>
+                <v-img :src="ossEndpoint + user.avatar"></v-img>
               </v-col>
 
               <v-col cols="12" sm="9">
@@ -84,14 +84,14 @@ import { get } from "@/net/index.js";
 import {
   capitalizeRouteName,
   getRouteNameForApi,
-  formatDatetime
+  formatDatetime,
 } from "@/assets/js/admin/common_read.js";
 
 const route = useRoute();
 const id = ref(null);
 const tab = ref(null);
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
-const defaultAvatar = "https://bookshare-fyp.oss-ap-southeast-3.aliyuncs.com/default_avatar.png";
 const user = ref({
   id: "",
   username: "",
@@ -124,7 +124,7 @@ onMounted(() => {
 @import "@/assets/css/admin/common_read.css";
 
 .v-img {
-  height: 150px;
+  height: 200px;
   margin-top: 50px;
 }
 

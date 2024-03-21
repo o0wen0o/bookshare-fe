@@ -101,6 +101,7 @@ const isEdit = ref(false);
 const id = ref(null);
 const bookForm = ref(null);
 const imagePreview = ref("");
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 const languages = [
   "English",
@@ -154,7 +155,7 @@ const rules = {
 };
 
 const previewImage = () =>
-  commonEditAddFunction.previewImage(imagePreview, book.value.imgUrl);
+  commonEditAddFunction.previewImage(imagePreview, book.value.imgUrl, ossEndpoint);
 
 const submitForm = () =>
   commonEditAddFunction.submitForm(bookForm, book, id, isEdit, router, route);

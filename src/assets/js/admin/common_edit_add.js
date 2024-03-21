@@ -28,7 +28,7 @@ const getTextRequiredRule = (message, triggers = ['blur']) => {
 }
 
 const validateNumber = (rule, value, callback) => {
-    const phoneNumberRegex = /^\d+$/;
+    const phoneNumberRegex = /^[\d-]+$/;
     if (!phoneNumberRegex.test(value)) {
         callback(new Error('Please enter a valid phone number'));
     } else {
@@ -36,14 +36,27 @@ const validateNumber = (rule, value, callback) => {
     }
 }
 
-const previewImage = (imagePreview, imgUrl) => {
-    // Set imagePreview to the URL entered by the user
-    imagePreview.value = imgUrl;
+const previewImage = (files, imgUrl, ossEndpoint) => {
+    files.value = [{
+        url: ossEndpoint + imgUrl,
+    }];
 }
 
-function submitForm(bookForm, book, id, isEdit, router, route) {
-    bookForm.value.validate((valid) => {
+function submitForm(dataForm, data, files, id, isEdit, router, route) {
+    dataForm.value.validate((valid) => {
         if (valid) {
+            const formData = new FormData();
+
+            // Append user data to formData
+            Object.keys(data.value).forEach(key => {
+                formData.append(key, data.value[key]);
+            });
+
+            // Append file data if exists
+            if (files.value.length > 0 && files.value[0].raw) {
+                formData.append('image', files.value[0].raw);
+            }
+            
             const successCallbackForEdit = () => {
                 ElMessage.success("Updated successfully");
                 router.push(`/${getRouteNameForApi(route.name)}/${id.value}`);
@@ -61,16 +74,18 @@ function submitForm(bookForm, book, id, isEdit, router, route) {
             if (isEdit.value) {
                 put(
                     `/api/${getRouteNameForApi(route.name)}/${id.value}/update`,
-                    book.value,
+                    formData,
                     successCallbackForEdit,
-                    errorCallback
+                    errorCallback,
+                    'multipart/form-data'
                 );
             } else {
                 post(
                     `/api/${getRouteNameForApi(route.name)}/create`,
-                    book.value,
+                    formData,
                     successCallbackForAdd,
-                    errorCallback
+                    errorCallback,
+                    'multipart/form-data'
                 );
             }
         } else {

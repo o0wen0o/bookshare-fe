@@ -56,13 +56,70 @@
           </el-form-item>
 
           <el-form-item label="Avatar" prop="avatar">
-            <el-input v-model="user.avatar"></el-input>
+            <el-upload
+              action="#"
+              list-type="picture-card"
+              :auto-upload="false"
+              :file-list="files"
+              @change="handlePictureChange"
+            >
+              <el-icon><Plus /></el-icon>
+
+              <template #file="{ file }">
+                <div>
+                  <img
+                    class="el-upload-list__item-thumbnail"
+                    :src="file.url"
+                    alt=""
+                  />
+                  <span class="el-upload-list__item-actions">
+                    <span
+                      class="el-upload-list__item-preview"
+                      @click="handlePictureCardPreview(file)"
+                    >
+                      <el-icon><zoom-in /></el-icon>
+                    </span>
+                    <span
+                      v-if="!disabled"
+                      class="el-upload-list__item-delete"
+                      @click="() => handlePictureRemove(file)"
+                    >
+                      <el-icon><delete /></el-icon>
+                    </span>
+                  </span>
+                </div>
+              </template>
+            </el-upload>
+
+            <!-- <el-upload
+              class="upload-demo"
+              drag
+              @change="previewImage"
+            >
+              <el-icon class="el-icon--upload">
+                <upload-filled />
+              </el-icon>
+              <div class="el-upload__text">
+                Drop file here or <em>click to upload</em>
+              </div>
+            </el-upload> -->
+
+            <!-- <img
+              v-if="imagePreview"
+              :src="imagePreview"
+              alt="Image Preview"
+              class="preview_image"
+            /> -->
           </el-form-item>
 
           <el-form-item>
             <el-button type="success" @click="submitForm">Save</el-button>
           </el-form-item>
         </el-form>
+
+        <el-dialog v-model="dialogImageVisible">
+          <img :src="dialogImageUrl" alt="Preview Image" class="dialog_image" />
+        </el-dialog>
       </v-container>
     </v-card>
   </div>
@@ -72,6 +129,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
+import { Delete, Plus, ZoomIn } from "@element-plus/icons-vue";
 import { get } from "@/net/index.js";
 import {
   capitalizeRouteName,
@@ -86,6 +144,7 @@ const route = useRoute();
 const isEdit = ref(false);
 const id = ref(null);
 const userForm = ref(null);
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 const user = ref({
   id: "",
@@ -96,7 +155,7 @@ const user = ref({
   bookshelfVisible: false,
   reviewVisible: false,
   contributionVisible: false,
-  avatar: "",
+  avatar: "", // this is url from database
 });
 
 const rules = {
@@ -105,14 +164,22 @@ const rules = {
     getTextRequiredRule("Please enter the email"),
     { type: "email", message: "Please enter a valid email", trigger: "blur" },
   ],
-  password: [
-    getPasswordRules(),
-  ],
+  password: [getPasswordRules()],
   phoneNumber: [
     getTextRequiredRule("Please enter the phone number"),
     { validator: validateNumber, trigger: "blur" },
   ],
 };
+
+const previewImage = () =>
+  commonEditAddFunction.previewImage(
+    files,
+    user.value.avatar,
+    ossEndpoint
+  );
+
+const submitForm = () =>
+  commonEditAddFunction.submitForm(userForm, user, files, id, isEdit, router, route);
 
 function getPasswordRules() {
   if (isEdit.value) {
@@ -144,9 +211,6 @@ function getPasswordRules() {
   }
 }
 
-const submitForm = () =>
-  commonEditAddFunction.submitForm(userForm, user, id, isEdit, router, route);
-
 onMounted(() => {
   id.value = route.params.id;
   isEdit.value = Boolean(id.value);
@@ -157,7 +221,12 @@ onMounted(() => {
       `/api/${getRouteNameForApi(route.name)}/${id.value}`,
       (data) => {
         user.value = data;
-        console.log(user.value);
+        user.value.password = "";
+
+        // Update the image preview
+        if (user.value.avatar) {
+          previewImage(user.value.avatar);
+        }
       },
       (error) => {
         ElMessage.error(error);
@@ -165,6 +234,26 @@ onMounted(() => {
     );
   }
 });
+
+// Below are for Image upload
+const dialogImageUrl = ref("");
+const dialogImageVisible = ref(false);
+const disabled = ref(false);
+const files = ref([]);
+
+const handlePictureChange = (file, fileList) => {
+  // Ensure only the last selected file is in the list
+  files.value = [fileList.at(-1)];
+};
+
+const handlePictureRemove = (file) => {
+  files.value.splice(files.value.indexOf(file), 1);
+};
+
+const handlePictureCardPreview = (file) => {
+  dialogImageUrl.value = file.url;
+  dialogImageVisible.value = true;
+};
 </script>
 
 <style scoped>

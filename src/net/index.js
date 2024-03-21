@@ -45,8 +45,11 @@ function internalPost(url, data, headers, success, failure, error = defaultError
     }).catch(err => error(err));
 }
 
-function post(url, data, success, failure = defaultFailure) {
-    internalPost(url, data, accessHeader(), success, failure);
+function post(url, data, success, failure = defaultFailure, contentType = 'application/json;charset=utf-8') {
+    internalPost(url, data, {
+        'Authorization': `Bearer ${takeAccessToken()}`,
+        'Content-Type': contentType
+    }, success, failure);
 }
 
 // Put Method
@@ -59,8 +62,11 @@ function internalPut(url, data, headers, success, failure, error = defaultError)
     }).catch(err => error(err));
 }
 
-function put(url, data, success, failure = defaultFailure) {
-    internalPut(url, data, accessHeader(), success, failure);
+function put(url, data, success, failure = defaultFailure, contentType = 'application/json;charset=utf-8') {
+    internalPut(url, data, {
+        'Authorization': `Bearer ${takeAccessToken()}`,
+        'Content-Type': contentType
+    }, success, failure);
 }
 
 // Delete Method
