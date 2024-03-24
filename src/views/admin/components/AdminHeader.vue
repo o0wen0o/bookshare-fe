@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { logout } from "@/net";
 import router from "@/router";
 import { useStore } from "vuex";
@@ -72,7 +72,7 @@ function profileInfo() {
 
 function logoutAccount() {
   logout(() => {
-    router.push("/user-auth");
+    router.push("/login");
   });
 }
 </script>

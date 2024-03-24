@@ -122,7 +122,7 @@ function userLogin() {
 
         // Check if the user has an admin role
         if (data.roles && data.roles.includes("Admin")) {
-          router.push("/admin");
+          router.push("/users");
         } else {
           router.push("/");
         }

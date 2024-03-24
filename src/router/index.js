@@ -20,10 +20,41 @@ const router = createRouter({
             ]
         }, {
             path: '/',
-            name: 'index',
-            component: () => import('@/views/IndexView.vue'),
+            name: 'user',
+            component: () => import('@/views/UserView.vue'),
             meta: { requiresAuth: true },
-            children: []
+            children: [
+                // index page
+                {
+                    path: '',
+                    name: 'index',
+                    component: () => import('@/views/user/index/IndexView.vue'),
+                    meta: { requiresAuth: true },
+                    children: [
+                        { path: '', name: 'home', component: () => import('@/views/user/home/ContentMainColumn.vue') },
+                        { path: 'community', name: 'community', component: () => import('@/views/user/community/ContentMainColumn.vue') },
+                        { path: 'fundraising-project', name: 'fundraising-project', component: () => import('@/views/user/fundraising-project/ContentMainColumn.vue') },
+                    ]
+                },
+
+                // profile page
+                {
+                    path: '/profile',
+                    name: 'profile',
+                    component: () => import('@/views/user/profile/ProfileView.vue'),
+                    meta: { requiresAuth: true },
+                    children: [
+                        { path: '/profile-detail', name: 'profile-detail', component: () => import('@/views/user/profile/ProfileDetail.vue') },
+                        { path: '/bookshelf', name: 'bookshelf', component: () => import('@/views/user/profile/Bookshelf.vue') },
+                        { path: '/book-review', name: 'book-review', component: () => import('@/views/user/profile/BookReview.vue') },
+                        { path: '/book-contribution', name: 'book-contribution', component: () => import('@/views/user/profile/BookContribution.vue') },
+                        { path: '/donation-history', name: 'donation-history', component: () => import('@/views/user/profile/DonationHistory.vue') },
+                    ]
+                },
+
+                // book detail page
+                { path: '/book-detail/:id', name: 'book-detail', component: () => import('@/views/user/book-detail/BookDetailView.vue') },
+            ]
         }, {
             path: '/admin',
             name: 'admin',
@@ -38,21 +69,21 @@ const router = createRouter({
                 { path: '/users/:id/edit', name: 'users-edit', component: () => import('@/views/admin/users/EditAdd.vue') },
 
                 { path: '/roles', name: 'roles', component: () => import('@/views/admin/roles/Browse.vue') },
-                
+
                 // Book
                 { path: '/books', name: 'books', component: () => import('@/views/admin/books/Browse.vue') },
                 { path: '/books/:id', name: 'books-read', component: () => import('@/views/admin/books/Read.vue') },
                 { path: '/books/create', name: 'books-create', component: () => import('@/views/admin/books/EditAdd.vue') },
                 { path: '/books/:id/edit', name: 'books-edit', component: () => import('@/views/admin/books/EditAdd.vue') },
-                
+
                 { path: '/genres', name: 'genres', component: () => import('@/views/admin/genres/Browse.vue') },
                 { path: '/genres/:id', name: 'genres-read', component: () => import('@/views/admin/genres/Read.vue') },
                 { path: '/genres/create', name: 'genres-create', component: () => import('@/views/admin/genres/EditAdd.vue') },
                 { path: '/genres/:id/edit', name: 'genres-edit', component: () => import('@/views/admin/genres/EditAdd.vue') },
-                
+
                 { path: '/book-submissions', name: 'book-submissions', component: () => import('@/views/admin/book-submissions/Browse.vue') },
                 { path: '/book-submissions/:id', name: 'book-submissions-read', component: () => import('@/views/admin/book-submissions/Read.vue') },
-                
+
                 // Post
                 { path: '/posts', name: 'posts', component: () => import('@/views/admin/posts/Browse.vue') },
                 { path: '/posts/:id', name: 'posts-read', component: () => import('@/views/admin/posts/Read.vue') },
