@@ -27,7 +27,7 @@
 
       <v-row justify="center" class="mt-5">
         <v-btn
-          to="/create"
+          to="/create-post"
           color="primary"
           prepend-icon="mdi-plus"
           variant="outlined"

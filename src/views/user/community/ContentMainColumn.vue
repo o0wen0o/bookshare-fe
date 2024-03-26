@@ -1,6 +1,50 @@
 <template>
   <v-card elevation="3" class="pa-3">
-    <v-card-title>Community</v-card-title>
+    <div v-for="book in books" :key="book.id">
+      <!-- Wrapped each book in router-link -->
+      <router-link
+        :to="{ name: 'book-detail', params: { id: book.id } }"
+        class="router-link-exact-active router-link-active"
+      >
+        <v-row align="center" class="book-item">
+          <!-- Book Image -->
+          <v-col cols="12" sm="3">
+            <v-img
+              :src="book.imgUrl"
+              :alt="book.title"
+              aspect-ratio="1"
+              contain
+            ></v-img>
+          </v-col>
+
+          <!-- Book Info -->
+          <v-col cols="12" sm="9">
+            <h3>{{ book.title }}</h3>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Publication Date:</strong> {{ book.publicationDate }}</p>
+
+            <!-- Inline Rating, Favourites, Reviews with Chips -->
+            <div class="chips-container">
+              <v-chip color="orange" size="small">
+                <v-icon icon="mdi-star" start></v-icon>
+                Rating: {{ book.rating }}
+              </v-chip>
+
+              <v-chip color="red" size="small">
+                <v-icon icon="mdi-heart" start></v-icon>
+                Favourites: {{ book.favourite }}
+              </v-chip>
+
+              <v-chip color="blue" size="small">
+                <v-icon icon="mdi-eye" start></v-icon>
+                Reviews: {{ book.review }}
+              </v-chip>
+            </div>
+          </v-col>
+        </v-row>
+      </router-link>
+      <v-divider class="my-3"></v-divider>
+    </div>
   </v-card>
 </template>
 

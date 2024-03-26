@@ -54,7 +54,9 @@ const router = createRouter({
 
                 // book detail page
                 { path: '/book-detail/:id', name: 'book-detail', component: () => import('@/views/user/book-detail/BookDetailView.vue') },
-            ]
+
+                // create post page
+                { path: '/create-post', name: 'create-post', component: () => import('@/views/user/community/CreatePostView.vue') },]
         }, {
             path: '/admin',
             name: 'admin',

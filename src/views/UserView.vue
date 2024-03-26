@@ -1,9 +1,11 @@
 <template>
   <div>
+    <!-- Page Header -->
     <div>
       <page-header />
     </div>
 
+    <!-- Page Body -->
     <v-container class="user_container" fluid>
       <v-row justify="center">
         <v-col cols="8">
@@ -25,5 +27,6 @@ import PageHeader from "@/views/user/component/PageHeader.vue";
 <style scoped>
 .user_container {
   background-color: #f9f9f9;
+  min-height: 90vh;
 }
 </style>

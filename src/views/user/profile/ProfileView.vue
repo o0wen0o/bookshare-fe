@@ -110,6 +110,10 @@ function navigateTo(route) {
   padding: 12px 0;
 }
 
+.navigation_menu {
+  border-radius: 5px;
+}
+
 .main-column {
   overflow-y: auto;
 }
