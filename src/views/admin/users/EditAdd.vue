@@ -66,7 +66,7 @@
               <el-icon><Plus /></el-icon>
 
               <template #file="{ file }">
-                <div>
+                <div style="display: contents;">
                   <img
                     class="el-upload-list__item-thumbnail"
                     :src="file.url"
@@ -90,26 +90,6 @@
                 </div>
               </template>
             </el-upload>
-
-            <!-- <el-upload
-              class="upload-demo"
-              drag
-              @change="previewImage"
-            >
-              <el-icon class="el-icon--upload">
-                <upload-filled />
-              </el-icon>
-              <div class="el-upload__text">
-                Drop file here or <em>click to upload</em>
-              </div>
-            </el-upload> -->
-
-            <!-- <img
-              v-if="imagePreview"
-              :src="imagePreview"
-              alt="Image Preview"
-              class="preview_image"
-            /> -->
           </el-form-item>
 
           <el-form-item>
