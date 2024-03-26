@@ -71,6 +71,9 @@ const router = createRouter({
                 { path: '/users/:id/edit', name: 'users-edit', component: () => import('@/views/admin/users/EditAdd.vue') },
 
                 { path: '/roles', name: 'roles', component: () => import('@/views/admin/roles/Browse.vue') },
+                { path: '/roles/:id', name: 'roles-read', component: () => import('@/views/admin/roles/Read.vue') },
+                { path: '/roles/create', name: 'roles-create', component: () => import('@/views/admin/roles/EditAdd.vue') },
+                { path: '/roles/:id/edit', name: 'roles-edit', component: () => import('@/views/admin/roles/EditAdd.vue') },
 
                 // Book
                 { path: '/books', name: 'books', component: () => import('@/views/admin/books/Browse.vue') },

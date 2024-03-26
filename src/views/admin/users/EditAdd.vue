@@ -66,7 +66,7 @@
               <el-icon><Plus /></el-icon>
 
               <template #file="{ file }">
-                <div style="display: contents;">
+                <div style="display: contents">
                   <img
                     class="el-upload-list__item-thumbnail"
                     :src="file.url"
@@ -152,14 +152,19 @@ const rules = {
 };
 
 const previewImage = () =>
-  commonEditAddFunction.previewImage(
-    files,
-    user.value.avatar,
-    ossEndpoint
-  );
+  commonEditAddFunction.previewImage(files, user.value.avatar, ossEndpoint);
 
 const submitForm = () =>
-  commonEditAddFunction.submitForm(userForm, user, files, id, isEdit, router, route);
+  commonEditAddFunction.submitForm(
+    userForm,
+    user,
+    id,
+    isEdit,
+    router,
+    route,
+    files,
+    "multipart/form-data"
+  );
 
 function getPasswordRules() {
   if (isEdit.value) {

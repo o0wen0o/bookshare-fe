@@ -42,7 +42,7 @@ const previewImage = (files, imgUrl, ossEndpoint) => {
     }];
 }
 
-function submitForm(dataForm, data, files, id, isEdit, router, route) {
+function submitForm(dataForm, data, id, isEdit, router, route, files, contentType = 'application/json;charset=utf-8') {
     dataForm.value.validate((valid) => {
         if (valid) {
             const formData = new FormData();
@@ -53,10 +53,10 @@ function submitForm(dataForm, data, files, id, isEdit, router, route) {
             });
 
             // Append file data if exists
-            if (files.value.length > 0 && files.value[0].raw) {
+            if (files && files.value.length > 0 && files.value[0].raw) {
                 formData.append('image', files.value[0].raw);
             }
-            
+
             const successCallbackForEdit = () => {
                 ElMessage.success("Updated successfully");
                 router.push(`/${getRouteNameForApi(route.name)}/${id.value}`);
@@ -77,7 +77,7 @@ function submitForm(dataForm, data, files, id, isEdit, router, route) {
                     formData,
                     successCallbackForEdit,
                     errorCallback,
-                    'multipart/form-data'
+                    contentType
                 );
             } else {
                 post(
@@ -85,7 +85,7 @@ function submitForm(dataForm, data, files, id, isEdit, router, route) {
                     formData,
                     successCallbackForAdd,
                     errorCallback,
-                    'multipart/form-data'
+                    contentType
                 );
             }
         } else {
