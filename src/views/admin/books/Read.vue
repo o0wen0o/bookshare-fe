@@ -20,7 +20,7 @@
           <v-container fluid>
             <v-row>
               <v-col cols="12" sm="4">
-                <v-img :src="book.imgUrl"></v-img>
+                <v-img  :src="ossEndpoint + book.imgUrl"></v-img>
               </v-col>
 
               <v-col cols="12" sm="8">
@@ -101,6 +101,7 @@ import {
 const route = useRoute();
 const id = ref(null);
 const tab = ref(null);
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 const book = ref({
   title: "",
