@@ -65,19 +65,50 @@
           </el-form-item>
 
           <el-form-item label="Image URL" prop="imgUrl">
-            <el-input v-model="book.imgUrl" @change="previewImage"></el-input>
-            <img
-              v-if="imagePreview"
-              :src="imagePreview"
-              alt="Image Preview"
-              class="preview_image"
-            />
+            <el-upload
+              action="#"
+              list-type="picture-card"
+              :auto-upload="false"
+              :file-list="files"
+              @change="handlePictureChange"
+            >
+              <el-icon><Plus /></el-icon>
+
+              <template #file="{ file }">
+                <div style="display: contents">
+                  <img
+                    class="el-upload-list__item-thumbnail"
+                    :src="file.url"
+                    alt=""
+                  />
+                  <span class="el-upload-list__item-actions">
+                    <span
+                      class="el-upload-list__item-preview"
+                      @click="handlePictureCardPreview(file)"
+                    >
+                      <el-icon><zoom-in /></el-icon>
+                    </span>
+                    <span
+                      v-if="!disabled"
+                      class="el-upload-list__item-delete"
+                      @click="() => handlePictureRemove(file)"
+                    >
+                      <el-icon><delete /></el-icon>
+                    </span>
+                  </span>
+                </div>
+              </template>
+            </el-upload>
           </el-form-item>
 
           <el-form-item>
             <el-button type="success" @click="submitForm">Save</el-button>
           </el-form-item>
         </el-form>
+
+        <el-dialog v-model="dialogImageVisible">
+          <img :src="dialogImageUrl" alt="Preview Image" class="dialog_image" />
+        </el-dialog>
       </v-container>
     </v-card>
   </div>
@@ -87,6 +118,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
+import { Delete, Plus, ZoomIn } from "@element-plus/icons-vue";
 import { get } from "@/net/index.js";
 import {
   capitalizeRouteName,
@@ -94,13 +126,13 @@ import {
   getTextRequiredRule,
 } from "@/assets/js/admin/common_edit_add.js";
 import * as commonEditAddFunction from "@/assets/js/admin/common_edit_add.js";
+import moment from 'moment';
 
 const router = useRouter();
 const route = useRoute();
 const isEdit = ref(false);
 const id = ref(null);
 const bookForm = ref(null);
-const imagePreview = ref("");
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 const languages = [
@@ -148,17 +180,30 @@ const rules = {
     },
   ],
   language: [getTextRequiredRule("Please select the language", "change")],
-  imgUrl: [
-    getTextRequiredRule("Please enter the image url"),
-    { type: "url", message: "Please enter a valid URL", trigger: "blur" },
-  ],
 };
 
 const previewImage = () =>
-  commonEditAddFunction.previewImage(imagePreview, book.value.imgUrl, ossEndpoint);
+  commonEditAddFunction.previewImage(files, book.value.imgUrl, ossEndpoint);
 
-const submitForm = () =>
-  commonEditAddFunction.submitForm(bookForm, book, id, isEdit, router, route);
+const submitForm = () => {
+  // Check and format publicationDate if it exists
+  if (book.value.publicationDate) {
+    book.value.publicationDate = moment(book.value.publicationDate).format(
+      "YYYY-MM-DD"
+    );
+  }
+
+  commonEditAddFunction.submitForm(
+    bookForm,
+    book,
+    id,
+    isEdit,
+    router,
+    route,
+    files,
+    "multipart/form-data"
+  );
+};
 
 onMounted(() => {
   id.value = route.params.id;
@@ -170,7 +215,11 @@ onMounted(() => {
       `/api/${getRouteNameForApi(route.name)}/${id.value}`,
       (data) => {
         book.value = data;
-        previewImage(); // Update the image preview
+
+        // Update the image preview
+        if (book.value.imgUrl) {
+          previewImage(book.value.imgUrl);
+        }
       },
       (error) => {
         ElMessage.error(error);
@@ -178,6 +227,26 @@ onMounted(() => {
     );
   }
 });
+
+// Below are for Image upload
+const dialogImageUrl = ref("");
+const dialogImageVisible = ref(false);
+const disabled = ref(false);
+const files = ref([]);
+
+const handlePictureChange = (file, fileList) => {
+  // Ensure only the last selected file is in the list
+  files.value = [fileList.at(-1)];
+};
+
+const handlePictureRemove = (file) => {
+  files.value.splice(files.value.indexOf(file), 1);
+};
+
+const handlePictureCardPreview = (file) => {
+  dialogImageUrl.value = file.url;
+  dialogImageVisible.value = true;
+};
 </script>
 
 <style scoped>
