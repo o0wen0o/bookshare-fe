@@ -1,24 +1,20 @@
 <template>
   <v-card class="mb-3" elevation="3">
     <v-card-title>Recommended Books</v-card-title>
-
     <v-divider></v-divider>
 
-    <v-list dense>
-      <v-list-item
+    <v-slide-group show-arrows>
+      <v-slide-group-item
         v-for="book in books"
         :key="book.id"
-        @click="goToBook(book.id)"
+        v-slot="{ active, toggle }"
       >
-        <v-list-item-avatar>
-          <v-img :src="book.imgUrl"></v-img>
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title>{{ book.title }}</v-list-item-title>
-          <v-list-item-subtitle>{{ book.author }}</v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
+        <v-card class="book-card" @click="goToBook(book.id)">
+          <v-img class="book-img" :src="book.imgUrl"></v-img>
+          <span class="book-title">{{ book.title }}</span>
+        </v-card>
+      </v-slide-group-item>
+    </v-slide-group>
   </v-card>
 </template>
 
@@ -26,19 +22,57 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
+const router = useRouter();
 const books = ref([
   {
     id: 1,
-    title: "Book One",
-    author: "Author A",
+    title: "Title 1Title 1Title 1Title 1Title 1Title 1",
     imgUrl: "https://via.placeholder.com/150",
   },
-  // Add more recommended books here
+  {
+    id: 2,
+    title: "Title 2",
+    imgUrl: "https://via.placeholder.com/150",
+  },
+  {
+    id: 3,
+    title: "Title 3",
+    imgUrl: "https://via.placeholder.com/150",
+  },
+  {
+    id: 4,
+    title: "Title 4",
+    imgUrl: "https://via.placeholder.com/150",
+  },
+  {
+    id: 5,
+    title: "Title 5",
+    imgUrl: "https://via.placeholder.com/150",
+  },
+  {
+    id: 6,
+    title: "Title 6Title 6Title 6Title 6",
+    imgUrl: "https://via.placeholder.com/150",
+  },
 ]);
-const router = useRouter();
 
 function goToBook(bookId) {
-  // Navigate to the book details. Adjust the route as needed.
-  router.push(`/books/${bookId}`);
+  // Navigate to the book details
+  router.push(`/book-detail/${bookId}`);
 }
 </script>
+
+<style scoped>
+.book-card {
+  margin: 30px 10px;
+  width: 90px;
+}
+
+.book-title {
+  padding: 5px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>
