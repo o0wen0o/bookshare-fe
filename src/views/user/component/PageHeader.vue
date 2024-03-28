@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card class="page_body" elevation="3">
+    <v-card class="page_header" elevation="3">
       <v-row align="center" justify="center" style="padding: 15px 30px">
         <v-col cols="1" style="padding: 0">
           <!-- Logo Section -->
@@ -17,7 +17,6 @@
           <v-tabs
             v-model="currentTab"
             align-tabs="start"
-            color="deep-purple-accent-4"
           >
             <v-tab :value="1" @click="navigateTo('home')">Home</v-tab>
             <v-tab :value="2" @click="navigateTo('community')">Community</v-tab>
@@ -102,11 +101,11 @@ const userData = computed(() => store.state.user || {});
 
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 const avatar = ossEndpoint + userData.value.avatar;
-const logo = ossEndpoint + "BookShare_logo.png";
+const logo = ossEndpoint + "BookShare_logo_transparent.png";
 const search = ref("");
 
 function profileInfo() {
-  router.push('/profile-detail');
+  router.push("/profile-detail");
 }
 
 function performSearch() {
@@ -145,10 +144,12 @@ function navigateTo(route) {
 </script>
 
 <style scoped>
-.admin_header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #e6e6e6;
+.v-card {
+  border-radius: 0;
+}
+
+.page_header {
+  background-color: rgb(180, 60, 0);
+  color: #fff;
 }
 </style>

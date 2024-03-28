@@ -66,6 +66,11 @@ function submitPost() {
 </script>
 
 <style scoped>
+.v-card-title {
+  background-color: rgb(180, 60, 0);
+  color: #fff;
+}
+
 .v-btn {
   margin-top: 20px;
 }
