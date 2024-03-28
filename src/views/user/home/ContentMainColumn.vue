@@ -1,5 +1,5 @@
 <template>
-  <v-card elevation="3" class="pa-3">
+  <v-card elevation="2" class="pa-3">
     <div v-for="book in books" :key="book.id">
       <!-- Wrapped each book in router-link -->
       <router-link

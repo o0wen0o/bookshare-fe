@@ -8,6 +8,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^41.2.1",
+    "@ckeditor/ckeditor5-vue": "^5.1.0",
     "@element-plus/icons-vue": "^2.1.0",
     "@mdi/font": "^7.4.47",
     "@vueuse/core": "^10.6.1",
