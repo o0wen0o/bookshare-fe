@@ -32,6 +32,5 @@ import ContentSideColumn from "@/views/user/home/ContentSideColumn.vue";
   padding: 12px 6px;
   position: sticky;
   top: 0;
-  height: 100vh;
 }
 </style>

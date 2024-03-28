@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-infinite-scroll side="end" @load="load">
     <v-card
       elevation="2"
       class="item_container"
@@ -44,7 +44,7 @@
                 :class="{ 'action-active': post.showComments }"
                 @click="toggleShowComments(post)"
               >
-                <v-icon size="20px"> mdi-comment-outline </v-icon>
+                <v-icon size="20px">mdi-comment-outline</v-icon>
                 {{ post.comments.length }}
               </span>
 
@@ -114,7 +114,13 @@
         </v-col>
       </v-row>
     </v-card>
-  </div>
+
+    <template v-slot:empty>
+      <v-alert icon="mdi-reload" type="warning">
+        No more posts available
+      </v-alert>
+    </template>
+  </v-infinite-scroll>
 </template>
 
 <script setup>
@@ -123,7 +129,7 @@ import moment from "moment";
 
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
-const posts = ref([
+const allPosts = ref([
   {
     id: 1,
     username: "User1",
@@ -154,11 +160,10 @@ const posts = ref([
         thumbed: false,
         createdDate: "2024-03-10 18:59",
       },
-      // ... other comments
     ],
   },
   {
-    id: 1,
+    id: 2,
     username: "User1",
     avatar: ossEndpoint + "default_avatar.png",
     createdDate: "2024-03-10 18:59",
@@ -187,10 +192,139 @@ const posts = ref([
         thumbed: false,
         createdDate: "2024-03-10 18:59",
       },
-      // ... other comments
+    ],
+  },
+  {
+    id: 3,
+    username: "User1",
+    avatar: ossEndpoint + "default_avatar.png",
+    createdDate: "2024-03-10 18:59",
+    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+    likes: 187,
+    thumbed: false,
+    shares: 73,
+    showComments: false,
+    newComment: "",
+    comments: [
+      {
+        id: 1,
+        username: "Commenter1",
+        avatar: ossEndpoint + "default_avatar.png",
+        text: "Great post!",
+        likes: 10,
+        thumbed: false,
+        createdDate: "2024-03-10 18:59",
+      },
+      {
+        id: 2,
+        username: "Commenter2",
+        avatar: ossEndpoint + "default_avatar.png",
+        text: "Thanks for sharing.",
+        likes: 10,
+        thumbed: false,
+        createdDate: "2024-03-10 18:59",
+      },
+    ],
+  },
+  {
+    id: 4,
+    username: "User1",
+    avatar: ossEndpoint + "default_avatar.png",
+    createdDate: "2024-03-10 18:59",
+    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+    likes: 187,
+    thumbed: false,
+    shares: 73,
+    showComments: false,
+    newComment: "",
+    comments: [
+      {
+        id: 1,
+        username: "Commenter1",
+        avatar: ossEndpoint + "default_avatar.png",
+        text: "Great post!",
+        likes: 10,
+        thumbed: false,
+        createdDate: "2024-03-10 18:59",
+      },
+      {
+        id: 2,
+        username: "Commenter2",
+        avatar: ossEndpoint + "default_avatar.png",
+        text: "Thanks for sharing.",
+        likes: 10,
+        thumbed: false,
+        createdDate: "2024-03-10 18:59",
+      },
+    ],
+  },
+  {
+    id: 5,
+    username: "User1",
+    avatar: ossEndpoint + "default_avatar.png",
+    createdDate: "2024-03-10 18:59",
+    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+    likes: 187,
+    thumbed: false,
+    shares: 73,
+    showComments: false,
+    newComment: "",
+    comments: [
+      {
+        id: 1,
+        username: "Commenter1",
+        avatar: ossEndpoint + "default_avatar.png",
+        text: "Great post!",
+        likes: 10,
+        thumbed: false,
+        createdDate: "2024-03-10 18:59",
+      },
+      {
+        id: 2,
+        username: "Commenter2",
+        avatar: ossEndpoint + "default_avatar.png",
+        text: "Thanks for sharing.",
+        likes: 10,
+        thumbed: false,
+        createdDate: "2024-03-10 18:59",
+      },
+    ],
+  },
+  {
+    id: 6,
+    username: "User1",
+    avatar: ossEndpoint + "default_avatar.png",
+    createdDate: "2024-03-10 18:59",
+    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+    likes: 187,
+    thumbed: false,
+    shares: 73,
+    showComments: false,
+    newComment: "",
+    comments: [
+      {
+        id: 1,
+        username: "Commenter1",
+        avatar: ossEndpoint + "default_avatar.png",
+        text: "Great post!",
+        likes: 10,
+        thumbed: false,
+        createdDate: "2024-03-10 18:59",
+      },
+      {
+        id: 2,
+        username: "Commenter2",
+        avatar: ossEndpoint + "default_avatar.png",
+        text: "Thanks for sharing.",
+        likes: 10,
+        thumbed: false,
+        createdDate: "2024-03-10 18:59",
+      },
     ],
   },
 ]);
+
+const posts = ref(allPosts.value.slice(0, 4));
 
 const toggleLike = (item) => {
   item.thumbed = !item.thumbed;
@@ -214,6 +348,23 @@ const addComment = (post) => {
     };
     post.comments.push(newComment);
     post.newComment = "";
+  }
+};
+
+// Function to load more posts
+const loadMorePosts = () => {
+  const currentCount = posts.value.length;
+  const morePosts = allPosts.value.slice(currentCount, currentCount + 1);
+  if (morePosts.length) {
+    posts.value = [...posts.value, ...morePosts];
+  }
+};
+
+// Load function for the v-infinite-scroll
+const load = ({ side, done }) => {
+  if (side === "end") {
+    loadMorePosts();
+    done("empty");
   }
 };
 </script>
