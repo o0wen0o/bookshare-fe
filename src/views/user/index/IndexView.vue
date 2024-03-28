@@ -24,11 +24,12 @@ import ContentSideColumn from "@/views/user/home/ContentSideColumn.vue";
 
 <style scoped>
 .main-column {
-  padding: 12px 0;
+  padding: 12px 6px;
   overflow-y: auto;
 }
 
 .side-column {
+  padding: 12px 6px;
   position: sticky;
   top: 0;
   height: 100vh;
