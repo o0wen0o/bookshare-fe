@@ -6,11 +6,11 @@ import store from '@/net/store.js';
 import 'element-plus/theme-chalk/dark/css-vars.css';
 
 // Vuetify
-import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
+import '@mdi/font/css/materialdesignicons.css';
+import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
 
 axios.defaults.baseURL = 'http://localhost:8081';
 
