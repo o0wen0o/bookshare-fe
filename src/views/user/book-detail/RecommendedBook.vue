@@ -4,13 +4,9 @@
     <v-divider></v-divider>
 
     <v-slide-group show-arrows>
-      <v-slide-group-item
-        v-for="book in books"
-        :key="book.id"
-        v-slot="{ active, toggle }"
-      >
+      <v-slide-group-item v-for="book in books" :key="book.id">
         <v-card class="book-card" @click="goToBook(book.id)">
-          <v-img class="book-img" :src="book.imgUrl"></v-img>
+          <v-img class="book-img" :src="book.imgUrl" cover></v-img>
           <span class="book-title">{{ book.title }}</span>
         </v-card>
       </v-slide-group-item>
@@ -68,8 +64,14 @@ function goToBook(bookId) {
   width: 90px;
 }
 
+.book-img {
+  height: 115px;
+}
+
 .book-title {
   padding: 5px;
+  font-size: small;
+
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;

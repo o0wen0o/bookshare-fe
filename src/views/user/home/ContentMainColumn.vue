@@ -187,6 +187,10 @@ const load = ({ side, done }) => {
 </script>
 
 <style scoped>
+.book-item {
+  margin: -10px 10px;
+}
+
 .book-item:hover {
   background-color: #f5f5f5;
   transition: background-color 0.3s ease;
