@@ -342,7 +342,7 @@ const addComment = (post) => {
       username: "Current User", // Replace with actual user info
       avatar: ossEndpoint + "default_avatar.png",
       text: post.newComment,
-      createdDate: moment().format("YYYY-MM-DD HH:mm"),
+      createdDate: moment().format("YYYY-MM-DD HH:mm:ss"),
       likes: 0, // Initialize likes for the new comment
       thumbed: false,
     };
