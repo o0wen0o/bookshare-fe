@@ -122,7 +122,7 @@ const fetchItems = () =>
     page,
     itemsPerPage,
     search,
-    route
+    route.path
   );
 
 const bulkDelete = (ids = selected.value) =>

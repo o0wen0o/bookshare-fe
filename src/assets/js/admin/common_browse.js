@@ -26,7 +26,7 @@ const updatePage = (page, newPage, fetchItems) => {
 };
 
 // Fetch items for data table
-const fetchItems = (loading, items, totalItems, page, itemsPerPage, search, route) => {
+const fetchItems = (loading, items, totalItems, page, itemsPerPage, search, routePath) => {
     loading.value = true;
     const params = {
         current: page.value,
@@ -35,7 +35,7 @@ const fetchItems = (loading, items, totalItems, page, itemsPerPage, search, rout
     };
 
     get(
-        `/api${route.path}/`,
+        `/api${routePath}/`,
         (data) => {
             items.value = data.records;
             totalItems.value = data.total;

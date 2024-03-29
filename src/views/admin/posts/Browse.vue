@@ -81,8 +81,8 @@ const headers = ref([
   { title: "ID", value: "id" },
   { title: "Content", value: "content" },
   { title: "Created Date", value: "createdDate" },
-  { title: "Likes", value: "Likes" },
-  { title: "Shares", value: "Shares" },
+  { title: "Likes", value: "likes" },
+  { title: "Shares", value: "shares" },
   { title: "User ID", value: "userId" },
   { title: "Book ID", value: "bookId" },
   { title: "Actions", value: "actions", sortable: false },
@@ -113,7 +113,7 @@ const fetchItems = () =>
     page,
     itemsPerPage,
     search,
-    route
+    route.path
   );
 
 const bulkDelete = (ids = selected.value) =>

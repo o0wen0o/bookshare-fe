@@ -108,7 +108,7 @@ const fetchItems = () =>
     page,
     itemsPerPage,
     search,
-    route
+    route.path
   );
 
 onMounted(() => {
