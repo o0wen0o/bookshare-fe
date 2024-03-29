@@ -82,7 +82,10 @@
           </v-container>
         </v-window-item>
 
-        <v-window-item :key="2" :value="2"></v-window-item>
+        <!-- Book Comments -->
+        <v-window-item :key="2" :value="2">
+          <book-comments :id="id" />
+        </v-window-item>
       </v-window>
     </v-card>
   </div>
@@ -94,9 +97,8 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { get } from "@/net/index.js";
-import {
-  getRouteNameForApi,
-} from "@/assets/js/admin/common_read.js";
+import { getRouteNameForApi } from "@/assets/js/admin/common_read.js";
+import BookComments from "../books/BookComments.vue";
 
 const route = useRoute();
 const id = ref(null);
