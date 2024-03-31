@@ -45,7 +45,7 @@ function internalPost(url, data, headers, success, failure, error = defaultError
     }).catch(err => error(err));
 }
 
-function post(url, data, success, failure = defaultFailure, contentType = 'application/json;charset=utf-8') {
+function post(url, data, success, failure = defaultFailure, contentType = 'application/x-www-form-urlencoded') {
     internalPost(url, data, {
         'Authorization': `Bearer ${takeAccessToken()}`,
         'Content-Type': contentType
@@ -70,9 +70,9 @@ function put(url, data, success, failure = defaultFailure, contentType = 'applic
 }
 
 // Delete Method
-function internalDelete(url, ids, success, failure, error = defaultError) {
+function internalDelete(url, ids, headers, success, failure, error = defaultError) {
     axios.delete(`${url}/${ids}`, {
-        headers: accessHeader()
+        headers: headers
     }).then(({ data }) => {
         if (data.code === 200)
             success();
@@ -82,7 +82,7 @@ function internalDelete(url, ids, success, failure, error = defaultError) {
 }
 
 function _delete(url, ids, success, failure = defaultFailure) {
-    internalDelete(url, ids, success, failure);
+    internalDelete(url, ids, accessHeader(), success, failure);
 }
 
 // remember is the checkbox

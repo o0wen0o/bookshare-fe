@@ -130,7 +130,7 @@
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
-import { get } from "@/net/index.js";
+import { get, post, _delete } from "@/net/index.js";
 import moment from "moment";
 
 const page = ref(1);
@@ -204,28 +204,28 @@ const toggleShowComments = async (post) => {
   post.showComments = !post.showComments;
 };
 
-const togglePostLike = async (thePost) => {  
-  item.thumbed = !item.thumbed;
-  item.likes += item.thumbed ? 1 : -1;
-  // const requestMethod = thePost.thumbed ? "post" : "_delete"; // Determine the request method
-  // const action = thePost.thumbed ? "unlike" : "like"; // Determine the action for url
-  // const url = `/api/community/${action}Post`;
-  // const data = {
-  //   postId: thePost.id,
-  //   userId: userData.value.id,
-  // };
+const togglePostLike = async (thePost) => {
+  const requestMethod = thePost.thumbed ? _delete : post; // Determine the request method
+  const action = thePost.thumbed ? "unlike" : "like"; // Determine the action for url
+  const url = `/api/community/${action}Post`;
 
-  // requestMethod(
-  //   url,
-  //   data,
-  //   (data) => {
-  //     thePost.thumbed = !thePost.thumbed; // Toggle the thumbed state
-  //     thePost.likes += thePost.thumbed ? 1 : -1; // Update the likes count
-  //   },
-  //   (message) => {
-  //     ElMessage.warning(message);
-  //   }
-  // );
+  const data = `${thePost.id}/${userData.value.id}`;
+  const formData = {
+    postId: thePost.id,
+    userId: userData.value.id,
+  };
+
+  requestMethod(
+    url,
+    thePost.thumbed ? data : formData,
+    (data) => {
+      thePost.thumbed = !thePost.thumbed; // Toggle the thumbed state
+      thePost.likes += thePost.thumbed ? 1 : -1; // Update the likes count
+    },
+    (message) => {
+      ElMessage.warning(message);
+    }
+  );
 };
 
 const toggleCommentLike = (item) => {
