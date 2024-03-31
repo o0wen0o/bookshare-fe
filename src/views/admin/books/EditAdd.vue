@@ -64,7 +64,7 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="Image URL" prop="imgUrl">
+          <el-form-item label="Image Upload" prop="imgUrl">
             <el-upload
               action="#"
               list-type="picture-card"
