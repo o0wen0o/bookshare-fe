@@ -27,10 +27,10 @@
 
       <v-row justify="center" class="mt-5">
         <v-btn
-          to="/create-post"
           color="primary"
           prepend-icon="mdi-plus"
           variant="outlined"
+          @click="navigateToCreatePost()"
         >
           Create a Post
         </v-btn>
@@ -40,6 +40,10 @@
 </template>
 
 <script setup>
+const navigateToCreatePost = () => {
+  const newTab = window.open("", "_blank"); // Open a new tab
+  newTab.location.href = `/create-post`;
+};
 </script>
 
 <style scoped>
