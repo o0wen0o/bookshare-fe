@@ -248,12 +248,6 @@ const load = ({ side, done }) => {
   transition: background-color 0.3s ease;
 }
 
-.router-link-exact-active,
-.router-link-active {
-  text-decoration: none;
-  color: inherit;
-}
-
 .v-img {
   height: 120px;
 }

@@ -46,7 +46,7 @@ const router = createRouter({
                     children: [
                         { path: '/profile-detail', name: 'profile-detail', component: () => import('@/views/user/profile/profile-detail/ProfileDetail.vue') },
                         { path: '/bookshelf', name: 'bookshelf', component: () => import('@/views/user/profile/Bookshelf.vue') },
-                        { path: '/book-review', name: 'book-review', component: () => import('@/views/user/profile/BookReview.vue') },
+                        { path: '/book-review', name: 'book-review', component: () => import('@/views/user/profile/book-review/BookReview.vue') },
                         { path: '/book-contribution', name: 'book-contribution', component: () => import('@/views/user/profile/BookContribution.vue') },
                         { path: '/donation-history', name: 'donation-history', component: () => import('@/views/user/profile/DonationHistory.vue') },
                     ]
@@ -56,7 +56,11 @@ const router = createRouter({
                 { path: '/book-detail/:id', name: 'book-detail', component: () => import('@/views/user/book-detail/BookDetailView.vue') },
 
                 // create post page
-                { path: '/create-post', name: 'create-post', component: () => import('@/views/user/community/CreatePostView.vue') },]
+                { path: '/create-post', name: 'create-post', component: () => import('@/views/user/community/CreatePostView.vue') },
+
+                // Write book review
+                { path: '/write-book-review/:id', name: 'write-book-review', component: () => import('@/views/user/profile/book-review/WriteBookReview.vue') },
+            ]
         }, {
             path: '/admin',
             name: 'admin',
