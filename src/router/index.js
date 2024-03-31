@@ -44,7 +44,7 @@ const router = createRouter({
                     component: () => import('@/views/user/profile/ProfileView.vue'),
                     meta: { requiresAuth: true },
                     children: [
-                        { path: '/profile-detail', name: 'profile-detail', component: () => import('@/views/user/profile/ProfileDetail.vue') },
+                        { path: '/profile-detail', name: 'profile-detail', component: () => import('@/views/user/profile/profile-detail/ProfileDetail.vue') },
                         { path: '/bookshelf', name: 'bookshelf', component: () => import('@/views/user/profile/Bookshelf.vue') },
                         { path: '/book-review', name: 'book-review', component: () => import('@/views/user/profile/BookReview.vue') },
                         { path: '/book-contribution', name: 'book-contribution', component: () => import('@/views/user/profile/BookContribution.vue') },

@@ -1,6 +1,6 @@
 <template>
   <v-card elevation="2">
-    <v-card-title>Create Post</v-card-title>
+    <v-card-title>Create a post</v-card-title>
     <v-divider></v-divider>
 
     <v-card-text>
