@@ -148,7 +148,8 @@ const navigateToBookDetail = (bookId) => {
 };
 
 const navigateToEditBookReview = (bookReviewId) => {
-  router.push({ name: "write-book-review", params: { id: bookReviewId } });
+  const newTab = window.open("", "_blank"); // Open a new tab
+  newTab.location.href = `/write-book-review/${bookReviewId}`;
 };
 
 // Function to load more bookReviews
