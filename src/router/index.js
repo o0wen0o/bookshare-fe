@@ -31,7 +31,7 @@ const router = createRouter({
                     component: () => import('@/views/user/index/IndexView.vue'),
                     meta: { requiresAuth: true },
                     children: [
-                        { path: '', name: 'home', component: () => import('@/views/user/home/ContentMainColumn.vue') },
+                        { path: '/', name: 'home', component: () => import('@/views/user/home/ContentMainColumn.vue') },
                         { path: 'community', name: 'community', component: () => import('@/views/user/community/ContentMainColumn.vue') },
                         { path: 'fundraising-project', name: 'fundraising-project', component: () => import('@/views/user/fundraising-project/ContentMainColumn.vue') },
                     ]

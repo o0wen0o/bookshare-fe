@@ -14,10 +14,7 @@
 
         <!-- Navigation Tabs -->
         <v-col cols="5" style="padding: 0">
-          <v-tabs
-            v-model="currentTab"
-            align-tabs="start"
-          >
+          <v-tabs v-model="currentTab" align-tabs="start">
             <v-tab :value="1" @click="navigateTo('home')">Home</v-tab>
             <v-tab :value="2" @click="navigateTo('community')">Community</v-tab>
             <v-tab :value="3" @click="navigateTo('fundraising-project')">
@@ -109,7 +106,7 @@ function profileInfo() {
 }
 
 function performSearch() {
-  router.push(`/search/${search.value}`);
+  router.push({ name: "home", query: { search: search.value } });
 }
 
 function logoutAccount() {

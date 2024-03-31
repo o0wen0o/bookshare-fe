@@ -11,7 +11,7 @@
             <!-- Book Image -->
             <v-col cols="12" sm="3">
               <v-img
-                :src="book.imgUrl"
+                :src="ossEndpoint + book.imgUrl"
                 :alt="book.title"
                 aspect-ratio="1"
                 contain
@@ -57,131 +57,54 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { ElMessage } from "element-plus";
+import { get } from "@/net/index.js";
 
-// Simulate a larger dataset
-const allBooks = ref([
-  {
-    id: 1,
-    title: "Book One",
-    author: "Author A",
-    publicationDate: "2022-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.5,
-    favourite: 100,
-    review: 200,
-  },
-  {
-    id: 2,
-    title: "Book Two",
-    author: "Author B",
-    publicationDate: "2023-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.7,
-    favourite: 140,
-    review: 230,
-  },
-  {
-    id: 3,
-    title: "Book Three",
-    author: "Author C",
-    publicationDate: "2021-05-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.2,
-    favourite: 120,
-    review: 300,
-  },
-  {
-    id: 4,
-    title: "Book Four",
-    author: "Author D",
-    publicationDate: "2020-11-15",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.8,
-    favourite: 200,
-    review: 220,
-  },
-  {
-    id: 5,
-    title: "Book Five",
-    author: "Author E",
-    publicationDate: "2019-06-21",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 3.9,
-    favourite: 90,
-    review: 100,
-  },
-  {
-    id: 6,
-    title: "Book Six",
-    author: "Author F",
-    publicationDate: "2018-02-14",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.6,
-    favourite: 150,
-    review: 190,
-  },
-  {
-    id: 7,
-    title: "Book Seven",
-    author: "Author G",
-    publicationDate: "2017-09-09",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.3,
-    favourite: 110,
-    review: 210,
-  },
-  {
-    id: 8,
-    title: "Book Eight",
-    author: "Author H",
-    publicationDate: "2023-03-03",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 5.0,
-    favourite: 300,
-    review: 400,
-  },
-  {
-    id: 9,
-    title: "Book Nine",
-    author: "Author I",
-    publicationDate: "2022-12-12",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.1,
-    favourite: 80,
-    review: 90,
-  },
-  {
-    id: 10,
-    title: "Book Ten",
-    author: "Author J",
-    publicationDate: "2021-07-07",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.9,
-    favourite: 250,
-    review: 320,
-  },
-]);
-
-// Ref for displayed books
-const books = ref(allBooks.value.slice(0, 5));
+const route = useRoute();
+const search = ref(route.params.search || "");
+const page = ref(1);
+const itemsPerPage = ref(10);
+const books = ref([]);
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 // Function to load more books
-const loadMoreBooks = () => {
-  const currentCount = books.value.length;
-  const moreBooks = allBooks.value.slice(currentCount, currentCount + 1);
-  if (moreBooks.length) {
-    books.value = [...books.value, ...moreBooks];
-  }
+const fetchItems = () => {
+  const params = {
+    current: page.value++,
+    size: itemsPerPage.value,
+    filter: search.value,
+  };
+
+  get(
+    `/api/home/getBooks`,
+    (data) => {
+      if (data.records.length) {
+        books.value = [...books.value, ...data.records];
+      }
+    },
+    (message) => {
+      ElMessage.warning(message);
+    },
+    params
+  );
 };
 
 // Load function for the v-infinite-scroll
 const load = ({ side, done }) => {
   if (side === "end") {
-    loadMoreBooks();
+    fetchItems();
     done("empty");
   }
 };
+
+watch(() => route.query.search, (newSearch) => {
+  search.value = newSearch;
+  page.value = 1;
+  books.value = [];
+  fetchItems();
+});
 </script>
 
 <style scoped>
