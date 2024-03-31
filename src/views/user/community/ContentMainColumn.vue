@@ -1,5 +1,5 @@
 <template>
-  <v-infinite-scroll side="end" @load="load">
+  <v-infinite-scroll side="end" @load="load" style="margin-top: -16px">
     <v-card
       elevation="2"
       class="item_container"
@@ -13,7 +13,7 @@
             <!-- Post User Info -->
             <div class="post_user_info">
               <v-avatar size="48px">
-                <v-img alt="Avatar" :src="post.avatar"></v-img>
+                <v-img alt="Avatar" :src="ossEndpoint + post.avatar"></v-img>
               </v-avatar>
 
               <div class="ml-2">
@@ -31,7 +31,7 @@
             <div class="post_actions">
               <span
                 :class="{ 'action-active': post.thumbed }"
-                @click="toggleLike(post)"
+                @click="togglePostLike(post)"
               >
                 <v-icon size="20px">
                   {{ post.thumbed ? "mdi-thumb-up" : "mdi-thumb-up-outline" }}
@@ -45,7 +45,7 @@
                 @click="toggleShowComments(post)"
               >
                 <v-icon size="20px">mdi-comment-outline</v-icon>
-                {{ post.comments.length }}
+                {{ post.commentCount }}
               </span>
 
               <span>
@@ -64,7 +64,10 @@
                 <v-row>
                   <v-col cols="1">
                     <v-avatar size="36px">
-                      <v-img alt="Avatar" :src="comment.avatar"></v-img>
+                      <v-img
+                        alt="Avatar"
+                        :src="ossEndpoint + comment.avatar"
+                      ></v-img>
                     </v-avatar>
                   </v-col>
 
@@ -82,7 +85,7 @@
 
                       <span
                         :class="{ 'action-active': comment.thumbed }"
-                        @click="toggleLike(comment)"
+                        @click="toggleCommentLike(comment)"
                       >
                         <v-icon size="16px">
                           {{
@@ -124,223 +127,118 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useStore } from "vuex";
+import { ElMessage } from "element-plus";
+import { get } from "@/net/index.js";
 import moment from "moment";
 
+const page = ref(1);
+const itemsPerPage = ref(10);
+const posts = ref([]);
+
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
+const store = useStore();
+const userData = computed(() => store.state.user || {});
 
-const allPosts = ref([
-  {
-    id: 1,
-    username: "User1",
-    avatar: ossEndpoint + "default_avatar.png",
-    createdDate: "2024-03-10 18:59",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-    likes: 187,
-    thumbed: false,
-    shares: 73,
-    showComments: false,
-    newComment: "",
-    comments: [
-      {
-        id: 1,
-        username: "Commenter1",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Great post!",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-      {
-        id: 2,
-        username: "Commenter2",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Thanks for sharing.",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-    ],
-  },
-  {
-    id: 2,
-    username: "User1",
-    avatar: ossEndpoint + "default_avatar.png",
-    createdDate: "2024-03-10 18:59",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-    likes: 187,
-    thumbed: false,
-    shares: 73,
-    showComments: false,
-    newComment: "",
-    comments: [
-      {
-        id: 1,
-        username: "Commenter1",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Great post!",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-      {
-        id: 2,
-        username: "Commenter2",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Thanks for sharing.",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-    ],
-  },
-  {
-    id: 3,
-    username: "User1",
-    avatar: ossEndpoint + "default_avatar.png",
-    createdDate: "2024-03-10 18:59",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-    likes: 187,
-    thumbed: false,
-    shares: 73,
-    showComments: false,
-    newComment: "",
-    comments: [
-      {
-        id: 1,
-        username: "Commenter1",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Great post!",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-      {
-        id: 2,
-        username: "Commenter2",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Thanks for sharing.",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-    ],
-  },
-  {
-    id: 4,
-    username: "User1",
-    avatar: ossEndpoint + "default_avatar.png",
-    createdDate: "2024-03-10 18:59",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-    likes: 187,
-    thumbed: false,
-    shares: 73,
-    showComments: false,
-    newComment: "",
-    comments: [
-      {
-        id: 1,
-        username: "Commenter1",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Great post!",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-      {
-        id: 2,
-        username: "Commenter2",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Thanks for sharing.",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-    ],
-  },
-  {
-    id: 5,
-    username: "User1",
-    avatar: ossEndpoint + "default_avatar.png",
-    createdDate: "2024-03-10 18:59",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-    likes: 187,
-    thumbed: false,
-    shares: 73,
-    showComments: false,
-    newComment: "",
-    comments: [
-      {
-        id: 1,
-        username: "Commenter1",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Great post!",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-      {
-        id: 2,
-        username: "Commenter2",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Thanks for sharing.",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-    ],
-  },
-  {
-    id: 6,
-    username: "User1",
-    avatar: ossEndpoint + "default_avatar.png",
-    createdDate: "2024-03-10 18:59",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-    likes: 187,
-    thumbed: false,
-    shares: 73,
-    showComments: false,
-    newComment: "",
-    comments: [
-      {
-        id: 1,
-        username: "Commenter1",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Great post!",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-      {
-        id: 2,
-        username: "Commenter2",
-        avatar: ossEndpoint + "default_avatar.png",
-        text: "Thanks for sharing.",
-        likes: 10,
-        thumbed: false,
-        createdDate: "2024-03-10 18:59",
-      },
-    ],
-  },
-]);
+// Function to load more posts
+const fetchItems = () => {
+  const params = {
+    current: page.value++,
+    size: itemsPerPage.value,
+    userId: userData.value.id,
+  };
 
-const posts = ref(allPosts.value.slice(0, 4));
+  get(
+    `/api/community/getPosts`,
+    (data) => {
+      // Map through each record to add the new attributes
+      const updatedPosts = data.records.map((post) => ({
+        ...post,
+        createdDate: moment(post.createdDate).format("YYYY-MM-DD HH:mm:ss"),
+        showComments: false,
+        newComment: "",
+        commentsLoaded: false, // Mark comments as loaded to prevent future fetches
+        comments: [],
+      }));
 
-const toggleLike = (item) => {
-  item.thumbed = !item.thumbed;
-  item.likes += item.thumbed ? 1 : -1;
+      // Update the posts state with the newly formatted posts
+      posts.value = [...posts.value, ...updatedPosts];
+    },
+    (message) => {
+      ElMessage.warning(message);
+    },
+    params
+  );
 };
 
-const toggleShowComments = (post) => {
+const toggleShowComments = async (post) => {
+  // Check if comments are already loaded for the post
+  if (!post.commentsLoaded) {
+    const params = {
+      postId: post.id,
+      userId: userData.value.id,
+    };
+
+    get(
+      `/api/community/getPostComments`,
+      (data) => {
+        // Map through each record to add the new attributes
+        post.comments = data.map((comment) => ({
+          ...comment,
+          createdDate: moment(comment.createdDate).format(
+            "YYYY-MM-DD HH:mm:ss"
+          ),
+        }));
+
+        post.commentsLoaded = true; // Mark comments as loaded to prevent future fetches
+      },
+      (message) => {
+        ElMessage.warning(message);
+      },
+      params
+    );
+  }
+
+  // Toggle the visibility of the comments section for the post
   post.showComments = !post.showComments;
+};
+
+const togglePostLike = async (thePost) => {  
+  item.thumbed = !item.thumbed;
+  item.likes += item.thumbed ? 1 : -1;
+  // const requestMethod = thePost.thumbed ? "post" : "_delete"; // Determine the request method
+  // const action = thePost.thumbed ? "unlike" : "like"; // Determine the action for url
+  // const url = `/api/community/${action}Post`;
+  // const data = {
+  //   postId: thePost.id,
+  //   userId: userData.value.id,
+  // };
+
+  // requestMethod(
+  //   url,
+  //   data,
+  //   (data) => {
+  //     thePost.thumbed = !thePost.thumbed; // Toggle the thumbed state
+  //     thePost.likes += thePost.thumbed ? 1 : -1; // Update the likes count
+  //   },
+  //   (message) => {
+  //     ElMessage.warning(message);
+  //   }
+  // );
+};
+
+const toggleCommentLike = (item) => {
+  item.thumbed = !item.thumbed;
+  item.likes += item.thumbed ? 1 : -1;
 };
 
 const addComment = (post) => {
   if (post.newComment.trim()) {
     const newComment = {
       id: Date.now(), // unique ID for the new comment
-      username: "Current User", // Replace with actual user info
-      avatar: ossEndpoint + "default_avatar.png",
+      username: userData.value.username,
+      avatar: userData.value.avatar,
       text: post.newComment,
       createdDate: moment().format("YYYY-MM-DD HH:mm:ss"),
       likes: 0, // Initialize likes for the new comment
@@ -351,19 +249,10 @@ const addComment = (post) => {
   }
 };
 
-// Function to load more posts
-const loadMorePosts = () => {
-  const currentCount = posts.value.length;
-  const morePosts = allPosts.value.slice(currentCount, currentCount + 1);
-  if (morePosts.length) {
-    posts.value = [...posts.value, ...morePosts];
-  }
-};
-
 // Load function for the v-infinite-scroll
 const load = ({ side, done }) => {
   if (side === "end") {
-    loadMorePosts();
+    fetchItems();
     done("empty");
   }
 };

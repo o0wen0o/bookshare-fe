@@ -99,6 +99,7 @@ const load = ({ side, done }) => {
   }
 };
 
+// Watch for search query changes
 watch(() => route.query.search, (newSearch) => {
   search.value = newSearch;
   page.value = 1;
