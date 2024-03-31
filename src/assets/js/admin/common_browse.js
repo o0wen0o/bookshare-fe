@@ -50,7 +50,6 @@ const fetchItems = (loading, items, totalItems, page, itemsPerPage, search, rout
 
 // Bulk delete after confirmation dialog
 const bulkDelete = (route, ids, dialog, fetchItems) => {
-    console.log(ids);
     _delete(`/api${route.path}/delete`, ids, () => {
         ElMessage.success("Items deleted successfully");
         dialog.value = false; // Close the dialog

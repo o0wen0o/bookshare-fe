@@ -1,7 +1,276 @@
 <template>
   <div>
-    <v-card elevation="3">
-      <v-card-title>Bookshelf</v-card-title>
+    <v-card elevation="2" class="pa-3">
+      <v-card-title>My Bookshelf</v-card-title>
+      <v-divider></v-divider>
+
+      <v-infinite-scroll side="end" @load="load">
+        <template v-for="book in books" :key="book.id">
+          <v-row align="center" class="book-item">
+            <!-- Book Image -->
+            <v-col cols="12" sm="3" @click="navigateToBookDetail(book.id)">
+              <v-img
+                :src="book.imgUrl"
+                :alt="book.title"
+                aspect-ratio="1"
+                contain
+              ></v-img>
+            </v-col>
+
+            <!-- Book Info -->
+            <v-col cols="12" sm="8" @click="navigateToBookDetail(book.id)">
+              <h4>{{ book.title }}</h4>
+              <p>Author: {{ book.author }}</p>
+              <p>Publication Date: {{ book.publicationDate }}</p>
+
+              <!-- Inline Rating, Favourites, Reviews with Chips -->
+              <div class="chips-container">
+                <v-chip color="orange" size="small">
+                  <v-icon icon="mdi-star" start></v-icon>
+                  Rating: {{ book.rating }}
+                </v-chip>
+
+                <v-chip color="red" size="small">
+                  <v-icon icon="mdi-heart" start></v-icon>
+                  Favourites: {{ book.favourite }}
+                </v-chip>
+
+                <v-chip color="blue" size="small">
+                  <v-icon icon="mdi-eye" start></v-icon>
+                  Reviews: {{ book.review }}
+                </v-chip>
+              </div>
+            </v-col>
+
+            <!-- Book Actions -->
+            <v-col cols="12" sm="1" class="book-actions">
+              <v-btn icon size="small" @click.stop="prepareDeleteItem(book)">
+                <v-icon>mdi-trash-can-outline</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-divider class="my-3"></v-divider>
+        </template>
+
+        <template v-slot:empty>
+          <v-alert icon="mdi-reload" type="warning">
+            No more books available
+          </v-alert>
+        </template>
+      </v-infinite-scroll>
     </v-card>
+
+    <v-dialog v-model="dialog" max-width="350">
+      <v-card
+        max-width="400"
+        prepend-icon="mdi-alert-circle"
+        text="Are you sure you want to delete it?"
+        title="Confirm Delete"
+      >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="text-none" rounded="xl" @click="cancelDelete">
+            Cancel
+          </v-btn>
+          <v-btn
+            class="text-none"
+            color="red"
+            rounded="xl"
+            variant="flat"
+            @click="deleteItem"
+          >
+            Delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
+
+<script setup>
+import { useRoute, useRouter } from "vue-router";
+import { ref, onMounted } from "vue";
+import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
+
+const route = useRoute();
+const router = useRouter();
+const dialog = ref(false); // Controls the visibility of the dialog
+const deleteItemId = ref([]);
+
+// Simulate a larger dataset
+const allBooks = ref([
+  {
+    id: 1,
+    title: "Book One",
+    author: "Author A",
+    publicationDate: "2022-01-01",
+    imgUrl: "https://via.placeholder.com/150",
+    rating: 4.5,
+    favourite: 100,
+    review: 200,
+  },
+  {
+    id: 2,
+    title: "Book Two",
+    author: "Author B",
+    publicationDate: "2023-01-01",
+    imgUrl: "https://via.placeholder.com/150",
+    rating: 4.7,
+    favourite: 140,
+    review: 230,
+  },
+  {
+    id: 3,
+    title: "Book Three",
+    author: "Author C",
+    publicationDate: "2021-05-01",
+    imgUrl: "https://via.placeholder.com/150",
+    rating: 4.2,
+    favourite: 120,
+    review: 300,
+  },
+  {
+    id: 4,
+    title: "Book Four",
+    author: "Author D",
+    publicationDate: "2020-11-15",
+    imgUrl: "https://via.placeholder.com/150",
+    rating: 4.8,
+    favourite: 200,
+    review: 220,
+  },
+  {
+    id: 5,
+    title: "Book Five",
+    author: "Author E",
+    publicationDate: "2019-06-21",
+    imgUrl: "https://via.placeholder.com/150",
+    rating: 3.9,
+    favourite: 90,
+    review: 100,
+  },
+  {
+    id: 6,
+    title: "Book Six",
+    author: "Author F",
+    publicationDate: "2018-02-14",
+    imgUrl: "https://via.placeholder.com/150",
+    rating: 4.6,
+    favourite: 150,
+    review: 190,
+  },
+  {
+    id: 7,
+    title: "Book Seven",
+    author: "Author G",
+    publicationDate: "2017-09-09",
+    imgUrl: "https://via.placeholder.com/150",
+    rating: 4.3,
+    favourite: 110,
+    review: 210,
+  },
+  {
+    id: 8,
+    title: "Book Eight",
+    author: "Author H",
+    publicationDate: "2023-03-03",
+    imgUrl: "https://via.placeholder.com/150",
+    rating: 5.0,
+    favourite: 300,
+    review: 400,
+  },
+  {
+    id: 9,
+    title: "Book Nine",
+    author: "Author I",
+    publicationDate: "2022-12-12",
+    imgUrl: "https://via.placeholder.com/150",
+    rating: 4.1,
+    favourite: 80,
+    review: 90,
+  },
+  {
+    id: 10,
+    title: "Book Ten",
+    author: "Author J",
+    publicationDate: "2021-07-07",
+    imgUrl: "https://via.placeholder.com/150",
+    rating: 4.9,
+    favourite: 250,
+    review: 320,
+  },
+]);
+
+// Ref for displayed books
+const books = ref(allBooks.value.slice(0, 5));
+
+// Wrap the functions to pass the router instance
+const prepareDeleteItem = (ids) =>
+  commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, ids);
+
+const deleteItem = () =>
+  commonBrowseFunction.bulkDelete(route, deleteItemId, dialog, fetchItems);
+
+const cancelDelete = () => {
+  dialog.value = false;
+  deleteItemId.value = [];
+};
+
+const navigateToBookDetail = (bookId) => {
+  router.push({ name: "book-detail", params: { id: bookId } });
+};
+
+// Function to load more books
+const loadMoreBooks = () => {
+  const currentCount = books.value.length;
+  const moreBooks = allBooks.value.slice(currentCount, currentCount + 1);
+  if (moreBooks.length) {
+    books.value = [...books.value, ...moreBooks];
+  }
+};
+
+// Load function for the v-infinite-scroll
+const load = ({ side, done }) => {
+  if (side === "end") {
+    loadMoreBooks();
+    done("empty");
+  }
+};
+</script>
+
+<style scoped>
+.book-item {
+  margin: -10px 10px;
+}
+
+.book-item:hover {
+  background-color: #f5f5f5;
+  transition: background-color 0.3s ease;
+}
+
+.router-link-exact-active,
+.router-link-active {
+  text-decoration: none;
+  color: inherit;
+}
+
+.v-img {
+  height: 120px;
+}
+
+.chips-container {
+  margin-top: 5px;
+}
+
+.chips-container > * {
+  margin-right: 8px;
+}
+
+.book-actions {
+  padding: 0;
+}
+
+.book-actions > * {
+  color: rgb(180, 60, 0);
+}
+</style>

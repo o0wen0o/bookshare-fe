@@ -20,11 +20,9 @@
 
             <!-- Book Info -->
             <v-col cols="12" sm="9">
-              <h3>{{ book.title }}</h3>
-              <p><strong>Author:</strong> {{ book.author }}</p>
-              <p>
-                <strong>Publication Date:</strong> {{ book.publicationDate }}
-              </p>
+              <h4>{{ book.title }}</h4>
+              <p>Author: {{ book.author }}</p>
+              <p>Publication Date: {{ book.publicationDate }}</p>
 
               <!-- Inline Rating, Favourites, Reviews with Chips -->
               <div class="chips-container">
