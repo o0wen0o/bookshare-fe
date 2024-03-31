@@ -14,15 +14,18 @@
           <el-input v-model="user.phoneNumber"></el-input>
         </el-form-item>
 
-        <el-form-item label="Bookshelf Visible" prop="bookshelfVisible">
+        <el-form-item prop="bookshelfVisible">
+          <label>Set bookshelf visiblity to public</label>
           <el-switch v-model="user.bookshelfVisible"></el-switch>
         </el-form-item>
 
-        <el-form-item label="Review Visible" prop="reviewVisible">
+        <el-form-item prop="reviewVisible">
+          <label>Set book review visiblity to public</label>
           <el-switch v-model="user.reviewVisible"></el-switch>
         </el-form-item>
 
-        <el-form-item label="Contribution Visible" prop="contributionVisible">
+        <el-form-item prop="contributionVisible">
+          <label>Set charitable contribution visiblity to public</label>
           <el-switch v-model="user.contributionVisible"></el-switch>
         </el-form-item>
 
@@ -82,7 +85,6 @@ import { ElMessage } from "element-plus";
 import { Delete, Plus, ZoomIn } from "@element-plus/icons-vue";
 import { get } from "@/net/index.js";
 import {
-  capitalizeRouteName,
   getRouteNameForApi,
   getTextRequiredRule,
   validateNumber,
@@ -177,4 +179,8 @@ const handlePictureCardPreview = (file) => {
 
 <style scoped>
 @import "@/assets/css/admin/common_edit_add.css";
+
+.el-switch {
+  margin-left: 10px;
+}
 </style>
