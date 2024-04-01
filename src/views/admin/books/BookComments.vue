@@ -33,18 +33,25 @@
 </template>
 
 <script setup>
-import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
 import { formatDatetime } from "@/assets/js/admin/common_read.js";
+import { get } from "@/net/index.js";
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
 
-const route = useRoute();
 const search = ref("");
 const loading = ref(false);
 const items = ref([]);
 const totalItems = ref(0);
 const page = ref(1);
 const itemsPerPage = ref(5);
+
+// Define the props received from the parent component
+const props = defineProps({
+  id: {
+    type: String,
+    required: true,
+  },
+});
 
 const itemsPerPageOptions = ref([
   { value: 5, title: "5" },
@@ -77,16 +84,29 @@ const updateItemsPerPage = (newItemsPerPage) =>
 const updatePage = (newPage) =>
   commonBrowseFunction.updatePage(page, newPage, fetchItems);
 
-const fetchItems = () =>
-  commonBrowseFunction.fetchItems(
-    loading,
-    items,
-    totalItems,
-    page,
-    itemsPerPage,
-    search,
-    "/book-comments"
+// Fetch items for data table
+const fetchItems = () => {
+  loading.value = true;
+  const params = {
+    current: page.value,
+    size: itemsPerPage.value,
+    filter: search.value,
+    bookId: props.id,
+  };
+
+  get(
+    `/api/book-comments/`,
+    (data) => {
+      items.value = data.records;
+      totalItems.value = data.total;
+      loading.value = false;
+    },
+    (message) => {
+      ElMessage.warning(message);
+    },
+    params
   );
+};
 
 onMounted(() => {
   fetchItems();
