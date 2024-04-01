@@ -95,7 +95,7 @@ const fetchItems = () => {
   };
 
   get(
-    `/api/book-comments/`,
+    `/api/book-comments/getBookCommentsByBookId`,
     (data) => {
       items.value = data.records;
       totalItems.value = data.total;
