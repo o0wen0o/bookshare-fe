@@ -204,22 +204,22 @@ const toggleShowComments = async (post) => {
   post.showComments = !post.showComments;
 };
 
-const togglePostLike = async (item) => {
-  const requestMethod = item.thumbed ? _delete : post; // Determine the request method
-  const action = item.thumbed ? "unlike" : "like"; // Determine the action for url
+const togglePostLike = async (postItem) => {
+  const requestMethod = postItem.thumbed ? _delete : post; // Determine the request method
+  const action = postItem.thumbed ? "unlike" : "like"; // Determine the action for url
   const url = `/api/community/${action}Post`;
 
-  const data = `${item.id}/${userData.value.id}`;
+  const data = `${postItem.id}/${userData.value.id}`;
   const formData = new FormData();
-  formData.append("postId", item.id);
+  formData.append("postId", postItem.id);
   formData.append("userId", userData.value.id);
 
   requestMethod(
     url,
-    item.thumbed ? data : formData,
+    postItem.thumbed ? data : formData,
     (data) => {
-      item.thumbed = !item.thumbed; // Toggle the thumbed state
-      item.likes += item.thumbed ? 1 : -1; // Update the likes count
+      postItem.thumbed = !postItem.thumbed; // Toggle the thumbed state
+      postItem.likes += postItem.thumbed ? 1 : -1; // Update the likes count
     },
     (message) => {
       ElMessage.warning(message);
@@ -227,22 +227,22 @@ const togglePostLike = async (item) => {
   );
 };
 
-const toggleCommentLike = (item) => {
-  const requestMethod = item.thumbed ? _delete : post; // Determine the request method
-  const action = item.thumbed ? "unlike" : "like"; // Determine the action for url
+const toggleCommentLike = (comment) => {
+  const requestMethod = comment.thumbed ? _delete : post; // Determine the request method
+  const action = comment.thumbed ? "unlike" : "like"; // Determine the action for url
   const url = `/api/community/${action}PostComment`;
 
-  const data = `${item.id}/${userData.value.id}`;
+  const data = `${comment.id}/${userData.value.id}`;
   const formData = new FormData();
-  formData.append("postCommentId", item.id);
+  formData.append("postCommentId", comment.id);
   formData.append("userId", userData.value.id);
 
   requestMethod(
     url,
-    item.thumbed ? data : formData,
+    comment.thumbed ? data : formData,
     (data) => {
-      item.thumbed = !item.thumbed; // Toggle the thumbed state
-      item.likes += item.thumbed ? 1 : -1; // Update the likes count
+      comment.thumbed = !comment.thumbed; // Toggle the thumbed state
+      comment.likes += comment.thumbed ? 1 : -1; // Update the likes count
     },
     (message) => {
       ElMessage.warning(message);
@@ -250,19 +250,41 @@ const toggleCommentLike = (item) => {
   );
 };
 
-const addComment = (post) => {
-  if (post.newComment.trim()) {
+const addComment = (postItem) => {
+  if (postItem.newComment.trim()) {
+    // Check and format publicationDate if it exists
+    if (book.value.publicationDate) {
+      book.value.publicationDate = moment(book.value.publicationDate).format(
+        "YYYY-MM-DD"
+      );
+    }
+    
     const newComment = {
-      id: Date.now(), // should get from backend
+      id: 0, // should get from backend
       username: userData.value.username,
       avatar: userData.value.avatar,
-      text: post.newComment,
+      text: postItem.newComment,
       createdDate: moment().format("YYYY-MM-DD HH:mm:ss"),
       likes: 0, // Initialize likes for the new comment
       thumbed: false,
+      userId: userData.value.id,
+      postId: postItem.id,
     };
-    post.comments.push(newComment);
-    post.newComment = "";
+
+    const url = `/api/community/createPostComment`;
+    post(
+      url,
+      newComment,
+      (data) => {
+        newComment.id = data;
+
+        postItem.comments.push(newComment);
+        postItem.newComment = "";
+      },
+      (message) => {
+        ElMessage.warning(message);
+      }
+    );
   }
 };
 
