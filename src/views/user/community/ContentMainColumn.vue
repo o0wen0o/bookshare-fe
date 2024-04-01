@@ -204,23 +204,22 @@ const toggleShowComments = async (post) => {
   post.showComments = !post.showComments;
 };
 
-const togglePostLike = async (thePost) => {
-  const requestMethod = thePost.thumbed ? _delete : post; // Determine the request method
-  const action = thePost.thumbed ? "unlike" : "like"; // Determine the action for url
+const togglePostLike = async (item) => {
+  const requestMethod = item.thumbed ? _delete : post; // Determine the request method
+  const action = item.thumbed ? "unlike" : "like"; // Determine the action for url
   const url = `/api/community/${action}Post`;
 
-  const data = `${thePost.id}/${userData.value.id}`;
-  const formData = {
-    postId: thePost.id,
-    userId: userData.value.id,
-  };
+  const data = `${item.id}/${userData.value.id}`;
+  const formData = new FormData();
+  formData.append("postId", item.id);
+  formData.append("userId", userData.value.id);
 
   requestMethod(
     url,
-    thePost.thumbed ? data : formData,
+    item.thumbed ? data : formData,
     (data) => {
-      thePost.thumbed = !thePost.thumbed; // Toggle the thumbed state
-      thePost.likes += thePost.thumbed ? 1 : -1; // Update the likes count
+      item.thumbed = !item.thumbed; // Toggle the thumbed state
+      item.likes += item.thumbed ? 1 : -1; // Update the likes count
     },
     (message) => {
       ElMessage.warning(message);
@@ -229,14 +228,32 @@ const togglePostLike = async (thePost) => {
 };
 
 const toggleCommentLike = (item) => {
-  item.thumbed = !item.thumbed;
-  item.likes += item.thumbed ? 1 : -1;
+  const requestMethod = item.thumbed ? _delete : post; // Determine the request method
+  const action = item.thumbed ? "unlike" : "like"; // Determine the action for url
+  const url = `/api/community/${action}PostComment`;
+
+  const data = `${item.id}/${userData.value.id}`;
+  const formData = new FormData();
+  formData.append("postCommentId", item.id);
+  formData.append("userId", userData.value.id);
+
+  requestMethod(
+    url,
+    item.thumbed ? data : formData,
+    (data) => {
+      item.thumbed = !item.thumbed; // Toggle the thumbed state
+      item.likes += item.thumbed ? 1 : -1; // Update the likes count
+    },
+    (message) => {
+      ElMessage.warning(message);
+    }
+  );
 };
 
 const addComment = (post) => {
   if (post.newComment.trim()) {
     const newComment = {
-      id: Date.now(), // unique ID for the new comment
+      id: Date.now(), // should get from backend
       username: userData.value.username,
       avatar: userData.value.avatar,
       text: post.newComment,

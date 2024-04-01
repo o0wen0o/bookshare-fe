@@ -45,7 +45,7 @@ function internalPost(url, data, headers, success, failure, error = defaultError
     }).catch(err => error(err));
 }
 
-function post(url, data, success, failure = defaultFailure, contentType = 'application/x-www-form-urlencoded') {
+function post(url, data, success, failure = defaultFailure, contentType = 'application/json;charset=utf-8') {
     internalPost(url, data, {
         'Authorization': `Bearer ${takeAccessToken()}`,
         'Content-Type': contentType
