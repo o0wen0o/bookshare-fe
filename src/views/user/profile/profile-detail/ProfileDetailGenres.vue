@@ -68,7 +68,6 @@ function removeChip(index) {
   selectedGenres.value.splice(index, 1);
 }
 
-// No changes needed here, keeping your custom filter function
 function customFilter(item, queryText, itemText) {
   const hasValue = (val) => (val != null ? val : "");
   const text = hasValue(itemText).toString().toLowerCase();

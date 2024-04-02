@@ -4,6 +4,17 @@
     <v-divider></v-divider>
 
     <v-card-text>
+      <v-autocomplete
+        v-model="selectedBook"
+        label="Select the related book"
+        item-value="id"
+        item-text="title"
+        :items="items"
+        :loading="loading"
+        :search="search"
+        return-object
+      ></v-autocomplete>
+
       <ckeditor
         :editor="editor"
         v-model="content"
@@ -22,15 +33,23 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { get, post } from "@/net/index.js";
+import { useStore } from "vuex";
 import CKEditor from "@ckeditor/ckeditor5-vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import moment from "moment";
 
 const ckeditor = CKEditor.component;
 const editor = ClassicEditor;
-const content = ref(
-  "<p>Content of your new post...</p><br><br><br><br><br><br>"
-);
+
+const router = useRouter();
+const store = useStore();
+const userData = computed(() => store.state.user || {});
+const content = ref("<p>Content of your new post...</p><br>");
+
 const editorConfig = ref({
   toolbar: {
     items: [
@@ -57,12 +76,70 @@ const editorConfig = ref({
 
 // Computed property to disable the Post button if content is empty or only contains empty tags
 const isPostButtonDisabled = computed(() => {
-  return content.value.replace(/<[^>]*>/g, "").trim() === "";
+  const isSelectEmpty = selectedBook.value === null;
+  const isContentEmpty = content.value.replace(/<[^>]*>/g, "").trim() === "";
+  return isSelectEmpty || isContentEmpty;
 });
 
+const selectedBook = ref(null);
+const search = ref("");
+const loading = ref(false);
+const items = ref([]);
+const page = ref(1);
+const itemsPerPage = ref(30); // The pagination funciton is not implemented yet
+
+// Fetch items (books) from backend
+const fetchItems = () => {
+  if (loading.value) return; // Prevent duplicate calls
+  loading.value = true;
+
+  const params = {
+    current: page.value,
+    size: itemsPerPage.value,
+    filter: search.value,
+  };
+
+  get(
+    `/api/community/getBookSelections`,
+    (data) => {
+      if (data.records && data.records.length > 0) {
+        items.value = [...items.value, ...data.records];
+      } else {
+        // Handle the end of the list (no more items to load)
+      }
+      loading.value = false;
+    },
+    (message) => {
+      ElMessage.warning(message);
+      loading.value = false;
+    },
+    params
+  );
+};
+
 function submitPost() {
-  console.log("submit!", content.value);
+  const formData = new FormData();
+  formData.append("content", content.value);
+  formData.append("createdDate", moment().format("YYYY-MM-DD HH:mm:ss"));
+  formData.append("userId", userData.value.id);
+  formData.append("bookId", selectedBook.value.id);
+
+  post(
+    "/api/community/createPost",
+    formData,
+    () => {
+      ElMessage.success("Post created successfully");
+      router.push({ name: "community" });
+    },
+    (message) => {
+      ElMessage.error(message);
+    }
+  );
 }
+
+onMounted(() => {
+  fetchItems();
+});
 </script>
 
 <style scoped>
