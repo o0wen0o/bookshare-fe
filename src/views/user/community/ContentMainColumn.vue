@@ -251,13 +251,6 @@ const toggleCommentLike = (comment) => {
 
 const addComment = (postItem) => {
   if (postItem.newComment.trim()) {
-    // Check and format publicationDate if it exists
-    if (book.value.publicationDate) {
-      book.value.publicationDate = moment(book.value.publicationDate).format(
-        "YYYY-MM-DD"
-      );
-    }
-
     const newComment = {
       id: 0, // should get from backend
       username: userData.value.username,

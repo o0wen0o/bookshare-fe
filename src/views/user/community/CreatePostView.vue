@@ -48,7 +48,7 @@ const editor = ClassicEditor;
 const router = useRouter();
 const store = useStore();
 const userData = computed(() => store.state.user || {});
-const content = ref("<p>Content of your new post...</p><br>");
+const content = ref("<p>Content of your new post...</p><p>&nbsp;</p>");
 
 const editorConfig = ref({
   toolbar: {
@@ -76,6 +76,7 @@ const editorConfig = ref({
 
 // Computed property to disable the Post button if content is empty or only contains empty tags
 const isPostButtonDisabled = computed(() => {
+  console.log(content.value);
   const isSelectEmpty = selectedBook.value === null;
   const isContentEmpty = content.value.replace(/<[^>]*>/g, "").trim() === "";
   return isSelectEmpty || isContentEmpty;
