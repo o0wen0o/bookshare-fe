@@ -132,11 +132,13 @@
 </template>
 
 <script setup>
-import { EditPen, Lock, Message, User } from "@element-plus/icons-vue";
-import router from "@/router";
 import { reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
+import { EditPen, Lock, Message, User } from "@element-plus/icons-vue";
 import { get, post } from "@/net/index.js";
+
+const router = useRouter();
 
 const form = reactive({
   username: "",

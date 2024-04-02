@@ -44,14 +44,15 @@
 
 <script setup>
 import { computed } from "vue";
-import { logout } from "@/net";
-import router from "@/router";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+import { logout } from "@/net";
 
 const { menuStatus } = defineProps({
   menuStatus: Boolean,
 });
 
+const router = useRouter();
 const store = useStore();
 const userData = computed(() => store.state.user || {});
 

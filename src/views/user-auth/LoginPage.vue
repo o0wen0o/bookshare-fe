@@ -78,12 +78,13 @@
 </template>
 
 <script setup>
-import router from "@/router";
-import { useStore } from "vuex";
 import { reactive, ref } from "vue";
-import { login } from "@/net/index.js";
+import { useRouter } from "vue-router";
 import { Message, Lock } from "@element-plus/icons-vue";
+import { useStore } from "vuex";
+import { login } from "@/net/index.js";
 
+const router = useRouter();
 const store = useStore();
 const formRef = ref();
 const form = reactive({

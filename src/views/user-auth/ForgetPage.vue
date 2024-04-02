@@ -167,11 +167,12 @@
 
 <script setup>
 import { reactive, ref } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
 import { EditPen, Lock, Message } from "@element-plus/icons-vue";
 import { get, post } from "@/net/index.js";
-import { ElMessage } from "element-plus";
-import router from "@/router";
 
+const router = useRouter();
 const active = ref(0);
 
 const form = reactive({
