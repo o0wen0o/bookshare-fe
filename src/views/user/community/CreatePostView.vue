@@ -118,8 +118,19 @@ const fetchItems = () => {
 };
 
 function submitPost() {
+  // Use regular expressions to remove <br> and <p>&nbsp;</p> from start and end
+  let cleanedContent = content.value.trim();
+
+  // Regular expressions for matching patterns to remove
+  const leadingTagsPattern = /^(<br\s*\/?>|<p>\&nbsp;<\/p>|\s)+/;
+  const trailingTagsPattern = /(<br\s*\/?>|<p>\&nbsp;<\/p>|\s)+$/;
+
+  // Remove leading and trailing <br> and <p>&nbsp;</p>
+  cleanedContent = cleanedContent.replace(leadingTagsPattern, "");
+  cleanedContent = cleanedContent.replace(trailingTagsPattern, "");
+
   const formData = new FormData();
-  formData.append("content", content.value);
+  formData.append("content", cleanedContent);
   formData.append("createdDate", moment().format("YYYY-MM-DD HH:mm:ss"));
   formData.append("userId", userData.value.id);
   formData.append("bookId", selectedBook.value.id);

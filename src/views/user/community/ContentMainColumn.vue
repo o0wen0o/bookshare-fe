@@ -130,7 +130,7 @@ import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { get, post, _delete } from "@/net/index.js";
 import moment from "moment";
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify"; // Sanitize HTML prevent XSS attacks
 
 const page = ref(1);
 const itemsPerPage = ref(10);
@@ -257,7 +257,7 @@ const addComment = (postItem) => {
         "YYYY-MM-DD"
       );
     }
-    
+
     const newComment = {
       id: 0, // should get from backend
       username: userData.value.username,
