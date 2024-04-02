@@ -23,9 +23,7 @@
             </div>
 
             <!-- Post Content -->
-            <div class="mt-2">
-              <p>{{ post.content }}</p>
-            </div>
+            <div class="mt-2" v-html="DOMPurify.sanitize(post.content)"></div>
 
             <!-- Post Actions -->
             <div class="post_actions">
@@ -132,6 +130,7 @@ import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { get, post, _delete } from "@/net/index.js";
 import moment from "moment";
+import DOMPurify from 'dompurify';
 
 const page = ref(1);
 const itemsPerPage = ref(10);
