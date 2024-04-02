@@ -18,7 +18,7 @@
 
               <div class="ml-2">
                 <strong>{{ post.username }}</strong>
-                <div>{{ post.createdDate }}</div>
+                <div style="color: grey">{{ post.createdDate }}</div>
               </div>
             </div>
 
@@ -154,7 +154,7 @@ const fetchItems = () => {
       // Map through each record to add the new attributes
       const updatedPosts = data.records.map((post) => ({
         ...post,
-        createdDate: moment(post.createdDate).format("YYYY-MM-DD HH:mm:ss"),
+        createdDate: formatCreatedDate(post.createdDate),
         showComments: false,
         newComment: "",
         commentsLoaded: false, // Mark comments as loaded to prevent future fetches
@@ -185,9 +185,7 @@ const toggleShowComments = async (post) => {
         // Map through each record to add the new attributes
         post.comments = data.map((comment) => ({
           ...comment,
-          createdDate: moment(comment.createdDate).format(
-            "YYYY-MM-DD HH:mm:ss"
-          ),
+          createdDate: formatCreatedDate(comment.createdDate),
         }));
 
         post.commentsLoaded = true; // Mark comments as loaded to prevent future fetches
@@ -270,6 +268,7 @@ const addComment = (postItem) => {
       (data) => {
         newComment.id = data;
 
+        newComment.createdDate = formatCreatedDate(newComment.createdDate);
         postItem.comments.push(newComment);
         postItem.newComment = "";
       },
@@ -279,6 +278,33 @@ const addComment = (postItem) => {
     );
   }
 };
+
+// Helper function to format the created date
+function formatCreatedDate(createdDate) {
+  const date = moment(createdDate);
+  const now = moment();
+
+  const diffSeconds = now.diff(date, "seconds");
+  const diffMinutes = now.diff(date, "minutes");
+  const diffHours = now.diff(date, "hours");
+  const diffDays = now.diff(date, "days");
+
+  if (diffSeconds < 60) { // Less than 60 seconds ago
+    return `${diffSeconds} seconds ago`;
+
+  } else if (diffMinutes < 60) { // Less than 60 minutes ago
+    return `${diffMinutes} minutes ago`;
+
+  } else if (diffHours < 24) { // Less than 24 hours ago
+    return `${diffHours} hours ago`;
+
+  } else if (diffDays < 7) { // Less than 7 days ago
+    return `${diffDays} days ago`;
+
+  } else { // Any time before this week
+    return date.format("YYYY-MM-DD HH:mm:ss");
+  }
+}
 
 // Load function for the v-infinite-scroll
 const load = ({ side, done }) => {
