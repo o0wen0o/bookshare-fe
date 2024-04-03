@@ -42,6 +42,7 @@
         :items-per-page-options="itemsPerPageOptions"
         @update:items-per-page="updateItemsPerPage"
         @update:page="updatePage"
+        show-select
         show-current-page
         hover
       >

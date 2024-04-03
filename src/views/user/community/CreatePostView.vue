@@ -81,12 +81,13 @@ const isPostButtonDisabled = computed(() => {
   return isSelectEmpty || isContentEmpty;
 });
 
+// The pagination funciton is not implemented yet
 const selectedBook = ref(null);
 const search = ref("");
 const loading = ref(false);
 const items = ref([]);
 const page = ref(1);
-const itemsPerPage = ref(30); // The pagination funciton is not implemented yet
+const itemsPerPage = ref(30);
 
 // Fetch items (books) from backend
 const fetchItems = () => {
