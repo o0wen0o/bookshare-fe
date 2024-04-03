@@ -4,6 +4,20 @@
       <h1 class="page_title" :style="{ textTransform: 'capitalize' }">
         {{ $route.name }}
       </h1>
+
+      <div class="page_actions">
+        <router-link :to="`${$route.path}/create`">
+          <v-btn color="primary" prepend-icon="mdi-plus">Add New</v-btn>
+        </router-link>
+
+        <v-btn
+          color="red"
+          prepend-icon="mdi-delete"
+          @click="prepareDeleteItem(selected)"
+        >
+          Bulk Delete
+        </v-btn>
+      </div>
     </div>
 
     <v-card class="page_body" elevation="3">
@@ -40,14 +54,19 @@
 
         <!-- Actions -->
         <template #item.actions="{ item }">
-          <router-link :to="`${route.path}/${item.id}`">
-            <v-btn color="warning" prepend-icon="mdi-eye" size="small">
-              View
-            </v-btn>
-          </router-link>
+          <DataTableActions
+            :item="item"
+            @prepare-delete-item="prepareDeleteItem"
+          ></DataTableActions>
         </template>
       </v-data-table-server>
     </v-card>
+
+    <!-- Delete Confirmation -->
+    <DeleteConfirmationDialog
+      v-model="dialog"
+      @confirm-delete="bulkDelete(deleteItemId)"
+    ></DeleteConfirmationDialog>
   </div>
 </template>
 
@@ -56,6 +75,8 @@ import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
 import { formatDatetime } from "@/assets/js/admin/common_browse.js";
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
+import DataTableActions from "@/views/admin/components/DataTableActions.vue";
+import DeleteConfirmationDialog from "@/views/admin/components/DeleteConfirmationDialog.vue";
 
 const route = useRoute();
 const dialog = ref(false); // Controls the visibility of the dialog

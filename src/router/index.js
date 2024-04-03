@@ -96,6 +96,8 @@ const router = createRouter({
                 // Post
                 { path: '/posts', name: 'posts', component: () => import('@/views/admin/posts/Browse.vue') },
                 { path: '/posts/:id', name: 'posts-read', component: () => import('@/views/admin/posts/Read.vue') },
+                { path: '/posts/create', name: 'posts-create', component: () => import('@/views/admin/posts/EditAdd.vue') },
+                { path: '/posts/:id/edit', name: 'posts-edit', component: () => import('@/views/admin/posts/EditAdd.vue') },
 
                 // Fundraising
                 { path: '/fundraising-organizers', name: 'fundraising-organizers', component: () => import('@/views/admin/fundraising-organizers/Browse.vue') },

@@ -1,6 +1,7 @@
 import { ElMessage } from "element-plus";
 import { post, put } from "@/net/index.js";
 
+// Modify route name for page title
 const capitalizeRouteName = (name) => {
     const words = name.split('-');
     const capitalizedWords = words.slice(0, -1).map(word => {
