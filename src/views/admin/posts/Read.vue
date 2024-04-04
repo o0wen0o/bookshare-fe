@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title">View Book</h1>
+      <h1 class="page_title">View {{ capitalizeRouteName(route.name) }}</h1>
       <div class="page_actions">
         <router-link :to="{ path: `/${getRouteNameForApi(route.name)}` }">
           <v-btn color="warning" prepend-icon="mdi-menu">Return to list</v-btn>
@@ -12,79 +12,54 @@
     <v-card class="page_body" elevation="3">
       <v-tabs v-model="tab" align-tabs="start" color="deep-purple-accent-4">
         <v-tab :value="1">General</v-tab>
-        <v-tab :value="2">Book Comment</v-tab>
       </v-tabs>
 
       <v-window v-model="tab">
         <v-window-item :key="1" :value="1">
           <v-container fluid>
             <v-row>
-              <v-col cols="12" sm="4">
-                <v-img :src="book.imgUrl"></v-img>
-              </v-col>
-
-              <v-col cols="12" sm="8">
-                <div>
-                  <v-card-title>{{ book.title }}</v-card-title>
-                  <v-card-subtitle>{{ book.author }}</v-card-subtitle>
-                </div>
-
+              <v-col cols="12">
                 <div class="details">
                   <v-card-text>
                     <div class="form_group">
-                      <strong>Publisher:</strong>
-                      {{ book.publisher }}
+                      <strong>ID:</strong>
+                      {{ post.id }}
                     </div>
 
                     <div class="form_group">
-                      <strong>ISBN:</strong>
-                      {{ book.isbn }}
+                      <strong>Content:</strong>
+                      {{ post.content }}
                     </div>
 
                     <div class="form_group">
-                      <strong>Publication Date:</strong>
-                      {{ book.publicationDate }}
+                      <strong>Created Date:</strong>
+                      {{ post.createdDate }}
                     </div>
 
                     <div class="form_group">
-                      <strong>Pages:</strong>
-                      {{ book.page }}
+                      <strong>Number of Likes:</strong>
+                      {{ post.likes }}
                     </div>
 
                     <div class="form_group">
-                      <strong>Language:</strong>
-                      {{ book.language }}
+                      <strong>Number of Shares:</strong>
+                      {{ post.shares }}
                     </div>
 
                     <div class="form_group">
-                      <strong>Rating:</strong>
-                      {{ book.rating }}
+                      <strong>User ID:</strong>
+                      {{ post.userId }}
                     </div>
 
                     <div class="form_group">
-                      <strong>Favourite:</strong>
-                      {{ book.favourite }}
-                    </div>
-
-                    <div class="form_group">
-                      <strong>Review:</strong>
-                      {{ book.review }}
-                    </div>
-
-                    <div class="form_group">
-                      <strong>Book Description:</strong>
-                      {{ book.description }}
+                      <strong>Book ID:</strong>
+                      {{ post.bookId }}
                     </div>
                   </v-card-text>
                 </div>
               </v-col>
             </v-row>
           </v-container>
-        </v-window-item>
-
-        <!-- Book Comments -->
-        <v-window-item :key="2" :value="2">
-          <book-comments :id="id" />
         </v-window-item>
       </v-window>
     </v-card>
@@ -97,36 +72,33 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { get } from "@/net/index.js";
-import { getRouteNameForApi } from "@/assets/js/admin/common_read.js";
-import BookComments from "../books/BookComments.vue";
+import {
+  capitalizeRouteName,
+  getRouteNameForApi,
+} from "@/assets/js/admin/common_read.js";
 
 const route = useRoute();
 const id = ref(null);
 const tab = ref(null);
 
-const book = ref({
-  title: "",
-  author: "",
-  description: "",
-  publisher: "",
-  isbn: "",
-  publicationDate: "",
-  page: 0,
-  language: "",
-  imgUrl: "",
-  rating: 0,
-  favourite: 0,
-  review: 0,
+const post = ref({
+  id: "",
+  content: "",
+  createdDate: "",
+  likes: "",
+  shares: "",
+  userId: "",
+  postId: 0,
 });
 
 onMounted(() => {
   id.value = route.params.id;
 
-  // Fetch book data based on id
+  // Fetch post data based on id
   get(
     `/api/${getRouteNameForApi(route.name)}/${id.value}`,
     (data) => {
-      book.value = data;
+      post.value = data;
     },
     (error) => {
       ElMessage.error(error);
