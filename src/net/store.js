@@ -13,6 +13,7 @@ const store = createStore({
         return {
             user: null, // This will hold our user data
             menuCollapsed: true, // navigation menu
+            bookId: null, // ID of the book in book detail page
         };
     },
     mutations: {
@@ -22,6 +23,9 @@ const store = createStore({
         toggleMenuCollapse(state) {
             state.menuCollapsed = !state.menuCollapsed;
         },
+        setBookId(state, id) {
+            state.bookId = id;
+        },
     },
     actions: {
         loginUser({ commit }, userData) {
@@ -30,9 +34,13 @@ const store = createStore({
         toggleMenuCollapse({ commit }) {
             commit('toggleMenuCollapse');
         },
+        setBookId({ commit }, id) {
+            commit('setBookId', id);
+        },
     },
     getters: {
         userRoles: (state) => state.user ? state.user.roles : [],
+        currentBookId: (state) => state.bookId,
     },
 });
 

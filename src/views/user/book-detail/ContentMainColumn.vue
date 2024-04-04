@@ -80,7 +80,6 @@ import { useRouter, useRoute } from "vue-router";
 import { get, post, _delete } from "@/net/index.js";
 import BookComments from "./BookComments.vue";
 
-const router = useRouter();
 const route = useRoute();
 const bookId = ref(null);
 const showDetails = ref(false);
@@ -136,7 +135,7 @@ const fetchItems = () => {
 
 onMounted(() => {
   bookId.value = route.params.id;
-
+  store.dispatch("setBookId", bookId); // Store bookId in Vuex store
   fetchItems();
 });
 </script>
