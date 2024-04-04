@@ -267,8 +267,8 @@ const addComment = (postItem) => {
       newComment,
       (data) => {
         newComment.id = data;
-
         newComment.createdDate = formatCreatedDate(newComment.createdDate);
+        
         postItem.comments.push(newComment);
         postItem.newComment = "";
       },

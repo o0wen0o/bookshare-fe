@@ -8,7 +8,7 @@
             <!-- comment User Info -->
             <div class="comment_user_info">
               <v-avatar size="48px">
-                <v-img alt="Avatar" :src="comment.avatar"></v-img>
+                <v-img alt="Avatar" :src="ossEndpoint + comment.avatar"></v-img>
               </v-avatar>
 
               <div class="ml-2">
@@ -42,7 +42,7 @@
                 @click="toggleShowReplies(comment)"
               >
                 <v-icon size="20px">mdi-comment-outline</v-icon>
-                {{ comment.replies.length }}
+                {{ comment.replyCount }}
               </span>
 
               <span>
@@ -51,7 +51,7 @@
               </span>
             </div>
 
-            <v-divider class="my-3"></v-divider>
+            <v-divider class="mt-3"></v-divider>
           </div>
 
           <!-- replies Section -->
@@ -61,7 +61,10 @@
                 <v-row>
                   <v-col cols="1">
                     <v-avatar size="36px">
-                      <v-img alt="Avatar" :src="reply.avatar"></v-img>
+                      <v-img
+                        alt="Avatar"
+                        :src="ossEndpoint + reply.avatar"
+                      ></v-img>
                     </v-avatar>
                   </v-col>
 
@@ -121,146 +124,171 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useStore } from "vuex";
+import { ElMessage } from "element-plus";
+import { get, post, _delete } from "@/net/index.js";
 import moment from "moment";
 
+const page = ref(1);
+const itemsPerPage = ref(10);
+const comments = ref([]);
+
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
+const store = useStore();
+const userData = computed(() => store.state.user || {});
+const bookId = computed(() => store.state.bookId || {});
 
-const allComments = ref([
-  {
-    id: 1,
-    username: "John Doe",
-    parentId: 0,
-    text: "This is the first reply",
-    createdDate: "2022-01-01 18:10:25",
-    likes: 10,
-    thumbed: false,
-    avatar: ossEndpoint + "default_avatar.png",
-    showReplies: false,
-    replies: [
-      {
-        id: 2,
-        username: "Jane Doe",
-        parentId: 1,
-        text: "This is the first reply",
-        createdDate: "2022-01-01 18:10:25",
-        likes: 10,
-        thumbed: false,
-        avatar: ossEndpoint + "default_avatar.png",
-      },
-    ],
-  },
-  {
-    id: 2,
-    username: "John Doe",
-    parentId: 0,
-    text: "This is the first reply",
-    createdDate: "2022-01-01 18:10:25",
-    likes: 10,
-    thumbed: false,
-    avatar: ossEndpoint + "default_avatar.png",
-    showReplies: false,
-    replies: [
-      {
-        id: 2,
-        username: "Jane Doe",
-        parentId: 1,
-        text: "This is the first reply",
-        createdDate: "2022-01-01 18:10:25",
-        likes: 10,
-        thumbed: false,
-        avatar: ossEndpoint + "default_avatar.png",
-      },
-    ],
-  },
-  {
-    id: 3,
-    username: "John Doe",
-    parentId: 0,
-    text: "This is the first reply",
-    createdDate: "2022-01-01 18:10:25",
-    likes: 10,
-    thumbed: false,
-    avatar: ossEndpoint + "default_avatar.png",
-    showReplies: false,
-    replies: [
-      {
-        id: 2,
-        username: "Jane Doe",
-        parentId: 1,
-        text: "This is the first reply",
-        createdDate: "2022-01-01 18:10:25",
-        likes: 10,
-        thumbed: false,
-        avatar: ossEndpoint + "default_avatar.png",
-      },
-    ],
-  },
-  {
-    id: 4,
-    username: "John Doe",
-    parentId: 0,
-    text: "This is the first reply",
-    createdDate: "2022-01-01 18:10:25",
-    likes: 10,
-    thumbed: false,
-    avatar: ossEndpoint + "default_avatar.png",
-    showReplies: false,
-    replies: [
-      {
-        id: 2,
-        username: "Jane Doe",
-        parentId: 1,
-        text: "This is the first reply",
-        createdDate: "2022-01-01 18:10:25",
-        likes: 10,
-        thumbed: false,
-        avatar: ossEndpoint + "default_avatar.png",
-      },
-    ],
-  },
-]);
+// Function to load more comments
+const fetchItems = () => {
+  const params = {
+    current: page.value++,
+    size: itemsPerPage.value,
+    bookId: bookId.value,
+    userId: userData.value.id,
+  };
 
-const comments = ref(allComments.value.slice(0, 4));
+  get(
+    `/api/book-detail/getComments`,
+    (data) => {
+      // Map through each record to add the new attributes
+      const updatedComments = data.records.map((comment) => ({
+        ...comment,
+        createdDate: formatCreatedDate(comment.createdDate),
+        showReplies: false,
+        newReply: "",
+        repliesLoaded: false, // Mark replies as loaded to prevent future fetches
+        replies: [],
+      }));
 
-const toggleLike = (item) => {
-  item.thumbed = !item.thumbed;
-  item.likes += item.thumbed ? 1 : -1;
+      // Update the comments state with the newly formatted comments
+      comments.value = [...comments.value, ...updatedComments];
+    },
+    (message) => {
+      ElMessage.warning(message);
+    },
+    params
+  );
 };
 
-const toggleShowReplies = (comment) => {
+const toggleShowReplies = async (comment) => {
+  // Check if replies are already loaded for the comment
+  if (!comment.repliesLoaded) {
+    const params = {
+      bookCommentId: comment.id,
+      userId: userData.value.id,
+    };
+
+    get(
+      `/api/book-detail/getCommentReplies`,
+      (data) => {
+        // Map through each record to add the new attributes
+        comment.replies = data.map((reply) => ({
+          ...reply,
+          createdDate: formatCreatedDate(reply.createdDate),
+        }));
+
+        comment.repliesLoaded = true; // Mark replies as loaded to prevent future fetches
+      },
+      (message) => {
+        ElMessage.warning(message);
+      },
+      params
+    );
+  }
+
+  // Toggle the visibility of the replies section for the comment
   comment.showReplies = !comment.showReplies;
+};
+
+const toggleLike = async (item) => {
+  const requestMethod = item.thumbed ? _delete : post; // Determine the request method
+  const action = item.thumbed ? "unlike" : "like"; // Determine the action for url
+  const url = `/api/book-detail/${action}BookComment`;
+
+  const data = `${item.id}/${userData.value.id}`;
+  const formData = new FormData();
+  formData.append("bookCommentId", item.id);
+  formData.append("userId", userData.value.id);
+
+  requestMethod(
+    url,
+    item.thumbed ? data : formData,
+    (data) => {
+      item.thumbed = !item.thumbed; // Toggle the thumbed state
+      item.likes += item.thumbed ? 1 : -1; // Update the likes count
+    },
+    (message) => {
+      ElMessage.warning(message);
+    }
+  );
 };
 
 const addreply = (comment) => {
   if (comment.newreply.trim()) {
     const newreply = {
-      id: Date.now(), // unique ID for the new reply
-      username: "Current User", // Replace with actual user info
-      avatar: ossEndpoint + "default_avatar.png",
+      id: 0, // should get from backend
+      username: userData.value.username,
+      avatar: userData.value.avatar,
+      parentId: comment.id,
       text: comment.newreply,
       createdDate: moment().format("YYYY-MM-DD HH:mm:ss"),
-      likes: 0, // Initialize likes for the new reply
+      likes: 0, // Initialize likes for the new comment
       thumbed: false,
+      userId: userData.value.id,
+      bookId: bookId.value,
     };
-    comment.replies.push(newreply);
-    comment.newreply = "";
+
+    const url = `/api/book-detail/createBookComment`;
+    post(
+      url,
+      newreply,
+      (data) => {
+        newreply.id = data;
+        newreply.createdDate = formatCreatedDate(newreply.createdDate);
+        
+        comment.replies.push(newreply);
+        comment.newreply = "";
+      },
+      (message) => {
+        ElMessage.warning(message);
+      }
+    );
   }
 };
 
-// Function to load more comments
-const loadMoreComments = () => {
-  const currentCount = comments.value.length;
-  const moreComments = allComments.value.slice(currentCount, currentCount + 1);
-  if (moreComments.length) {
-    comments.value = [...comments.value, ...moreComments];
+// Helper function to format the created date
+function formatCreatedDate(createdDate) {
+  const date = moment(createdDate);
+  const now = moment();
+
+  const diffSeconds = now.diff(date, "seconds");
+  const diffMinutes = now.diff(date, "minutes");
+  const diffHours = now.diff(date, "hours");
+  const diffDays = now.diff(date, "days");
+
+  if (diffSeconds < 60) {
+    // Less than 60 seconds ago
+    return `${diffSeconds} seconds ago`;
+  } else if (diffMinutes < 60) {
+    // Less than 60 minutes ago
+    return `${diffMinutes} minutes ago`;
+  } else if (diffHours < 24) {
+    // Less than 24 hours ago
+    return `${diffHours} hours ago`;
+  } else if (diffDays < 7) {
+    // Less than 7 days ago
+    return `${diffDays} days ago`;
+  } else {
+    // Any time before this week
+    return date.format("YYYY-MM-DD HH:mm:ss");
   }
-};
+}
 
 // Load function for the v-infinite-scroll
 const load = ({ side, done }) => {
   if (side === "end") {
-    loadMoreComments();
+    fetchItems();
     done("empty");
   }
 };
@@ -273,7 +301,7 @@ const load = ({ side, done }) => {
 }
 
 .comment_container {
-  padding: 10px;
+  padding: 0 10px;
 }
 
 .comment_user_info {
@@ -299,7 +327,7 @@ const load = ({ side, done }) => {
 }
 
 .reply_container {
-  margin: 0 15px;
+  margin: 15px 15px 0 15px;
 }
 
 .reply_body {

@@ -76,7 +76,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useStore } from "vuex";
-import { useRouter, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import { get, post, _delete } from "@/net/index.js";
 import BookComments from "./BookComments.vue";
 
