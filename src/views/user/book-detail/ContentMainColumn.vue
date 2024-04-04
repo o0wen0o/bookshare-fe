@@ -78,6 +78,7 @@ import { ref, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { get, post, _delete } from "@/net/index.js";
+import { ElMessage } from "element-plus";
 import BookComments from "./BookComments.vue";
 
 const route = useRoute();
@@ -108,17 +109,32 @@ const book = ref({
   ratingCount: 123,
 });
 
-function addToBookshelf(book) {
-  console.log("Adding to bookshelf", book.title);
+// Toggle favourite button, add/remove the book to bookshelf
+function toggleFavourite(book) {
+  const requestMethod = book.isFavourite ? _delete : post; // Determine the request method
+  const action = book.isFavourite ? "deleteFrom" : "addTo"; // Determine the action for url
+  const url = `/api/book-detail/${action}Bookshelf`;
+
+  const data = `${book.id}/${userData.value.id}`;
+  const formData = new FormData();
+  formData.append("bookId", book.id);
+  formData.append("userId", userData.value.id);
+
+  requestMethod(
+    url,
+    book.isFavourite ? data : formData,
+    (data) => {
+      book.isFavourite = !book.isFavourite; // Toggle the thumbed state
+      book.favourite += book.isFavourite ? 1 : -1; // Update the likes count
+    },
+    (message) => {
+      ElMessage.warning(message);
+    }
+  );
 }
 
 function scrollToComments() {
   console.log("Scrolling to comments");
-}
-
-function toggleFavourite(book) {
-  book.isFavourite = !book.isFavourite;
-  book.favourite += book.isFavourite ? 1 : -1;
 }
 
 const fetchItems = () => {
