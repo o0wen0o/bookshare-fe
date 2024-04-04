@@ -68,13 +68,13 @@
       <v-divider class="my-3"></v-divider>
 
       <!-- Comments -->
-      <book-comments />
+      <book-comments ref="commentsSection" />
     </v-container>
   </v-card>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, nextTick } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { get, post, _delete } from "@/net/index.js";
@@ -133,8 +133,13 @@ function toggleFavourite(book) {
   );
 }
 
+const commentsSection = ref(null);
 function scrollToComments() {
-  console.log("Scrolling to comments");
+  nextTick(() => {
+    if (commentsSection.value) {
+      commentsSection.value.$el.scrollIntoView({ behavior: "smooth" });
+    }
+  });
 }
 
 const fetchItems = () => {
