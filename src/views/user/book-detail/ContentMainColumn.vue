@@ -10,7 +10,7 @@
         <p><strong>Author:</strong> {{ book.author }}</p>
         <p><strong>Page:</strong> {{ book.page }}</p>
         <p><strong>Language:</strong> {{ book.language }}</p>
-        <p><strong>Genres:</strong> {{ book.genres.join(", ") }}</p>
+        <p><strong>Genres:</strong> {{ book.genres.split(",").join(", ") }}</p>
 
         <!-- Toggleable Details -->
         <v-btn
@@ -74,10 +74,21 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { useStore } from "vuex";
+import { useRouter, useRoute } from "vue-router";
+import { get, post, _delete } from "@/net/index.js";
 import BookComments from "./BookComments.vue";
 
+const router = useRouter();
+const route = useRoute();
+const bookId = ref(null);
+const showDetails = ref(false);
+
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
+const store = useStore();
+const userData = computed(() => store.state.user || {});
+
 const book = ref({
   title: "The Great Adventure",
   author: "John Doe",
@@ -87,7 +98,7 @@ const book = ref({
   publicationDate: "2022-01-01",
   page: 300,
   language: "English",
-  genres: ["Adventure", "Fantasy"],
+  genres: "Adventure,Fantasy",
   imgUrl: "books/the_great_adventure_.jpg",
   rating: 4.5,
   favourite: 100,
@@ -97,8 +108,6 @@ const book = ref({
   commentCount: 456,
   ratingCount: 123,
 });
-
-const showDetails = ref(false);
 
 function addToBookshelf(book) {
   console.log("Adding to bookshelf", book.title);
@@ -112,6 +121,24 @@ function toggleFavourite(book) {
   book.isFavourite = !book.isFavourite;
   book.favourite += book.isFavourite ? 1 : -1;
 }
+
+const fetchItems = () => {
+  get(
+    `/api/book-detail/getBookDetail/${bookId.value}/${userData.value.id}`,
+    (data) => {
+      book.value = data;
+    },
+    (error) => {
+      ElMessage.error(error);
+    }
+  );
+};
+
+onMounted(() => {
+  bookId.value = route.params.id;
+
+  fetchItems();
+});
 </script>
 
 <style>
