@@ -58,9 +58,10 @@
         </div>
 
         <v-rating
-          :model-value="book.rating"
+          v-model="book.currentRating"
           color="yellow-darken-3"
           half-increments
+          @click="rateBook"
         ></v-rating>
         <div class="px-3">{{ book.ratingCount }} ratings</div>
       </div>
@@ -90,24 +91,37 @@ const store = useStore();
 const userData = computed(() => store.state.user || {});
 
 const book = ref({
-  title: "The Great Adventure",
-  author: "John Doe",
-  description: "Description of the book...",
-  publisher: "Publisher Name",
-  isbn: "1234567890",
-  publicationDate: "2022-01-01",
-  page: 300,
-  language: "English",
-  genres: "Adventure,Fantasy",
-  imgUrl: "books/the_great_adventure_.jpg",
-  rating: 4.5,
-  favourite: 100,
-  review: 200,
+  title: "",
+  author: "",
+  description: "",
+  publisher: "",
+  isbn: "",
+  publicationDate: "",
+  page: 0,
+  language: "",
+  genres: "",
+  imgUrl: "",
+  rating: 0,
+  favourite: 0,
+  review: 0,
 
   isFavourite: false,
-  commentCount: 456,
-  ratingCount: 123,
+  commentCount: 0,
+  ratingCount: 0,
+  currentRating: 0,
 });
+
+const fetchItems = () => {
+  get(
+    `/api/book-detail/getBookDetail/${bookId.value}/${userData.value.id}`,
+    (data) => {
+      book.value = data;
+    },
+    (error) => {
+      ElMessage.error(error);
+    }
+  );
+};
 
 // Toggle favourite button, add/remove the book to bookshelf
 function toggleFavourite(book) {
@@ -142,14 +156,22 @@ function scrollToComments() {
   });
 }
 
-const fetchItems = () => {
-  get(
-    `/api/book-detail/getBookDetail/${bookId.value}/${userData.value.id}`,
+const rateBook = () => {
+  const url = "/api/book-detail/rateBook";
+
+  const formData = new FormData();
+  formData.append("rating", book.value.currentRating);
+  formData.append("bookId", bookId.value);
+  formData.append("userId", userData.value.id);
+
+  post(
+    url,
+    formData,
     (data) => {
-      book.value = data;
+      // book.favourite += book.favourite ? 1 : -1; // Update the likes count
     },
-    (error) => {
-      ElMessage.error(error);
+    (message) => {
+      ElMessage.error(message);
     }
   );
 };
