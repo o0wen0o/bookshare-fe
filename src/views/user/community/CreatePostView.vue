@@ -8,7 +8,7 @@
         v-model="selectedBook"
         label="Select the related book"
         item-value="id"
-        item-text="title"
+        item-title="title"
         :items="items"
         :loading="loading"
         :search="search"

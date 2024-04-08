@@ -16,7 +16,7 @@
             v-model="bookReview.bookId"
             label="Select the related book"
             item-value="id"
-            item-text="title"
+            item-title="title"
             :items="books"
             :loading="loading"
             :search="searchBook"

@@ -3,78 +3,110 @@
     <!-- Displaying Chips Separately -->
     <div class="selected-chips" v-if="selectedGenres.length">
       <v-chip
-        v-for="(genre, index) in selectedGenres"
-        :key="index"
-        close
-        @click:close="removeChip(index)"
+        v-for="genreId in selectedGenres"
+        :key="genreId"
+        closable
         color="blue lighten-3"
+        @click:close="removeChip(genreId)"
       >
-        {{ genre }}
+        {{ findGenreName(genreId) }}
       </v-chip>
     </div>
 
     <v-autocomplete
       v-model="selectedGenres"
-      :items="genres"
       label="Select your favorite genres"
+      item-value="id"
+      item-title="name"
+      :items="genres"
       multiple
-      outlined
-      :filter="customFilter"
-      @change="updateChips"
     ></v-autocomplete>
 
-    <v-btn color="success" @click="saveGenres">Save Genres</v-btn>
+    <v-btn color="success" @click="saveFavouriteGenres">Save Genres</v-btn>
   </v-container>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { ElMessage } from "element-plus";
+import { get, post } from "@/net/index.js";
+import { useStore } from "vuex";
 
-const genres = ref([
-  "Fantasy",
-  "Science Fiction",
-  "Mystery",
-  "Thriller",
-  "Romance12",
-  "Fantasy",
-  "Scie121nce Fiction",
-  "Myst12ery",
-  "Thriller",
-  "R1oman122ce",
-  "Fantasy4",
-  "Science Fiction",
-  "Mys212tery",
-  "Thr3iller",
-  "R4omance",
-  "Fa4ntasy",
-  "Science Fiction",
-  "Mystery",
-  "Thriller",
-  "Romance",
-  // Add more genres as necessary
-]);
+const store = useStore();
+const userData = computed(() => store.state.user || {});
+
 const selectedGenres = ref([]);
+const genres = ref([]);
 
-function saveGenres() {
-  console.log("Favorite genres saved:", selectedGenres.value);
+const fetchGenres = () => {
+  get(
+    "/api/profile-favourite-genre/getAllGenres",
+    (data) => {
+      genres.value = data;
+    },
+    (message) => {
+      ElMessage.warning(message);
+    }
+  );
+};
+
+const fetchFavouriteGenres = () => {
+  const params = {
+    userId: userData.value.id,
+  };
+
+  get(
+    "/api/profile-favourite-genre/getFavouriteGenres",
+    (data) => {
+      data.forEach((userPivotGenre) => {
+        selectedGenres.value.push(userPivotGenre.genreId);
+      });
+    },
+    (message) => {
+      ElMessage.warning(message);
+    },
+    params
+  );
+};
+
+const saveFavouriteGenres = () => {
+  const formData = new FormData();
+  formData.append("ids", selectedGenres.value);
+  formData.append("userId", userData.value.id);
+
+  const favouriteGenreDTO = {
+    userId: userData.value.id,
+    ids: selectedGenres.value,
+  };
+
+  post(
+    "/api/profile-favourite-genre/saveFavouriteGenres",
+    favouriteGenreDTO,
+    () => {
+      ElMessage.success("Favourite genres saved successfully");
+    },
+    (message) => {
+      ElMessage.error(message);
+    }
+  );
+};
+
+function removeChip(genreId) {
+  const index = selectedGenres.value.findIndex((id) => id === genreId);
+  if (index !== -1) {
+    selectedGenres.value.splice(index, 1);
+  }
 }
 
-// This is not needed if you are only displaying chips outside of the v-autocomplete
-function updateChips() {
-  // This function would be used if you need to perform an action right after the selection changes
+function findGenreName(genreId) {
+  const genre = genres.value.find((genre) => genre.id === genreId);
+  return genre ? genre.name : "Unknown";
 }
 
-function removeChip(index) {
-  selectedGenres.value.splice(index, 1);
-}
-
-function customFilter(item, queryText, itemText) {
-  const hasValue = (val) => (val != null ? val : "");
-  const text = hasValue(itemText).toString().toLowerCase();
-  const query = hasValue(queryText).toLowerCase();
-
-  return text.indexOf(query) > -1;
-}
+onMounted(() => {
+  fetchGenres();
+  fetchFavouriteGenres();
+});
 </script>
 
 <style scoped>
