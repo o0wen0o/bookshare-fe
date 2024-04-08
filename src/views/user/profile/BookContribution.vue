@@ -97,25 +97,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { Delete, Plus, ZoomIn } from "@element-plus/icons-vue";
-import { get } from "@/net/index.js";
-import {
-  capitalizeRouteName,
-  getRouteNameForApi,
-  getTextRequiredRule,
-} from "@/assets/js/admin/common_edit_add.js";
-import * as commonEditAddFunction from "@/assets/js/admin/common_edit_add.js";
+import { post } from "@/net/index.js";
+import { getTextRequiredRule } from "@/assets/js/admin/common_edit_add.js";
 import moment from "moment";
 
 const router = useRouter();
-const route = useRoute();
-const isEdit = ref(false);
-const id = ref(null);
+const store = useStore();
+const userData = computed(() => store.state.user || {});
 const bookForm = ref(null);
-const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 const languages = [
   "English",
@@ -164,9 +158,6 @@ const rules = {
   language: [getTextRequiredRule("Please select the language", "change")],
 };
 
-const previewImage = () =>
-  commonEditAddFunction.previewImage(files, book.value.imgUrl, ossEndpoint);
-
 const submitForm = () => {
   // Check and format publicationDate if it exists
   if (book.value.publicationDate) {
@@ -175,40 +166,62 @@ const submitForm = () => {
     );
   }
 
-  commonEditAddFunction.submitForm(
-    bookForm,
-    book,
-    id,
-    isEdit,
-    router,
-    route,
-    files,
-    "multipart/form-data"
-  );
-};
+  bookForm.value.validate((valid) => {
+    if (valid) {
+      const formData = new FormData();
 
-onMounted(() => {
-  id.value = route.params.id;
-  isEdit.value = Boolean(id.value);
+      // Append data to formData
+      Object.keys(book.value).forEach((key) => {
+        formData.append(key, book.value[key]);
+      });
 
-  if (isEdit.value) {
-    // Fetch book data based on id
-    get(
-      `/api/${getRouteNameForApi(route.name)}/${id.value}`,
-      (data) => {
-        book.value = data;
+      // Append user data
+      formData.append("userId", userData.value.id);
 
-        // Update the image preview
-        if (book.value.imgUrl) {
-          previewImage(book.value.imgUrl);
-        }
-      },
-      (error) => {
-        ElMessage.error(error);
+      // Append file data if exists
+      if (files && files.value.length > 0 && files.value[0].raw) {
+        formData.append("image", files.value[0].raw);
       }
-    );
-  }
-});
+
+      const successCallback = () => {
+        ElMessage.success("Contributed successfully");
+
+        // Reset book form
+        book.value = {
+          title: "",
+          author: "",
+          publisher: "",
+          isbn: "",
+          publicationDate: "",
+          page: 0,
+          language: "",
+          imgUrl: "",
+        };
+
+        // Reset files
+        files.value = [];
+
+        // Scroll to the top of the page
+        window.scrollTo(0, 0);
+      };
+
+      const errorCallback = (error) => {
+        ElMessage.error(error);
+      };
+
+      post(
+        `/api/profile-book-contribution/createBookSubmission`,
+        formData,
+        successCallback,
+        errorCallback,
+        "multipart/form-data"
+      );
+    } else {
+      ElMessage.error("Please correct the errors in the form");
+      return false;
+    }
+  });
+};
 
 // Below are for Image upload
 const dialogImageUrl = ref("");
