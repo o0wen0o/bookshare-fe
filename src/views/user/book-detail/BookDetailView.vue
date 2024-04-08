@@ -3,12 +3,16 @@
     <v-row>
       <!-- Main Column -->
       <v-col cols="8" class="main-column">
-        <content-main-column />
+        <router-view :key="$route.fullPath">
+          <content-main-column />
+        </router-view>
       </v-col>
 
       <!-- Side Column -->
       <v-col cols="4" class="side-column">
-        <content-side-column />
+        <router-view :key="$route.fullPath">
+          <content-side-column />
+        </router-view>
       </v-col>
     </v-row>
   </div>
