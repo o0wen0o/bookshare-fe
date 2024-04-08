@@ -59,7 +59,8 @@ const router = createRouter({
                 { path: '/create-post', name: 'create-post', component: () => import('@/views/user/community/CreatePostView.vue') },
 
                 // Write book review
-                { path: '/write-book-review/:id', name: 'write-book-review', component: () => import('@/views/user/profile/book-review/WriteBookReview.vue') },
+                { path: '/write-book-review/create', name: 'write-book-review-create', component: () => import('@/views/user/profile/book-review/WriteBookReview.vue') },
+                { path: '/write-book-review/:id/edit', name: 'write-book-review-edit', component: () => import('@/views/user/profile/book-review/WriteBookReview.vue') },
             ]
         }, {
             path: '/admin',

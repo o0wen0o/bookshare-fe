@@ -1,7 +1,17 @@
 <template>
   <div>
     <v-card elevation="2" class="pa-3">
-      <v-card-title>My Book Review</v-card-title>
+      <v-card-title class="d-flex">
+        <span>My Book Review</span>
+        <v-btn
+          class="ml-auto"
+          color="success"
+          prepend-icon="mdi-plus"
+          @click="navigateToAddBookReview"
+        >
+          Create Book Review
+        </v-btn>
+      </v-card-title>
       <v-divider></v-divider>
 
       <v-infinite-scroll side="end" @load="load">
@@ -14,7 +24,7 @@
               @click="navigateToBookDetail(bookReview.id)"
             >
               <v-img
-                :src="bookReview.imgUrl"
+                :src="ossEndpoint + bookReview.imgUrl"
                 :alt="bookReview.title"
                 aspect-ratio="1"
                 contain
@@ -28,7 +38,9 @@
               @click="navigateToBookDetail(bookReview.id)"
             >
               <h4>{{ bookReview.title }}</h4>
-              <p class="book-review-text">Content: {{ bookReview.text }}</p>
+              <p class="book-review-text">
+                Content: {{ stripHtml(bookReview.text) }}
+              </p>
               <p>Updated Date: {{ bookReview.updatedDate }}</p>
               <p>Created Date: {{ bookReview.createdDate }}</p>
             </v-col>
@@ -46,7 +58,7 @@
               <v-btn
                 icon
                 size="small"
-                @click.stop="prepareDeleteItem(bookReview)"
+                @click.stop="prepareDeleteItem(bookReview.id)"
               >
                 <v-icon>mdi-trash-can-outline</v-icon>
               </v-btn>
@@ -63,6 +75,7 @@
       </v-infinite-scroll>
     </v-card>
 
+    <!-- Delete Confirmation -->
     <v-dialog v-model="dialog" max-width="350">
       <v-card
         max-width="400"
@@ -91,52 +104,78 @@
 </template>
 
 <script setup>
-import { useRoute, useRouter } from "vue-router";
-import { ref, onMounted } from "vue";
-import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { useStore } from "vuex";
+import { get, _delete } from "@/net/index.js";
+import moment from "moment";
 
-const route = useRoute();
 const router = useRouter();
 const dialog = ref(false); // Controls the visibility of the dialog
-const deleteItemId = ref([]);
+const deleteItemId = ref();
+const page = ref(1);
+const itemsPerPage = ref(10);
+const bookReviews = ref([]);
 
-// Simulate a larger dataset
-const allBookReviews = ref([
-  {
-    id: 1,
-    title: "Book Review One",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    imgUrl: "https://via.placeholder.com/150",
-    updatedDate: "2022-01-01 03:01:40",
-    createdDate: "2020-03-08 11:33:50",
-  },
-  {
-    id: 2,
-    title: "Book Review Two",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    imgUrl: "https://via.placeholder.com/150",
-    updatedDate: "2022-01-01 03:01:40",
-    createdDate: "2020-03-08 11:33:50",
-  },
-  {
-    id: 3,
-    title: "Book Review Three",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    imgUrl: "https://via.placeholder.com/150",
-    updatedDate: "2022-01-01 03:01:40",
-    createdDate: "2020-03-08 11:33:50",
-  },
-]);
+const store = useStore();
+const userData = computed(() => store.state.user || {});
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
-// Ref for displayed bookReviews
-const bookReviews = ref(allBookReviews.value.slice(0, 5));
+// Function to load more book reviews
+const fetchItems = () => {
+  const params = {
+    current: page.value++,
+    size: itemsPerPage.value,
+    userId: userData.value.id,
+  };
 
-// Wrap the functions to pass the router instance
-const prepareDeleteItem = (ids) =>
-  commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, ids);
+  get(
+    `/api/profile-book-review/getBookReviewsByUserId`,
+    (data) => {
+      if (data.records.length) {
+        // Format dates
+        data.records.forEach((bookReview) => {
+          bookReview.updatedDate = moment(bookReview.updatedDate).format(
+            "DD-MM-YYYY HH:mm:ss"
+          );
+          bookReview.createdDate = moment(bookReview.createdDate).format(
+            "DD-MM-YYYY HH:mm:ss"
+          );
+        });
 
-const deleteItem = () =>
-  commonBrowseFunction.bulkDelete(route, deleteItemId, dialog, fetchItems);
+        bookReviews.value = [...bookReviews.value, ...data.records];
+      }
+    },
+    (message) => {
+      ElMessage.warning(message);
+    },
+    params
+  );
+};
+
+// Prepares delete action (opens dialog)
+function prepareDeleteItem(id) {
+  deleteItemId.value = id;
+  dialog.value = true;
+}
+
+// Bulk delete after confirmation dialog
+const deleteItem = () => {
+  _delete(
+    `/api/profile-book-review/deleteBookReview`,
+    `${deleteItemId.value}`,
+    () => {
+      ElMessage.success("The book review is deleted successfully");
+      dialog.value = false; // Close the dialog
+
+      // Clear the current book list and reload from the first page
+      bookReviews.value = []; // Reset books array to empty
+      page.value = 1; // Reset to first page
+      fetchItems(); // Fetch the initial set of books again
+    }
+  );
+};
 
 const cancelDelete = () => {
   dialog.value = false;
@@ -147,27 +186,27 @@ const navigateToBookDetail = (bookId) => {
   router.push({ name: "book-detail", params: { id: bookId } });
 };
 
-const navigateToEditBookReview = (bookReviewId) => {
+const navigateToAddBookReview = () => {
   const newTab = window.open("", "_blank"); // Open a new tab
-  newTab.location.href = `/write-book-review/${bookReviewId}`;
+  newTab.location.href = `/write-book-review/create`;
 };
 
-// Function to load more bookReviews
-const loadMoreBooks = () => {
-  const currentCount = bookReviews.value.length;
-  const moreBookReviews = allBookReviews.value.slice(
-    currentCount,
-    currentCount + 1
-  );
-  if (moreBookReviews.length) {
-    bookReviews.value = [...bookReviews.value, ...moreBookReviews];
-  }
+const navigateToEditBookReview = (bookReviewId) => {
+  const newTab = window.open("", "_blank"); // Open a new tab
+  newTab.location.href = `/write-book-review/${bookReviewId}/edit`;
+};
+
+// Method to strip HTML tags from a string
+const stripHtml = (htmlString) => {
+  if (!htmlString) return "";
+  // First replace &nbsp; with a space, then remove HTML tags
+  return htmlString.replace(/&nbsp;/gi, " ").replace(/<[^>]*>?/gm, "");
 };
 
 // Load function for the v-infinite-scroll
 const load = ({ side, done }) => {
   if (side === "end") {
-    loadMoreBooks();
+    fetchItems();
     done("empty");
   }
 };

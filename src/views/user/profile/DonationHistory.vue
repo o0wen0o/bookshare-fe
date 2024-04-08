@@ -30,6 +30,7 @@ import { ref, computed } from "vue";
 import { ElMessage } from "element-plus";
 import { useStore } from "vuex";
 import { get, _delete } from "@/net/index.js";
+import moment from "moment";
 
 const page = ref(1);
 const itemsPerPage = ref(10);
@@ -50,6 +51,13 @@ const fetchItems = () => {
     `/api/profile-donation/getDonationsByUserId`,
     (data) => {
       if (data.records.length) {
+        // Format dates
+        data.records.forEach((donation) => {
+          donation.contributionDate = moment(donation.contributionDate).format(
+            "DD-MM-YYYY HH:mm:ss"
+          );
+        });
+
         donations.value = [...donations.value, ...data.records];
       }
     },
