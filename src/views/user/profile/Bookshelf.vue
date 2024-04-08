@@ -10,7 +10,7 @@
             <!-- Book Image -->
             <v-col cols="12" sm="3" @click="navigateToBookDetail(book.id)">
               <v-img
-                :src="book.imgUrl"
+                :src="ossEndpoint + book.imgUrl"
                 :alt="book.title"
                 aspect-ratio="1"
                 contain
@@ -44,7 +44,7 @@
 
             <!-- Book Actions -->
             <v-col cols="12" sm="1" class="book-actions">
-              <v-btn icon size="small" @click.stop="prepareDeleteItem(book)">
+              <v-btn icon size="small" @click.stop="prepareDeleteItem(book.id)">
                 <v-icon>mdi-trash-can-outline</v-icon>
               </v-btn>
             </v-col>
@@ -64,8 +64,8 @@
       <v-card
         max-width="400"
         prepend-icon="mdi-alert-circle"
-        text="Are you sure you want to delete it?"
-        title="Confirm Delete"
+        text="Are you sure you want to remove it from bookshelf?"
+        title="Confirm Remove"
       >
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -88,128 +88,67 @@
 </template>
 
 <script setup>
-import { useRoute, useRouter } from "vue-router";
-import { ref, onMounted } from "vue";
-import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { useStore } from "vuex";
+import { get, _delete } from "@/net/index.js";
 
-const route = useRoute();
 const router = useRouter();
 const dialog = ref(false); // Controls the visibility of the dialog
-const deleteItemId = ref([]);
+const deleteItemId = ref();
+const page = ref(1);
+const itemsPerPage = ref(10);
+const books = ref([]);
 
-// Simulate a larger dataset
-const allBooks = ref([
-  {
-    id: 1,
-    title: "Book One",
-    author: "Author A",
-    publicationDate: "2022-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.5,
-    favourite: 100,
-    review: 200,
-  },
-  {
-    id: 2,
-    title: "Book Two",
-    author: "Author B",
-    publicationDate: "2023-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.7,
-    favourite: 140,
-    review: 230,
-  },
-  {
-    id: 3,
-    title: "Book Three",
-    author: "Author C",
-    publicationDate: "2021-05-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.2,
-    favourite: 120,
-    review: 300,
-  },
-  {
-    id: 4,
-    title: "Book Four",
-    author: "Author D",
-    publicationDate: "2020-11-15",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.8,
-    favourite: 200,
-    review: 220,
-  },
-  {
-    id: 5,
-    title: "Book Five",
-    author: "Author E",
-    publicationDate: "2019-06-21",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 3.9,
-    favourite: 90,
-    review: 100,
-  },
-  {
-    id: 6,
-    title: "Book Six",
-    author: "Author F",
-    publicationDate: "2018-02-14",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.6,
-    favourite: 150,
-    review: 190,
-  },
-  {
-    id: 7,
-    title: "Book Seven",
-    author: "Author G",
-    publicationDate: "2017-09-09",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.3,
-    favourite: 110,
-    review: 210,
-  },
-  {
-    id: 8,
-    title: "Book Eight",
-    author: "Author H",
-    publicationDate: "2023-03-03",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 5.0,
-    favourite: 300,
-    review: 400,
-  },
-  {
-    id: 9,
-    title: "Book Nine",
-    author: "Author I",
-    publicationDate: "2022-12-12",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.1,
-    favourite: 80,
-    review: 90,
-  },
-  {
-    id: 10,
-    title: "Book Ten",
-    author: "Author J",
-    publicationDate: "2021-07-07",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.9,
-    favourite: 250,
-    review: 320,
-  },
-]);
+const store = useStore();
+const userData = computed(() => store.state.user || {});
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
-// Ref for displayed books
-const books = ref(allBooks.value.slice(0, 5));
+// Function to load more books
+const fetchItems = () => {
+  const params = {
+    current: page.value++,
+    size: itemsPerPage.value,
+    userId: userData.value.id,
+  };
 
-// Wrap the functions to pass the router instance
-const prepareDeleteItem = (ids) =>
-  commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, ids);
+  get(
+    `/api/profile-bookshelf/getFavouriteBooks`,
+    (data) => {
+      if (data.records.length) {
+        books.value = [...books.value, ...data.records];
+      }
+    },
+    (message) => {
+      ElMessage.warning(message);
+    },
+    params
+  );
+};
 
-const deleteItem = () =>
-  commonBrowseFunction.bulkDelete(route, deleteItemId, dialog, fetchItems);
+// Prepares delete action (opens dialog)
+function prepareDeleteItem(id) {
+  deleteItemId.value = id;
+  dialog.value = true;
+}
+
+// Bulk delete after confirmation dialog
+const deleteItem = () => {
+  _delete(
+    `/api/profile-bookshelf/deleteFromBookshelf`,
+    `${deleteItemId.value}/${userData.value.id}`,
+    () => {
+      ElMessage.success("Items deleted successfully");
+      dialog.value = false; // Close the dialog
+
+      // Clear the current book list and reload from the first page
+      books.value = []; // Reset books array to empty
+      page.value = 1; // Reset to first page
+      fetchItems(); // Fetch the initial set of books again
+    }
+  );
+};
 
 const cancelDelete = () => {
   dialog.value = false;
@@ -220,19 +159,10 @@ const navigateToBookDetail = (bookId) => {
   router.push({ name: "book-detail", params: { id: bookId } });
 };
 
-// Function to load more books
-const loadMoreBooks = () => {
-  const currentCount = books.value.length;
-  const moreBooks = allBooks.value.slice(currentCount, currentCount + 1);
-  if (moreBooks.length) {
-    books.value = [...books.value, ...moreBooks];
-  }
-};
-
 // Load function for the v-infinite-scroll
 const load = ({ side, done }) => {
   if (side === "end") {
-    loadMoreBooks();
+    fetchItems();
     done("empty");
   }
 };
