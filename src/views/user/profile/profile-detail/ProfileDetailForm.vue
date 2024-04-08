@@ -79,22 +79,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { ref, onMounted, computed } from "vue";
+import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { Delete, Plus, ZoomIn } from "@element-plus/icons-vue";
-import { get } from "@/net/index.js";
+import { get, put } from "@/net/index.js";
 import {
-  getRouteNameForApi,
   getTextRequiredRule,
   validateNumber,
 } from "@/assets/js/admin/common_edit_add.js";
-import * as commonEditAddFunction from "@/assets/js/admin/common_edit_add.js";
 
-const router = useRouter();
-const route = useRoute();
-const isEdit = ref(false);
-const id = ref(null);
+const store = useStore();
+const userData = computed(() => store.state.user || {});
+
 const userForm = ref(null);
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
@@ -117,43 +114,84 @@ const rules = {
   ],
 };
 
-const previewImage = () =>
-  commonEditAddFunction.previewImage(files, user.value.avatar, ossEndpoint);
+const submitForm = () => {
+  userForm.value.validate((valid) => {
+    if (valid) {
+      const formData = new FormData();
 
-const submitForm = () =>
-  commonEditAddFunction.submitForm(
-    userForm,
-    user,
-    id,
-    isEdit,
-    router,
-    route,
-    files,
-    "multipart/form-data"
+      // Append user data to formData
+      Object.keys(user.value).forEach((key) => {
+        formData.append(key, user.value[key]);
+      });
+
+      // Append file data if exists
+      if (files && files.value.length > 0 && files.value[0].raw) {
+        formData.append("image", files.value[0].raw);
+      }
+
+      const successCallback = () => {
+        ElMessage.success("Updated successfully");
+
+        fetchItems(true);
+      };
+
+      const errorCallback = (error) => {
+        ElMessage.error(error);
+      };
+
+      put(
+        `/api/profile-detail/updateUserDetail/${user.value.id}`,
+        formData,
+        successCallback,
+        errorCallback,
+        "multipart/form-data"
+      );
+    } else {
+      ElMessage.error("Please correct the errors in the form");
+      return false;
+    }
+  });
+};
+
+const fetchItems = (isUpdateStore = false) => {
+  get(
+    `/api/profile-detail/getUserDetail/${userData.value.id}`,
+    (data) => {
+      user.value = data;
+      user.value.password = "";
+
+      // Update the image preview
+      if (user.value.avatar) {
+        previewImage();
+      }
+
+      // Update store
+      if (isUpdateStore) {
+        store.dispatch("loginUser", {
+          id: user.value.id,
+          username: user.value.username,
+          email: user.value.email,
+          avatar: user.value.avatar,
+          roles: userData.value.roles,
+        });
+      }
+    },
+    (error) => {
+      ElMessage.error(error);
+    }
   );
+};
+
+const previewImage = () => {
+  files.value = [
+    {
+      url: ossEndpoint + user.value.avatar,
+    },
+  ];
+};
 
 onMounted(() => {
-  id.value = route.params.id;
-  isEdit.value = Boolean(id.value);
-
-  if (isEdit.value) {
-    // Fetch user data based on id
-    get(
-      `/api/${getRouteNameForApi(route.name)}/${id.value}`,
-      (data) => {
-        user.value = data;
-        user.value.password = "";
-
-        // Update the image preview
-        if (user.value.avatar) {
-          previewImage(user.value.avatar);
-        }
-      },
-      (error) => {
-        ElMessage.error(error);
-      }
-    );
-  }
+  fetchItems();
 });
 
 // Below are for Image upload

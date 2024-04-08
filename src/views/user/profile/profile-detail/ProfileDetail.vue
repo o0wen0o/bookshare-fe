@@ -6,6 +6,7 @@
         <v-tab value="profile">Profile</v-tab>
         <v-tab value="genres">Favourite Genres</v-tab>
       </v-tabs>
+      <v-divider></v-divider>
     </v-container>
 
     <!-- Tab Contents -->
