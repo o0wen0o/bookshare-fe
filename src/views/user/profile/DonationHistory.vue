@@ -18,7 +18,7 @@
 
       <template v-slot:empty>
         <v-alert icon="mdi-reload" type="warning">
-          No more books available
+          No more data available
         </v-alert>
       </template>
     </v-infinite-scroll>
@@ -26,49 +26,44 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed } from "vue";
+import { ElMessage } from "element-plus";
+import { useStore } from "vuex";
+import { get, _delete } from "@/net/index.js";
 
-// Simulate a larger dataset
-const allDonations = ref([
-  {
-    id: 1,
-    projectName: "Project One",
-    donationAmount: "200.00",
-    contributionDate: "2022-01-01 03:10:20",
-  },
-  {
-    id: 2,
-    projectName: "Project Two",
-    donationAmount: "300.00",
-    contributionDate: "2022-01-01 03:10:20",
-  },
-  {
-    id: 3,
-    projectName: "Project Three",
-    donationAmount: "400.00",
-    contributionDate: "2022-01-01 03:10:20",
-  },
-]);
+const page = ref(1);
+const itemsPerPage = ref(10);
+const donations = ref([]);
 
-// Ref for displayed donations
-const donations = ref(allDonations.value.slice(0, 5));
+const store = useStore();
+const userData = computed(() => store.state.user || {});
 
 // Function to load more donations
-const loadMoreDonations = () => {
-  const currentCount = donations.value.length;
-  const moreDonations = allDonations.value.slice(
-    currentCount,
-    currentCount + 1
+const fetchItems = () => {
+  const params = {
+    current: page.value++,
+    size: itemsPerPage.value,
+    userId: userData.value.id,
+  };
+
+  get(
+    `/api/profile-donation/getDonationsByUserId`,
+    (data) => {
+      if (data.records.length) {
+        donations.value = [...donations.value, ...data.records];
+      }
+    },
+    (message) => {
+      ElMessage.warning(message);
+    },
+    params
   );
-  if (moreDonations.length) {
-    donations.value = [...donations.value, ...moreDonations];
-  }
 };
 
 // Load function for the v-infinite-scroll
 const load = ({ side, done }) => {
   if (side === "end") {
-    loadMoreDonations();
+    fetchItems();
     done("empty");
   }
 };
