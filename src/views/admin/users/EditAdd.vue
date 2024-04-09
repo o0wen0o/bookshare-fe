@@ -26,6 +26,17 @@
             <el-input v-model="user.username"></el-input>
           </el-form-item>
 
+          <el-form-item label="Role" prop="role">
+            <v-autocomplete
+              v-model="selectedRoles"
+              label="Select your role"
+              item-value="id"
+              item-title="name"
+              :items="roles"
+              multiple
+            ></v-autocomplete>
+          </el-form-item>
+
           <el-form-item label="Email" prop="email">
             <el-input v-model="user.email"></el-input>
           </el-form-item>
@@ -43,15 +54,18 @@
             <el-input v-model="user.phoneNumber"></el-input>
           </el-form-item>
 
-          <el-form-item label="Bookshelf Visible" prop="bookshelfVisible">
+          <el-form-item prop="bookshelfVisible">
+            <label>Set bookshelf visiblity to public</label>
             <el-switch v-model="user.bookshelfVisible"></el-switch>
           </el-form-item>
 
-          <el-form-item label="Review Visible" prop="reviewVisible">
+          <el-form-item prop="reviewVisible">
+            <label>Set book review visiblity to public</label>
             <el-switch v-model="user.reviewVisible"></el-switch>
           </el-form-item>
 
-          <el-form-item label="Contribution Visible" prop="contributionVisible">
+          <el-form-item prop="contributionVisible">
+            <label>Set charitable contribution visiblity to public</label>
             <el-switch v-model="user.contributionVisible"></el-switch>
           </el-form-item>
 
@@ -106,11 +120,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { Delete, Plus, ZoomIn } from "@element-plus/icons-vue";
-import { get } from "@/net/index.js";
+import { get, post, put } from "@/net/index.js";
 import {
   capitalizeRouteName,
   getRouteNameForApi,
@@ -124,6 +139,12 @@ const route = useRoute();
 const isEdit = ref(false);
 const id = ref(null);
 const userForm = ref(null);
+
+const selectedRoles = ref([]);
+const roles = ref([]);
+
+const store = useStore();
+const userData = computed(() => store.state.user || {});
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 const user = ref({
@@ -136,6 +157,7 @@ const user = ref({
   reviewVisible: false,
   contributionVisible: false,
   avatar: "", // this is url from database
+  userPivotRoles: null,
 });
 
 const rules = {
@@ -154,17 +176,65 @@ const rules = {
 const previewImage = () =>
   commonEditAddFunction.previewImage(files, user.value.avatar, ossEndpoint);
 
-const submitForm = () =>
-  commonEditAddFunction.submitForm(
-    userForm,
-    user,
-    id,
-    isEdit,
-    router,
-    route,
-    files,
-    "multipart/form-data"
-  );
+const submitForm = () => {
+  userForm.value.validate((valid) => {
+    if (valid) {
+      const formData = new FormData();
+
+      // Append user data to formData
+      Object.keys(user.value).forEach((key) => {
+        if (key !== "userPivotRoles" && key !== "roleIds") {
+          // Check to exclude userPivotRoles
+          formData.append(key, user.value[key]);
+        }
+      });
+
+      // Append role ids to formData
+      formData.append("roleIds", selectedRoles.value);
+
+      // Append file data if exists
+      if (files && files.value.length > 0 && files.value[0].raw) {
+        formData.append("image", files.value[0].raw);
+      }
+
+      const successCallbackForEdit = () => {
+        ElMessage.success("Updated successfully");
+        fetchItems(true);
+        router.push(`/${getRouteNameForApi(route.name)}/${id.value}`);
+      };
+
+      const successCallbackForAdd = () => {
+        ElMessage.success("Created successfully");
+        router.push(`/${getRouteNameForApi(route.name)}`);
+      };
+
+      const errorCallback = (error) => {
+        ElMessage.error(error);
+      };
+
+      if (isEdit.value) {
+        put(
+          `/api/${getRouteNameForApi(route.name)}/${id.value}/update`,
+          formData,
+          successCallbackForEdit,
+          errorCallback,
+          "multipart/form-data"
+        );
+      } else {
+        post(
+          `/api/${getRouteNameForApi(route.name)}/create`,
+          formData,
+          successCallbackForAdd,
+          errorCallback,
+          "multipart/form-data"
+        );
+      }
+    } else {
+      ElMessage.error("Please correct the errors in the form");
+      return false;
+    }
+  });
+};
 
 function getPasswordRules() {
   if (isEdit.value) {
@@ -196,27 +266,60 @@ function getPasswordRules() {
   }
 }
 
+// Fetch user data
+const fetchItems = (isUpdateStore) => {
+  get(
+    `/api/${getRouteNameForApi(route.name)}/${id.value}`,
+    (data) => {
+      user.value = data;
+      user.value.password = "";
+
+      user.value.userPivotRoles.forEach((userPivotRole) => {
+        selectedRoles.value.push(userPivotRole.roleId);
+      });
+
+      // Update the image preview
+      if (user.value.avatar) {
+        previewImage(user.value.avatar);
+      }
+
+      // Update store
+      if (isUpdateStore) {
+        store.dispatch("loginUser", {
+          id: user.value.id,
+          username: user.value.username,
+          email: user.value.email,
+          avatar: user.value.avatar,
+          roles: userData.value.roles,
+        });
+      }
+    },
+    (error) => {
+      ElMessage.error(error);
+    }
+  );
+};
+
+// Fetch role selections
+const fetchRoleSelections = () => {
+  get(
+    `/api/roles/getAllRoles`,
+    (data) => {
+      roles.value = data;
+    },
+    (message) => {
+      ElMessage.error(message);
+    }
+  );
+};
+
 onMounted(() => {
   id.value = route.params.id;
   isEdit.value = Boolean(id.value);
 
   if (isEdit.value) {
-    // Fetch user data based on id
-    get(
-      `/api/${getRouteNameForApi(route.name)}/${id.value}`,
-      (data) => {
-        user.value = data;
-        user.value.password = "";
-
-        // Update the image preview
-        if (user.value.avatar) {
-          previewImage(user.value.avatar);
-        }
-      },
-      (error) => {
-        ElMessage.error(error);
-      }
-    );
+    fetchItems();
+    fetchRoleSelections();
   }
 });
 
@@ -243,4 +346,8 @@ const handlePictureCardPreview = (file) => {
 
 <style scoped>
 @import "@/assets/css/admin/common_edit_add.css";
+
+.el-switch {
+  margin-left: 10px;
+}
 </style>

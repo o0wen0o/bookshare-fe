@@ -70,10 +70,6 @@ const fetchFavouriteGenres = () => {
 };
 
 const saveFavouriteGenres = () => {
-  const formData = new FormData();
-  formData.append("ids", selectedGenres.value);
-  formData.append("userId", userData.value.id);
-
   const favouriteGenreDTO = {
     userId: userData.value.id,
     ids: selectedGenres.value,
