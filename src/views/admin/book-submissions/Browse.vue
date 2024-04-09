@@ -19,7 +19,6 @@
       ></v-text-field>
 
       <v-data-table-server
-        v-model="selected"
         :headers="headers"
         :loading="loading"
         :items="items"
@@ -28,7 +27,6 @@
         :items-per-page-options="itemsPerPageOptions"
         @update:items-per-page="updateItemsPerPage"
         @update:page="updatePage"
-        show-select
         show-current-page
         hover
       >
@@ -48,11 +46,33 @@
 
         <!-- Actions -->
         <template #item.actions="{ item }">
-          <router-link :to="`${route.path}/${item.id}`">
-            <v-btn color="warning" prepend-icon="mdi-eye" size="small">
-              View
-            </v-btn>
-          </router-link>
+          <div class="action_buttons">
+            <router-link :to="`${route.path}/${item.id}`">
+              <v-btn color="warning" prepend-icon="mdi-eye" size="small">
+                View
+              </v-btn>
+            </router-link>
+
+            <!-- Check if the status is 'pending' and display Accept/Reject buttons -->
+            <template v-if="item.status === 'Pending'">
+              <v-btn
+                color="success"
+                prepend-icon="mdi-check"
+                size="small"
+                @click="acceptBookSubmission(item)"
+              >
+                Accept
+              </v-btn>
+              <v-btn
+                color="red"
+                prepend-icon="mdi-close"
+                size="small"
+                @click="rejectBookSubmission(item)"
+              >
+                Reject
+              </v-btn>
+            </template>
+          </div>
         </template>
       </v-data-table-server>
     </v-card>
@@ -60,16 +80,14 @@
 </template>
 
 <script setup>
-import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { ElMessage } from "element-plus";
+import { post } from "@/net/index.js";
 import { formatDatetime, formatDate } from "@/assets/js/admin/common_browse.js";
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
 
 const route = useRoute();
-const dialog = ref(false); // Controls the visibility of the dialog
-const deleteItemId = ref([]);
-
-const selected = ref([]);
 const search = ref([]);
 const loading = ref(false);
 const items = ref([]);
@@ -100,7 +118,6 @@ const headers = ref([
 ]);
 
 // Wrap the functions to pass the router instance
-
 const performSearch = () =>
   commonBrowseFunction.performSearch(page, fetchItems);
 
@@ -128,8 +145,51 @@ const fetchItems = () =>
 onMounted(() => {
   fetchItems();
 });
+
+const acceptBookSubmission = async (item) => {
+  const bookSubmissionId = item.id;
+
+  post(
+    `/api${route.path}/acceptBookSubmission`,
+    bookSubmissionId,
+    () => {
+      ElMessage.success("Book submission approved successfully");
+      fetchItems();
+    },
+    (message) => {
+      ElMessage.error(message);
+    }
+  );
+};
+
+const rejectBookSubmission = async (item) => {
+  const bookSubmissionId = item.id;
+
+  post(
+    `/api${route.path}/rejectBookSubmission`,
+    bookSubmissionId,
+    () => {
+      ElMessage.success("Book submission rejected successfully");
+      fetchItems();
+    },
+    (message) => {
+      ElMessage.error(message);
+    }
+  );
+};
 </script>
 
 <style scoped>
 @import "@/assets/css/admin/common_browse.css";
+
+.action_buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 0;
+}
+
+.v-btn {
+  width: 120px;
+}
 </style>

@@ -12,7 +12,6 @@
     <v-card class="page_body" elevation="3">
       <v-tabs v-model="tab" align-tabs="start" color="deep-purple-accent-4">
         <v-tab :value="1">General</v-tab>
-        <v-tab :value="2">Book Comment</v-tab>
       </v-tabs>
 
       <v-window v-model="tab">
@@ -20,7 +19,7 @@
           <v-container fluid>
             <v-row>
               <v-col cols="12" sm="4">
-                <v-img :src="book.imgUrl"></v-img>
+                <v-img :src="ossEndpoint + book.imgUrl"></v-img>
               </v-col>
 
               <v-col cols="12" sm="8">
@@ -57,22 +56,7 @@
                     </div>
 
                     <div class="form_group">
-                      <strong>Rating:</strong>
-                      {{ book.rating }}
-                    </div>
-
-                    <div class="form_group">
-                      <strong>Favourite:</strong>
-                      {{ book.favourite }}
-                    </div>
-
-                    <div class="form_group">
-                      <strong>Review:</strong>
-                      {{ book.review }}
-                    </div>
-
-                    <div class="form_group">
-                      <strong>Book Description:</strong>
+                      <strong>Description:</strong>
                       {{ book.description }}
                     </div>
                   </v-card-text>
@@ -81,8 +65,6 @@
             </v-row>
           </v-container>
         </v-window-item>
-
-        <v-window-item :key="2" :value="2"></v-window-item>
       </v-window>
     </v-card>
   </div>
@@ -94,13 +76,12 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { get } from "@/net/index.js";
-import {
-  getRouteNameForApi,
-} from "@/assets/js/admin/common_read.js";
+import { getRouteNameForApi } from "@/assets/js/admin/common_read.js";
 
 const route = useRoute();
 const id = ref(null);
 const tab = ref(null);
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 const book = ref({
   title: "",
@@ -112,9 +93,9 @@ const book = ref({
   page: 0,
   language: "",
   imgUrl: "",
-  rating: 0,
-  favourite: 0,
-  review: 0,
+  createdDate: "",
+  status: "",
+  userId: "",
 });
 
 onMounted(() => {

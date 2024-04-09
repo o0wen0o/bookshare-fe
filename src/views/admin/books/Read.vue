@@ -72,7 +72,7 @@
                     </div>
 
                     <div class="form_group">
-                      <strong>Book Description:</strong>
+                      <strong>Description:</strong>
                       {{ book.description }}
                     </div>
                   </v-card-text>
