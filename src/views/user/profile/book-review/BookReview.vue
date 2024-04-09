@@ -15,7 +15,7 @@
       </v-card-title>
       <v-divider></v-divider>
 
-      <v-infinite-scroll side="end" @load="load">
+      <v-infinite-scroll side="end" @load="load" v-if="isVisible">
         <template v-for="bookReview in bookReviews" :key="bookReview.id">
           <v-row align="center" class="book-review-item">
             <!-- Book Review Image -->
@@ -74,11 +74,17 @@
         </template>
 
         <template v-slot:empty>
-          <v-alert icon="mdi-reload" type="warning">
-            No more bookReviews available
+          <v-alert type="info" variant="tonal">
+            No more book reviews available.
           </v-alert>
         </template>
       </v-infinite-scroll>
+
+      <div v-else>
+        <v-alert type="info" variant="tonal">
+          This book review is set to private.
+        </v-alert>
+      </div>
     </v-card>
 
     <!-- Delete Confirmation -->
@@ -124,6 +130,7 @@ const deleteItemId = ref();
 const page = ref(1);
 const itemsPerPage = ref(10);
 const bookReviews = ref([]);
+const isVisible = ref(true);
 
 const store = useStore();
 const userData = computed(() => store.state.user || {});
@@ -132,6 +139,27 @@ const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 // Function to load more book reviews
 const fetchItems = () => {
+  // Check if the book review is visible
+  if (routeUserId) {
+    get(
+      `/api/profile-book-review/checkBookReviewVisible/${routeUserId}`,
+      (data) => {
+        isVisible.value = data;
+
+        // Get book reviews if the book review is visible
+        if (data) {
+          fetchBookReviews();
+        }
+      },
+      (message) => {
+        ElMessage.warning(message);
+      }
+    );
+  }
+};
+
+// Function to load book reviews
+const fetchBookReviews = () => {
   const params = {
     current: page.value++,
     size: itemsPerPage.value,

@@ -4,7 +4,7 @@
       <v-card-title>My Bookshelf</v-card-title>
       <v-divider></v-divider>
 
-      <v-infinite-scroll side="end" @load="load">
+      <v-infinite-scroll side="end" @load="load" v-if="isVisible">
         <template v-for="book in books" :key="book.id">
           <v-row align="center" class="book-item">
             <!-- Book Image -->
@@ -53,11 +53,17 @@
         </template>
 
         <template v-slot:empty>
-          <v-alert icon="mdi-reload" type="warning">
-            No more books available
+          <v-alert type="info" variant="tonal">
+            No more books available.
           </v-alert>
         </template>
       </v-infinite-scroll>
+
+      <div v-else>
+        <v-alert type="info" variant="tonal">
+          This bookshelf is set to private.
+        </v-alert>
+      </div>
     </v-card>
 
     <!-- Delete Dialog -->
@@ -111,6 +117,27 @@ const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 // Function to load more books
 const fetchItems = () => {
+  // Check if the bookshelf is visible
+  if (routeUserId) {
+    get(
+      `/api/profile-bookshelf/checkBookshelfVisible/${routeUserId}`,
+      (data) => {
+        isVisible.value = data;
+
+        // Get favourite books if the bookshelf is visible
+        if (data) {
+          fetchFavouriteBooks();
+        }
+      },
+      (message) => {
+        ElMessage.warning(message);
+      }
+    );
+  }
+};
+
+// Function to load favorite books
+const fetchFavouriteBooks = () => {
   const params = {
     current: page.value++,
     size: itemsPerPage.value,

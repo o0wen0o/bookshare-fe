@@ -3,7 +3,7 @@
     <v-card-title>Donation History</v-card-title>
     <v-divider></v-divider>
 
-    <v-infinite-scroll side="end" @load="load">
+    <v-infinite-scroll side="end" @load="load" v-if="isVisible">
       <template v-for="donation in donations" :key="donation.id">
         <v-row align="center" class="book-item">
           <!-- Book Info -->
@@ -17,11 +17,17 @@
       </template>
 
       <template v-slot:empty>
-        <v-alert icon="mdi-reload" type="warning">
-          No more data available
+        <v-alert type="info" variant="tonal">
+          No more donation records available.
         </v-alert>
       </template>
     </v-infinite-scroll>
+
+    <div v-else>
+      <v-alert type="info" variant="tonal">
+        This bookshelf is set to private.
+      </v-alert>
+    </div>
   </v-card>
 </template>
 
@@ -37,6 +43,7 @@ const route = useRoute();
 const page = ref(1);
 const itemsPerPage = ref(10);
 const donations = ref([]);
+const isVisible = ref(true);
 
 const store = useStore();
 const userData = computed(() => store.state.user || {});
@@ -44,6 +51,27 @@ const routeUserId = route.query.userId;
 
 // Function to load more donations
 const fetchItems = () => {
+  // Check if the donations is visible
+  if (routeUserId) {
+    get(
+      `/api/profile-donation/checkDonationVisible/${routeUserId}`,
+      (data) => {
+        isVisible.value = data;
+
+        // Get donations if the donations is visible
+        if (data) {
+          fetchDonations();
+        }
+      },
+      (message) => {
+        ElMessage.warning(message);
+      }
+    );
+  }
+};
+
+// Function to load donations
+const fetchDonations = () => {
   const params = {
     current: page.value++,
     size: itemsPerPage.value,
