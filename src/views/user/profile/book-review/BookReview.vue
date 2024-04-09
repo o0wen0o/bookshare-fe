@@ -146,9 +146,8 @@ const fetchItems = () => {
       (data) => {
         isVisible.value = data;
 
-        // Get book reviews if the book review is visible
-        if (data) {
-          fetchBookReviews();
+        if (!data) {
+          return;
         }
       },
       (message) => {
@@ -156,6 +155,9 @@ const fetchItems = () => {
       }
     );
   }
+
+  // Get book reviews if the book review is visible
+  fetchBookReviews();
 };
 
 // Function to load book reviews

@@ -58,9 +58,8 @@ const fetchItems = () => {
       (data) => {
         isVisible.value = data;
 
-        // Get donations if the donations is visible
-        if (data) {
-          fetchDonations();
+        if (!data) {
+          return;
         }
       },
       (message) => {
@@ -68,6 +67,9 @@ const fetchItems = () => {
       }
     );
   }
+
+  // Get donations if the donations is visible
+  fetchDonations();
 };
 
 // Function to load donations

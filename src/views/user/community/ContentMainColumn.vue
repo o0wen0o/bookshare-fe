@@ -121,7 +121,7 @@
     </v-card>
 
     <template v-slot:empty>
-      <v-alert icon="mdi-reload" type="warning">
+        <v-alert type="info" variant="tonal">
         No more posts available
       </v-alert>
     </template>

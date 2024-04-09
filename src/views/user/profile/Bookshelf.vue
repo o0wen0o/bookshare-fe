@@ -124,9 +124,8 @@ const fetchItems = () => {
       (data) => {
         isVisible.value = data;
 
-        // Get favourite books if the bookshelf is visible
-        if (data) {
-          fetchFavouriteBooks();
+        if (!data) {
+          return;
         }
       },
       (message) => {
@@ -134,6 +133,9 @@ const fetchItems = () => {
       }
     );
   }
+
+  // Get favourite books if the bookshelf is visible
+  fetchFavouriteBooks();
 };
 
 // Function to load favorite books
