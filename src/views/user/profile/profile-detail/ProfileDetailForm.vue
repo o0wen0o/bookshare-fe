@@ -2,8 +2,10 @@
   <div>
     <v-container>
       <el-form :model="user" ref="userForm" :rules="rules" label-position="top">
+        <v-img :src="ossEndpoint + user.avatar" class="avatar"></v-img>
+
         <el-form-item label="Username" prop="username">
-          <el-input v-model="user.username"></el-input>
+          <el-input v-model="user.username" :disabled="!!routeUserId"></el-input>
         </el-form-item>
 
         <el-form-item label="Email" prop="email">
@@ -11,25 +13,25 @@
         </el-form-item>
 
         <el-form-item label="Phone Number" prop="phoneNumber">
-          <el-input v-model="user.phoneNumber"></el-input>
+          <el-input v-model="user.phoneNumber" :disabled="!!routeUserId"></el-input>
         </el-form-item>
 
-        <el-form-item prop="bookshelfVisible">
+        <el-form-item prop="bookshelfVisible" v-if="!routeUserId">
           <label>Set bookshelf visiblity to public</label>
           <el-switch v-model="user.bookshelfVisible"></el-switch>
         </el-form-item>
 
-        <el-form-item prop="reviewVisible">
+        <el-form-item prop="reviewVisible" v-if="!routeUserId">
           <label>Set book review visiblity to public</label>
           <el-switch v-model="user.reviewVisible"></el-switch>
         </el-form-item>
 
-        <el-form-item prop="contributionVisible">
+        <el-form-item prop="contributionVisible" v-if="!routeUserId">
           <label>Set charitable contribution visiblity to public</label>
           <el-switch v-model="user.contributionVisible"></el-switch>
         </el-form-item>
 
-        <el-form-item label="Avatar" prop="avatar">
+        <el-form-item label="Avatar" prop="avatar" v-if="!routeUserId">
           <el-upload
             action="#"
             list-type="picture-card"
@@ -66,7 +68,7 @@
           </el-upload>
         </el-form-item>
 
-        <el-form-item>
+        <el-form-item v-if="!routeUserId">
           <el-button type="success" @click="submitForm">Save</el-button>
         </el-form-item>
       </el-form>
@@ -80,6 +82,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { Delete, Plus, ZoomIn } from "@element-plus/icons-vue";
@@ -89,8 +92,10 @@ import {
   validateNumber,
 } from "@/assets/js/admin/common_edit_add.js";
 
+const route = useRoute();
 const store = useStore();
 const userData = computed(() => store.state.user || {});
+const routeUserId = route.query.userId;
 
 const userForm = ref(null);
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
@@ -155,7 +160,7 @@ const submitForm = () => {
 
 const fetchItems = (isUpdateStore = false) => {
   get(
-    `/api/profile-detail/getUserDetail/${userData.value.id}`,
+    `/api/profile-detail/getUserDetail/${routeUserId || userData.value.id}`,
     (data) => {
       user.value = data;
       user.value.password = "";
@@ -166,7 +171,7 @@ const fetchItems = (isUpdateStore = false) => {
       }
 
       // Update store
-      if (isUpdateStore) {
+      if (isUpdateStore && !routeUserId) {
         store.dispatch("loginUser", {
           id: user.value.id,
           username: user.value.username,
@@ -217,6 +222,16 @@ const handlePictureCardPreview = (file) => {
 
 <style scoped>
 @import "@/assets/css/admin/common_edit_add.css";
+
+.avatar {
+  margin-bottom: 20px;
+  height: 250px;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 20%,
+    rgba(0, 0, 0, 0.4)
+  );
+}
 
 .el-switch {
   margin-left: 10px;

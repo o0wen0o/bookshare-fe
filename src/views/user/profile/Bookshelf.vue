@@ -43,7 +43,7 @@
             </v-col>
 
             <!-- Book Actions -->
-            <v-col cols="12" sm="1" class="book-actions">
+            <v-col cols="12" sm="1" class="book-actions" v-if="!routeUserId">
               <v-btn icon size="small" @click.stop="prepareDeleteItem(book.id)">
                 <v-icon>mdi-trash-can-outline</v-icon>
               </v-btn>
@@ -60,6 +60,7 @@
       </v-infinite-scroll>
     </v-card>
 
+    <!-- Delete Dialog -->
     <v-dialog v-model="dialog" max-width="350">
       <v-card
         max-width="400"
@@ -89,20 +90,23 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { useStore } from "vuex";
 import { get, _delete } from "@/net/index.js";
 
+const route = useRoute();
 const router = useRouter();
-const dialog = ref(false); // Controls the visibility of the dialog
+const dialog = ref(false); // Controls the visible of the dialog
 const deleteItemId = ref();
 const page = ref(1);
 const itemsPerPage = ref(10);
 const books = ref([]);
+const isVisible = ref(true);
 
 const store = useStore();
 const userData = computed(() => store.state.user || {});
+const routeUserId = route.query.userId;
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 // Function to load more books
@@ -110,7 +114,7 @@ const fetchItems = () => {
   const params = {
     current: page.value++,
     size: itemsPerPage.value,
-    userId: userData.value.id,
+    userId: routeUserId || userData.value.id,
   };
 
   get(
@@ -137,7 +141,7 @@ function prepareDeleteItem(id) {
 const deleteItem = () => {
   _delete(
     `/api/profile-bookshelf/deleteFromBookshelf`,
-    `${deleteItemId.value}/${userData.value.id}`,
+    `${deleteItemId.value}/${routeUserId || userData.value.id}`,
     () => {
       ElMessage.success("Items deleted successfully");
       dialog.value = false; // Close the dialog

@@ -5,7 +5,7 @@
       <v-chip
         v-for="genreId in selectedGenres"
         :key="genreId"
-        closable
+        :closable="!routeUserId"
         color="blue lighten-3"
         @click:close="removeChip(genreId)"
       >
@@ -20,20 +20,26 @@
       item-title="name"
       :items="genres"
       multiple
+      :disabled="!!routeUserId"
     ></v-autocomplete>
 
-    <v-btn color="success" @click="saveFavouriteGenres">Save Genres</v-btn>
+    <v-btn color="success" @click="saveFavouriteGenres" v-if="!routeUserId">
+      Save
+    </v-btn>
   </v-container>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { get, post } from "@/net/index.js";
 import { useStore } from "vuex";
 
+const route = useRoute();
 const store = useStore();
 const userData = computed(() => store.state.user || {});
+const routeUserId = route.query.userId;
 
 const selectedGenres = ref([]);
 const genres = ref([]);
@@ -52,7 +58,7 @@ const fetchGenres = () => {
 
 const fetchFavouriteGenres = () => {
   const params = {
-    userId: userData.value.id,
+    userId: routeUserId || userData.value.id,
   };
 
   get(
@@ -71,7 +77,7 @@ const fetchFavouriteGenres = () => {
 
 const saveFavouriteGenres = () => {
   const favouriteGenreDTO = {
-    userId: userData.value.id,
+    userId: routeUserId || userData.value.id,
     ids: selectedGenres.value,
   };
 

@@ -12,7 +12,7 @@
           <el-menu-item
             index="1"
             :class="{ 'is-active': currentTab === '1' }"
-            @click="navigateTo('/profile-detail')"
+            @click="navigateTo('profile-detail')"
           >
             <v-icon>mdi-account</v-icon>
             Profile
@@ -21,7 +21,7 @@
           <el-menu-item
             index="2"
             :class="{ 'is-active': currentTab === '2' }"
-            @click="navigateTo('/bookshelf')"
+            @click="navigateTo('bookshelf')"
           >
             <v-icon>mdi-bookshelf</v-icon>
             Bookshelf
@@ -30,7 +30,7 @@
           <el-menu-item
             index="3"
             :class="{ 'is-active': currentTab === '3' }"
-            @click="navigateTo('/book-review')"
+            @click="navigateTo('book-review')"
           >
             <v-icon>mdi-notebook-edit</v-icon>
             Book Review
@@ -39,7 +39,8 @@
           <el-menu-item
             index="4"
             :class="{ 'is-active': currentTab === '4' }"
-            @click="navigateTo('/book-contribution')"
+            @click="navigateTo('book-contribution')"
+            v-if="!routeUserId"
           >
             <v-icon>mdi-book-plus</v-icon>
             Book Contribution
@@ -48,7 +49,7 @@
           <el-menu-item
             index="5"
             :class="{ 'is-active': currentTab === '5' }"
-            @click="navigateTo('/donation-history')"
+            @click="navigateTo('donation-history')"
           >
             <v-icon>mdi-hand-coin</v-icon>
             Donation History
@@ -73,10 +74,11 @@ import { ref, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 
-const router = useRouter();
 const route = useRoute();
+const router = useRouter();
 const store = useStore();
 const userData = computed(() => store.state.user || {});
+const routeUserId = route.query.userId;
 
 // Computes the currentTab value based on the current route.
 // This function finds the tab number (1, 2, 3) that corresponds to the current route name.
@@ -100,8 +102,13 @@ const updateTab = () => {
 updateTab();
 watch(() => route.path, updateTab, { immediate: true });
 
-function navigateTo(route) {
-  router.push(route);
+function navigateTo(routeName) {
+  if (!routeUserId) {
+    router.push({ name: routeName });
+  } else {
+    // if the route contains userId, use it
+    router.push({ name: routeName, query: { userId: routeUserId } });
+  }
 }
 </script>
 

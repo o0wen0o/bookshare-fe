@@ -8,6 +8,7 @@
           color="success"
           prepend-icon="mdi-plus"
           @click="navigateToAddBookReview"
+          v-if="!routeUserId"
         >
           Create Book Review
         </v-btn>
@@ -46,7 +47,12 @@
             </v-col>
 
             <!-- Book Review Actions -->
-            <v-col cols="12" sm="1" class="book-review-actions">
+            <v-col
+              cols="12"
+              sm="1"
+              class="book-review-actions"
+              v-if="!routeUserId"
+            >
               <v-btn
                 icon
                 size="small"
@@ -105,12 +111,13 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { useStore } from "vuex";
 import { get, _delete } from "@/net/index.js";
 import moment from "moment";
 
+const route = useRoute();
 const router = useRouter();
 const dialog = ref(false); // Controls the visibility of the dialog
 const deleteItemId = ref();
@@ -120,6 +127,7 @@ const bookReviews = ref([]);
 
 const store = useStore();
 const userData = computed(() => store.state.user || {});
+const routeUserId = route.query.userId;
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
 // Function to load more book reviews
@@ -127,7 +135,7 @@ const fetchItems = () => {
   const params = {
     current: page.value++,
     size: itemsPerPage.value,
-    userId: userData.value.id,
+    userId: routeUserId || userData.value.id,
   };
 
   get(

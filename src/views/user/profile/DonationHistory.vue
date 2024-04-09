@@ -9,7 +9,7 @@
           <!-- Book Info -->
           <v-col cols="12">
             <h4>Project Name: {{ donation.title }}</h4>
-            <p>Amount Donated: {{ donation.donationAmount }}</p>
+            <p>Amount Donated: RM {{ donation.donationAmount }}.00</p>
             <p>Contribution Date: {{ donation.contributionDate }}</p>
           </v-col>
         </v-row>
@@ -27,24 +27,27 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { ElMessage } from "element-plus";
+import { useRoute } from "vue-router";
 import { useStore } from "vuex";
+import { ElMessage } from "element-plus";
 import { get, _delete } from "@/net/index.js";
 import moment from "moment";
 
+const route = useRoute();
 const page = ref(1);
 const itemsPerPage = ref(10);
 const donations = ref([]);
 
 const store = useStore();
 const userData = computed(() => store.state.user || {});
+const routeUserId = route.query.userId;
 
 // Function to load more donations
 const fetchItems = () => {
   const params = {
     current: page.value++,
     size: itemsPerPage.value,
-    userId: userData.value.id,
+    userId: routeUserId || userData.value.id,
   };
 
   get(

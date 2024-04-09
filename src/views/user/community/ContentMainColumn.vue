@@ -12,12 +12,14 @@
           <div class="post_container">
             <!-- Post User Info -->
             <div class="post_user_info">
-              <v-avatar size="48px">
+              <v-avatar size="48px" @click="goToProfile(post.userId)">
                 <v-img alt="Avatar" :src="ossEndpoint + post.avatar"></v-img>
               </v-avatar>
 
               <div class="ml-2">
-                <strong>{{ post.username }}</strong>
+                <strong @click="goToProfile(post.userId)">{{
+                  post.username
+                }}</strong>
                 <div style="color: grey">{{ post.createdDate }}</div>
               </div>
             </div>
@@ -60,7 +62,7 @@
             <v-col cols="12" v-for="comment in post.comments" :key="comment.id">
               <div class="comment_container">
                 <v-row>
-                  <v-col cols="1">
+                  <v-col cols="1" @click="goToProfile(comment.userId)">
                     <v-avatar size="36px">
                       <v-img
                         alt="Avatar"
@@ -71,7 +73,9 @@
 
                   <v-col cols="11">
                     <div class="comment_header">
-                      <strong>{{ comment.username }}</strong>
+                      <strong @click="goToProfile(comment.userId)">
+                        {{ comment.username }}
+                      </strong>
                     </div>
 
                     <div class="comment_body">
@@ -126,12 +130,14 @@
 
 <script setup>
 import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { get, post, _delete } from "@/net/index.js";
 import moment from "moment";
 import DOMPurify from "dompurify"; // Sanitize HTML prevent XSS attacks
 
+const router = useRouter();
 const page = ref(1);
 const itemsPerPage = ref(10);
 const posts = ref([]);
@@ -268,7 +274,7 @@ const addComment = (postItem) => {
       (data) => {
         newComment.id = data;
         newComment.createdDate = formatCreatedDate(newComment.createdDate);
-        
+
         postItem.comments.push(newComment);
         postItem.newComment = "";
       },
@@ -289,20 +295,30 @@ function formatCreatedDate(createdDate) {
   const diffHours = now.diff(date, "hours");
   const diffDays = now.diff(date, "days");
 
-  if (diffSeconds < 60) { // Less than 60 seconds ago
+  if (diffSeconds < 60) {
+    // Less than 60 seconds ago
     return `${diffSeconds} seconds ago`;
-
-  } else if (diffMinutes < 60) { // Less than 60 minutes ago
+  } else if (diffMinutes < 60) {
+    // Less than 60 minutes ago
     return `${diffMinutes} minutes ago`;
-
-  } else if (diffHours < 24) { // Less than 24 hours ago
+  } else if (diffHours < 24) {
+    // Less than 24 hours ago
     return `${diffHours} hours ago`;
-
-  } else if (diffDays < 7) { // Less than 7 days ago
+  } else if (diffDays < 7) {
+    // Less than 7 days ago
     return `${diffDays} days ago`;
-
-  } else { // Any time before this week
+  } else {
+    // Any time before this week
     return date.format("YYYY-MM-DD HH:mm:ss");
+  }
+}
+
+function goToProfile(userId) {
+  // Navigate to the user profile
+  if (userId === userData.value.id) {
+    router.push({ name: "profile-detail" });
+  } else {
+    router.push({ name: "profile-detail", query: { userId: userId } });
   }
 }
 
