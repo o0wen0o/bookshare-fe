@@ -4,17 +4,23 @@
       <v-row>
         <v-col cols="12">
           <h3 class="mb-5">Comments</h3>
-          
+
           <!-- comment Section -->
           <div class="comment_container">
             <!-- comment User Info -->
             <div class="comment_user_info">
               <v-avatar size="48px">
-                <v-img alt="Avatar" :src="ossEndpoint + comment.avatar"></v-img>
+                <v-img
+                  alt="Avatar"
+                  :src="ossEndpoint + comment.avatar"
+                  @click="goToProfile(comment.userId)"
+                ></v-img>
               </v-avatar>
 
               <div class="ml-2">
-                <strong>{{ comment.username }}</strong>
+                <strong @click="goToProfile(comment.userId)">
+                  {{ comment.username }}
+                </strong>
                 <div>{{ comment.createdDate }}</div>
               </div>
             </div>
@@ -66,13 +72,16 @@
                       <v-img
                         alt="Avatar"
                         :src="ossEndpoint + reply.avatar"
+                        @click="goToProfile(reply.userId)"
                       ></v-img>
                     </v-avatar>
                   </v-col>
 
                   <v-col cols="11">
                     <div class="reply_header">
-                      <strong>{{ reply.username }}</strong>
+                      <strong @click="goToProfile(reply.userId)">
+                        {{ reply.username }}
+                      </strong>
                     </div>
 
                     <div class="reply_body">
@@ -118,7 +127,7 @@
     </div>
 
     <template v-slot:empty>
-      <v-alert icon="mdi-reload" type="warning">
+      <v-alert type="info" variant="tonal">
         No more comments available
       </v-alert>
     </template>
@@ -127,11 +136,13 @@
 
 <script setup>
 import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { get, post, _delete } from "@/net/index.js";
 import moment from "moment";
 
+const router = useRouter();
 const page = ref(1);
 const itemsPerPage = ref(10);
 const comments = ref([]);
@@ -248,7 +259,7 @@ const addreply = (comment) => {
       (data) => {
         newreply.id = data;
         newreply.createdDate = formatCreatedDate(newreply.createdDate);
-        
+
         comment.replies.push(newreply);
         comment.newreply = "";
       },
@@ -284,6 +295,15 @@ function formatCreatedDate(createdDate) {
   } else {
     // Any time before this week
     return date.format("YYYY-MM-DD HH:mm:ss");
+  }
+}
+
+function goToProfile(userId) {
+  // Navigate to the user profile
+  if (userId === userData.value.id) {
+    router.push({ name: "profile-detail" });
+  } else {
+    router.push({ name: "profile-detail", query: { userId: userId } });
   }
 }
 
