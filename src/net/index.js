@@ -10,7 +10,12 @@ const accessHeader = () => {
 
 const defaultError = (error) => {
     console.error(error);
-    ElMessage.error('发生了一些错误，请联系管理员');
+
+    if (error.response) {
+        ElMessage.error(error.response.data.message);
+    } else {
+        ElMessage.error('Error occurred, please contact administrator');
+    }
 }
 
 const defaultFailure = (message, status, url) => {
