@@ -61,9 +61,6 @@ import {
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
 
 const route = useRoute();
-const dialog = ref(false); // Controls the visibility of the dialog
-const deleteItemId = ref([]);
-
 const selected = ref([]);
 const search = ref([]);
 const loading = ref(false);
