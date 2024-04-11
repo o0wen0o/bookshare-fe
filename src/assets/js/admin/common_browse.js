@@ -2,6 +2,16 @@ import { ElMessage } from "element-plus";
 import { get, _delete } from "@/net/index.js";
 import moment from 'moment';
 
+// Modify route name for page title
+const capitalizeRouteName = (name) => {
+    const words = name.split('-');
+    const capitalizedWords = words.map(word => {
+        // Capitalize the first character of each word
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    });
+    return capitalizedWords.join(' ');
+};
+
 // Prepares delete action (opens dialog)
 function prepareDeleteItem(deleteItemId, dialog, ids) {
     deleteItemId.value = ids;
@@ -66,6 +76,7 @@ const formatDate = (date) => {
 };
 
 export {
+    capitalizeRouteName,
     prepareDeleteItem,
     performSearch,
     updateItemsPerPage,

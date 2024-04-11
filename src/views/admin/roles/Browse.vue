@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title" :style="{ textTransform: 'capitalize' }">
-        {{ $route.name }}
+      <h1 class="page_title">
+        {{ capitalizeRouteName(route.name) }}
       </h1>
 
       <div class="page_actions">
@@ -67,6 +67,7 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
+import { capitalizeRouteName } from "@/assets/js/admin/common_browse.js";
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
 import DataTableActions from "@/views/admin/components/DataTableActions.vue";
 import DeleteConfirmationDialog from "@/views/admin/components/DeleteConfirmationDialog.vue";

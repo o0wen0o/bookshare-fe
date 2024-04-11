@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title" :style="{ textTransform: 'capitalize' }">
-        {{ $route.name }}
+      <h1 class="page_title">
+        {{ capitalizeRouteName(route.name) }}
       </h1>
     </div>
 
@@ -54,7 +54,10 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
-import { formatDatetime } from "@/assets/js/admin/common_browse.js";
+import {
+  capitalizeRouteName,
+  formatDatetime,
+} from "@/assets/js/admin/common_browse.js";
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
 
 const route = useRoute();

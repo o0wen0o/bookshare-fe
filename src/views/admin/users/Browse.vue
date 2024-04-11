@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title" :style="{ textTransform: 'capitalize' }">{{ $route.name }}</h1>
-      
+      <h1 class="page_title">{{ capitalizeRouteName(route.name) }}</h1>
+
       <div class="page_actions">
         <router-link :to="`${$route.path}/create`">
           <v-btn color="primary" prepend-icon="mdi-plus">Add New</v-btn>
@@ -106,7 +106,10 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
-import { formatDatetime } from "@/assets/js/admin/common_browse.js";
+import {
+  capitalizeRouteName,
+  formatDatetime,
+} from "@/assets/js/admin/common_browse.js";
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";
 import DataTableActions from "@/views/admin/components/DataTableActions.vue";
 import DeleteConfirmationDialog from "@/views/admin/components/DeleteConfirmationDialog.vue";
@@ -147,10 +150,15 @@ const headers = ref([
 const prepareDeleteItem = (id) =>
   commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, id);
 
-const performSearch = () => commonBrowseFunction.performSearch(page, fetchItems);
+const performSearch = () =>
+  commonBrowseFunction.performSearch(page, fetchItems);
 
 const updateItemsPerPage = (newItemsPerPage) =>
-  commonBrowseFunction.updateItemsPerPage(itemsPerPage, newItemsPerPage, fetchItems);
+  commonBrowseFunction.updateItemsPerPage(
+    itemsPerPage,
+    newItemsPerPage,
+    fetchItems
+  );
 
 const updatePage = (newPage) =>
   commonBrowseFunction.updatePage(page, newPage, fetchItems);
