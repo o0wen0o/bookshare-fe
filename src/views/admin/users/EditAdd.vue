@@ -27,6 +27,23 @@
           </el-form-item>
 
           <el-form-item label="Role" prop="role">
+            <el-select
+              v-model="selectedRoles"
+              multiple
+              filterable
+              placeholder="Select your role(s)"
+            >
+              <el-option
+                v-for="role in roles"
+                :key="role.id"
+                :label="role.name"
+                :value="role.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <!-- <el-form-item label="Role" prop="role">
             <v-autocomplete
               v-model="selectedRoles"
               label="Select your role"
@@ -35,7 +52,7 @@
               :items="roles"
               multiple
             ></v-autocomplete>
-          </el-form-item>
+          </el-form-item> -->
 
           <el-form-item label="Email" prop="email">
             <el-input v-model="user.email"></el-input>
@@ -319,8 +336,8 @@ onMounted(() => {
 
   if (isEdit.value) {
     fetchItems();
-    fetchRoleSelections();
   }
+  fetchRoleSelections();
 });
 
 // Below are for Image upload
