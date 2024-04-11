@@ -27,10 +27,11 @@
           </el-form-item>
 
           <el-form-item label="Description" prop="description">
-            <el-input
-              type="textarea"
+            <ckeditor
+              :editor="editor"
               v-model="fundraisingProject.description"
-            ></el-input>
+              :config="editorConfig"
+            ></ckeditor>
           </el-form-item>
 
           <el-form-item label="Start Date" prop="startDate">
@@ -142,6 +143,11 @@ import {
 } from "@/assets/js/admin/common_edit_add.js";
 import * as commonEditAddFunction from "@/assets/js/admin/common_edit_add.js";
 import moment from "moment";
+import CKEditor from "@ckeditor/ckeditor5-vue";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
+const ckeditor = CKEditor.component;
+const editor = ClassicEditor;
 
 const router = useRouter();
 const route = useRoute();
@@ -159,6 +165,30 @@ const fundraisingProject = ref({
   status: "",
   organizerId: "",
   imgUrl: "",
+});
+
+const editorConfig = ref({
+  toolbar: {
+    items: [
+      "undo",
+      "redo",
+      "|",
+      "heading",
+      "|",
+      "bold",
+      "italic",
+      "|",
+      "link",
+      "|",
+      "outdent",
+      "indent",
+      "|",
+      "bulletedList",
+      "numberedList",
+      "|",
+      "blockQuote",
+    ],
+  },
 });
 
 const rules = {
@@ -190,6 +220,18 @@ const submitForm = () => {
   if (endDate) {
     fundraisingProject.value.endDate = moment(endDate).format("YYYY-MM-DD");
   }
+
+  // Use regular expressions to remove <br> and <p>&nbsp;</p> from start and end
+  let cleanedContent = fundraisingProject.value.description.trim();
+
+  // Regular expressions for matching patterns to remove
+  const leadingTagsPattern = /^(<br\s*\/?>|<p>\&nbsp;<\/p>|\s)+/;
+  const trailingTagsPattern = /(<br\s*\/?>|<p>\&nbsp;<\/p>|\s)+$/;
+
+  // Remove leading and trailing <br> and <p>&nbsp;</p>
+  cleanedContent = cleanedContent.replace(leadingTagsPattern, "");
+  cleanedContent = cleanedContent.replace(trailingTagsPattern, "");
+  fundraisingProject.value.description = cleanedContent;
 
   commonEditAddFunction.submitForm(
     fundraisingProjectForm,
