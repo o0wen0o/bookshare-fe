@@ -87,7 +87,7 @@ const fetchDonations = () => {
         // Format dates
         data.records.forEach((donation) => {
           donation.contributionDate = moment(donation.contributionDate).format(
-            "DD-MM-YYYY HH:mm:ss"
+            "YYYY-MM-DD HH:mm:ss"
           );
         });
 

@@ -106,7 +106,7 @@ function profileInfo() {
 }
 
 function performSearch() {
-  router.push({ name: "home", query: { search: search.value } });
+  router.push({ name: route.name, query: { search: search.value } });
 }
 
 function logoutAccount() {

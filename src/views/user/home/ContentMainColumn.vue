@@ -48,9 +48,7 @@
       </template>
 
       <template v-slot:empty>
-        <v-alert type="info" variant="tonal">
-          No more books available
-        </v-alert>
+        <v-alert type="info" variant="tonal"> No more books available </v-alert>
       </template>
     </v-infinite-scroll>
   </v-card>
@@ -100,12 +98,15 @@ const load = ({ side, done }) => {
 };
 
 // Watch for search query changes
-watch(() => route.query.search, (newSearch) => {
-  search.value = newSearch;
-  page.value = 1;
-  books.value = [];
-  fetchItems();
-});
+watch(
+  () => route.query.search,
+  (newSearch) => {
+    search.value = newSearch;
+    page.value = 1;
+    books.value = [];
+    fetchItems();
+  }
+);
 </script>
 
 <style scoped>

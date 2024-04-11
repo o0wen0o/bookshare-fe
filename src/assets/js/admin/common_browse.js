@@ -58,11 +58,11 @@ const bulkDelete = (route, ids, dialog, fetchItems) => {
 };
 
 const formatDatetime = (timestamp) => {
-    return moment(timestamp).format('DD-MM-YYYY HH:mm:ss');
+    return moment(timestamp).format('YYYY-MM-DD HH:mm:ss');
 };
 
 const formatDate = (date) => {
-    return moment(date).format('DD-MM-YYYY');
+    return moment(date).format('YYYY-MM-DD');
 };
 
 export {

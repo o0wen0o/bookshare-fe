@@ -175,10 +175,10 @@ const fetchBookReviews = () => {
         // Format dates
         data.records.forEach((bookReview) => {
           bookReview.updatedDate = moment(bookReview.updatedDate).format(
-            "DD-MM-YYYY HH:mm:ss"
+            "YYYY-MM-DD HH:mm:ss"
           );
           bookReview.createdDate = moment(bookReview.createdDate).format(
-            "DD-MM-YYYY HH:mm:ss"
+            "YYYY-MM-DD HH:mm:ss"
           );
         });
 
