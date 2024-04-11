@@ -58,9 +58,12 @@ const router = createRouter({
                 // create post page
                 { path: '/create-post', name: 'create-post', component: () => import('@/views/user/community/CreatePostView.vue') },
 
-                // Write book review
+                // write book review
                 { path: '/write-book-review/create', name: 'write-book-review-create', component: () => import('@/views/user/profile/book-review/WriteBookReview.vue') },
                 { path: '/write-book-review/:id/edit', name: 'write-book-review-edit', component: () => import('@/views/user/profile/book-review/WriteBookReview.vue') },
+
+                // fundraising project detail page
+                { path: '/fundraising-project-detail/:id', name: 'fundraising-project-detail', component: () => import('@/views/user/fundraising-project/FundraisingProjectDetailView.vue') },
             ]
         }, {
             path: '/admin',

@@ -1,109 +1,117 @@
 <template>
-  <v-card elevation="3" class="pa-3">
-    <v-card-title>Fundraising Projects</v-card-title>
-  </v-card>
+  <v-infinite-scroll side="end" @load="load" style="margin-top: -16px">
+    <v-row no-gutters>
+      <template
+        v-for="fundraisingProject in fundraisingProjects"
+        :key="fundraisingProject.id"
+      >
+        <v-col cols="6">
+          <!-- Wrapped each fundraisingProject in router-link -->
+          <router-link
+            :to="{
+              name: 'fundraising-project-detail',
+              params: { id: fundraisingProject.id },
+            }"
+            class="router-link-exact-active router-link-active"
+          >
+            <v-card elevation="2" class="fundraisingProject-item">
+              <!-- FundraisingProject Image -->
+              <div>
+                <v-img
+                  :src="ossEndpoint + fundraisingProject.imgUrl"
+                  :alt="fundraisingProject.projectName"
+                  aspect-ratio="1"
+                  contain
+                ></v-img>
+              </div>
+
+              <!-- FundraisingProject Info -->
+              <div class="fundraisingProject-info">
+                <h4>{{ fundraisingProject.projectName }}</h4>
+                <p>Amount Raised: RM {{ fundraisingProject.amountRaised }}</p>
+                <p>
+                  Number of donations: {{ fundraisingProject.donationCount }}
+                </p>
+              </div>
+            </v-card>
+          </router-link>
+        </v-col>
+      </template>
+    </v-row>
+
+    <template v-slot:empty>
+      <v-alert type="info" variant="tonal">
+        No more fundraising projects available
+      </v-alert>
+    </template>
+  </v-infinite-scroll>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { ElMessage } from "element-plus";
+import { get } from "@/net/index.js";
 
-// Example book data
-const books = ref([
-  {
-    id: 1,
-    title: "Book One",
-    author: "Author A",
-    publicationDate: "2022-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.5,
-    favourite: 100,
-    review: 200,
-  },
-  {
-    id: 2,
-    title: "Book Two",
-    author: "Author B",
-    publicationDate: "2023-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.7,
-    favourite: 140,
-    review: 230,
-  },
-  {
-    id: 2,
-    title: "Book Two",
-    author: "Author B",
-    publicationDate: "2023-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.7,
-    favourite: 140,
-    review: 230,
-  },
-  {
-    id: 2,
-    title: "Book Two",
-    author: "Author B",
-    publicationDate: "2023-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.7,
-    favourite: 140,
-    review: 230,
-  },
-  {
-    id: 2,
-    title: "Book Two",
-    author: "Author B",
-    publicationDate: "2023-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.7,
-    favourite: 140,
-    review: 230,
-  },
-  {
-    id: 2,
-    title: "Book Two",
-    author: "Author B",
-    publicationDate: "2023-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.7,
-    favourite: 140,
-    review: 230,
-  },
-  {
-    id: 2,
-    title: "Book Two",
-    author: "Author B",
-    publicationDate: "2023-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.7,
-    favourite: 140,
-    review: 230,
-  },
-  {
-    id: 2,
-    title: "Book Two",
-    author: "Author B",
-    publicationDate: "2023-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.7,
-    favourite: 140,
-    review: 230,
-  },
-  {
-    id: 2,
-    title: "Book Two",
-    author: "Author B",
-    publicationDate: "2023-01-01",
-    imgUrl: "https://via.placeholder.com/150",
-    rating: 4.7,
-    favourite: 140,
-    review: 230,
-  },
-]);
+const route = useRoute();
+const search = ref(route.params.search || "");
+const page = ref(1);
+const itemsPerPage = ref(10);
+const fundraisingProjects = ref([]);
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
+
+// Function to load more fundraisingProjects
+const fetchItems = () => {
+  const params = {
+    current: page.value++,
+    size: itemsPerPage.value,
+    filter: search.value,
+  };
+
+  get(
+    `/api/fundraising-project/getFundraisingProjects`,
+    (data) => {
+      if (data.records.length) {
+        fundraisingProjects.value = [
+          ...fundraisingProjects.value,
+          ...data.records,
+        ];
+      }
+    },
+    (message) => {
+      ElMessage.warning(message);
+    },
+    params
+  );
+};
+
+// Load function for the v-infinite-scroll
+const load = ({ side, done }) => {
+  if (side === "end") {
+    fetchItems();
+    done("empty");
+  }
+};
+
+// Watch for search query changes
+watch(
+  () => route.query.search,
+  (newSearch) => {
+    search.value = newSearch;
+    page.value = 1;
+    fundraisingProjects.value = [];
+    fetchItems();
+  }
+);
 </script>
 
 <style scoped>
-.book-item:hover {
+.fundraisingProject-item {
+  margin: 0 10px 20px 10px;
+  padding: 12px;
+}
+
+.fundraisingProject-item:hover {
   background-color: #f5f5f5;
   transition: background-color 0.3s ease;
 }
@@ -115,14 +123,11 @@ const books = ref([
 }
 
 .v-img {
-  height: 120px;
+  height: 150px;
+  border-radius: 3px;
 }
 
-.chips-container {
-  margin-top: 5px;
-}
-
-.chips-container > * {
-  margin-right: 8px;
+.fundraisingProject-info {
+  margin: 10px 10px 0 10px;
 }
 </style>
