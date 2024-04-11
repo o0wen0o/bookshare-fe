@@ -63,9 +63,9 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="Organizer ID" prop="organizerId">
+          <el-form-item label="Fundraising Organizer ID" prop="fundraisingOrganizerId">
             <el-select
-              v-model="fundraisingProject.organizerId"
+              v-model="fundraisingProject.fundraisingOrganizerId"
               filterable
               placeholder="Select the related organizer"
               :loading="loading"
@@ -163,7 +163,7 @@ const fundraisingProject = ref({
   endDate: "",
   goalAmount: 0,
   status: "",
-  organizerId: "",
+  fundraisingOrganizerId: "",
   imgUrl: "",
 });
 
@@ -198,7 +198,7 @@ const rules = {
   endDate: [getTextRequiredRule("Please select the end date")],
   goalAmount: [getTextRequiredRule("Please enter the goal amount")],
   status: [getTextRequiredRule("Please select the status", "change")],
-  organizerId: [getTextRequiredRule("Please select the organizer")],
+  fundraisingOrganizerId: [getTextRequiredRule("Please select the organizer")],
 };
 
 const previewImage = () =>

@@ -71,8 +71,8 @@
                     </div>
 
                     <div class="form_group">
-                      <strong>Organizer ID:</strong>
-                      {{ fundraisingProject.organizerId }}
+                      <strong>Fundraising Organizer ID:</strong>
+                      {{ fundraisingProject.fundraisingOrganizerId }}
                     </div>
 
                     <div class="form_group">
@@ -122,7 +122,7 @@ const fundraisingProject = ref({
   amountRaised: 0,
   donationCount: 0,
   status: "",
-  organizerId: "",
+  fundraisingOrganizerId: "",
   updatedDate: "",
   createdDate: "",
   imgUrl: "",

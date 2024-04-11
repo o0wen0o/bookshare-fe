@@ -120,7 +120,7 @@ const headers = ref([
   { title: "Amount Raised", value: "amountRaised" },
   { title: "Donation Count", value: "donationCount" },
   { title: "Status", value: "status" },
-  { title: "Organizer ID", value: "organizerId" },
+  { title: "Fundraising Organizer ID", value: "fundraisingOrganizerId" },
   { title: "Updated Date", value: "updatedDate" },
   { title: "Created Date", value: "createdDate" },
   { title: "Actions", value: "actions", sortable: false },
