@@ -117,7 +117,7 @@ function navigateTo(route) {
 
 // Computes the currentTab value based on the current route.
 // This function finds the tab number (1, 2, 3) that corresponds to the current route name.
-const currentTab = ref(null);
+const currentTab = ref("1-1");
 const tabsToRoutes = {
   "1-1": "users",
   "1-2": "roles",
@@ -134,7 +134,7 @@ const updateTab = () => {
   const tab = Object.keys(tabsToRoutes).find(
     (key) => tabsToRoutes[key] === route.name
   );
-  currentTab.value = tab ? tab : "1-1"; // Defaults to the first tab if no match is found.
+  currentTab.value = tab ? tab : ""; // Defaults to the first tab if no match is found.
 };
 
 // Call updateTab initially and whenever the route changes.

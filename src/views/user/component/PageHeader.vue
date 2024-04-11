@@ -15,9 +15,9 @@
         <!-- Navigation Tabs -->
         <v-col cols="5" style="padding: 0">
           <v-tabs v-model="currentTab" align-tabs="start">
-            <v-tab :value="1" @click="navigateTo('home')">Home</v-tab>
-            <v-tab :value="2" @click="navigateTo('community')">Community</v-tab>
-            <v-tab :value="3" @click="navigateTo('fundraising-project')">
+            <v-tab value="1" @click="navigateTo('home')">Home</v-tab>
+            <v-tab value="2" @click="navigateTo('community')">Community</v-tab>
+            <v-tab value="3" @click="navigateTo('fundraising-project')">
               Fundraising Project
             </v-tab>
           </v-tabs>
@@ -121,18 +121,18 @@ function navigateTo(route) {
 
 // Computes the currentTab value based on the current route.
 // This function finds the tab number (1, 2, 3) that corresponds to the current route name.
-const currentTab = ref(null);
+const currentTab = ref(1);
 const tabsToRoutes = {
-  1: "home",
-  2: "community",
-  3: "fundraising-project",
+  "1": "home",
+  "2": "community",
+  "3": "fundraising-project",
 };
 
 const updateTab = () => {
   const tab = Object.keys(tabsToRoutes).find(
     (key) => tabsToRoutes[key] === route.name
   );
-  currentTab.value = tab ? parseInt(tab, 10) : 1; // Defaults to the first tab if no match is found.
+  currentTab.value = tab ? tab : ""; // Defaults to the first tab if no match is found.
 };
 
 // Call updateTab initially and whenever the route changes.
