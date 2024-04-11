@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title" :style="{ textTransform: 'capitalize' }">{{ $route.name }}</h1>
+      <h1 class="page_title" :style="{ textTransform: 'capitalize' }">
+        {{ $route.name }}
+      </h1>
 
       <div class="page_actions">
         <router-link :to="`${$route.path}/create`">
@@ -44,6 +46,13 @@
         show-current-page
         hover
       >
+        <!-- Updated Date -->
+        <template #item.updatedDate="{ item }">
+          <div>
+            {{ formatDatetime(item.updatedDate) }}
+          </div>
+        </template>
+
         <!-- Created Date -->
         <template #item.createdDate="{ item }">
           <div>
@@ -104,9 +113,11 @@ const headers = ref([
   { title: "Start Date", value: "startDate" },
   { title: "End Date", value: "endDate" },
   { title: "Goal Amount", value: "goalAmount" },
-  { title: "Current Amount", value: "currentAmount" },
+  { title: "Amount Raised", value: "amountRaised" },
+  { title: "Donation Count", value: "donationCount" },
   { title: "Status", value: "status" },
   { title: "Organizer ID", value: "organizerId" },
+  { title: "Updated Date", value: "updatedDate" },
   { title: "Created Date", value: "createdDate" },
   { title: "Actions", value: "actions", sortable: false },
 ]);
@@ -115,10 +126,15 @@ const headers = ref([
 const prepareDeleteItem = (ids) =>
   commonBrowseFunction.prepareDeleteItem(deleteItemId, dialog, ids);
 
-const performSearch = () => commonBrowseFunction.performSearch(page, fetchItems);
+const performSearch = () =>
+  commonBrowseFunction.performSearch(page, fetchItems);
 
 const updateItemsPerPage = (newItemsPerPage) =>
-  commonBrowseFunction.updateItemsPerPage(itemsPerPage, newItemsPerPage, fetchItems);
+  commonBrowseFunction.updateItemsPerPage(
+    itemsPerPage,
+    newItemsPerPage,
+    fetchItems
+  );
 
 const updatePage = (newPage) =>
   commonBrowseFunction.updatePage(page, newPage, fetchItems);

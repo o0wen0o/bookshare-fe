@@ -17,67 +17,113 @@
     <v-card class="page_body" elevation="3">
       <v-container>
         <el-form
-          :model="book"
-          ref="bookForm"
+          :model="fundraisingProject"
+          ref="fundraisingProjectForm"
           :rules="rules"
           label-position="top"
         >
-          <el-form-item label="Title" prop="title">
-            <el-input v-model="book.title"></el-input>
-          </el-form-item>
-
-          <el-form-item label="Author" prop="author">
-            <el-input v-model="book.author"></el-input>
+          <el-form-item label="Project Name" prop="projectName">
+            <el-input v-model="fundraisingProject.projectName"></el-input>
           </el-form-item>
 
           <el-form-item label="Description" prop="description">
-            <el-input type="textarea" v-model="book.description"></el-input>
+            <el-input
+              type="textarea"
+              v-model="fundraisingProject.description"
+            ></el-input>
           </el-form-item>
 
-          <el-form-item label="Publisher" prop="publisher">
-            <el-input v-model="book.publisher"></el-input>
-          </el-form-item>
-
-          <el-form-item label="ISBN" prop="isbn">
-            <el-input v-model="book.isbn"></el-input>
-          </el-form-item>
-
-          <el-form-item label="Publication Date" prop="publicationDate">
+          <el-form-item label="Start Date" prop="startDate">
             <el-date-picker
-              v-model="book.publicationDate"
+              v-model="fundraisingProject.startDate"
               type="date"
             ></el-date-picker>
           </el-form-item>
 
-          <el-form-item label="Page Count" prop="page">
-            <el-input v-model="book.page" type="number"></el-input>
+          <el-form-item label="End Date" prop="endDate">
+            <el-date-picker
+              v-model="fundraisingProject.endDate"
+              type="date"
+            ></el-date-picker>
           </el-form-item>
 
-          <el-form-item label="Language" prop="language">
-            <el-select v-model="book.language" placeholder="Select Language">
-              <el-option
-                v-for="item in languages"
-                :key="item"
-                :label="item"
-                :value="item"
-              ></el-option>
+          <el-form-item label="Goal Amount" prop="goalAmount">
+            <el-input-number
+              v-model="fundraisingProject.goalAmount"
+              :min="0"
+            ></el-input-number>
+          </el-form-item>
+
+          <el-form-item label="Status" prop="status">
+            <el-select v-model="fundraisingProject.status" placeholder="Select">
+              <el-option label="Active" value="Active"></el-option>
+              <el-option label="Inactive" value="Inactive"></el-option>
+              <el-option label="Completed" value="Completed"></el-option>
             </el-select>
           </el-form-item>
 
-          <el-form-item label="Image URL" prop="imgUrl">
-            <el-input v-model="book.imgUrl" @change="previewImage"></el-input>
-            <img
-              v-if="imagePreview"
-              :src="imagePreview"
-              alt="Image Preview"
-              class="preview_image"
-            />
+          <el-form-item label="Organizer ID" prop="organizerId">
+            <el-select
+              v-model="fundraisingProject.organizerId"
+              filterable
+              placeholder="Select the related organizer"
+              :loading="loading"
+            >
+              <el-option
+                v-for="organizer in organizers"
+                :key="organizer.id"
+                :label="organizer.username"
+                :value="organizer.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="Image Upload" prop="imgUrl">
+            <el-upload
+              action="#"
+              list-type="picture-card"
+              :auto-upload="false"
+              :file-list="files"
+              @change="handlePictureChange"
+            >
+              <el-icon><Plus /></el-icon>
+
+              <template #file="{ file }">
+                <div style="display: contents">
+                  <img
+                    class="el-upload-list__item-thumbnail"
+                    :src="file.url"
+                    alt=""
+                  />
+                  <span class="el-upload-list__item-actions">
+                    <span
+                      class="el-upload-list__item-preview"
+                      @click="handlePictureCardPreview(file)"
+                    >
+                      <el-icon><zoom-in /></el-icon>
+                    </span>
+                    <span
+                      v-if="!disabled"
+                      class="el-upload-list__item-delete"
+                      @click="() => handlePictureRemove(file)"
+                    >
+                      <el-icon><delete /></el-icon>
+                    </span>
+                  </span>
+                </div>
+              </template>
+            </el-upload>
           </el-form-item>
 
           <el-form-item>
             <el-button type="success" @click="submitForm">Save</el-button>
           </el-form-item>
         </el-form>
+
+        <el-dialog v-model="dialogImageVisible">
+          <img :src="dialogImageUrl" alt="Preview Image" class="dialog_image" />
+        </el-dialog>
       </v-container>
     </v-card>
   </div>
@@ -87,6 +133,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
+import { Delete, Plus, ZoomIn } from "@element-plus/icons-vue";
 import { get } from "@/net/index.js";
 import {
   capitalizeRouteName,
@@ -94,89 +141,148 @@ import {
   getTextRequiredRule,
 } from "@/assets/js/admin/common_edit_add.js";
 import * as commonEditAddFunction from "@/assets/js/admin/common_edit_add.js";
+import moment from "moment";
 
 const router = useRouter();
 const route = useRoute();
 const isEdit = ref(false);
 const id = ref(null);
-const bookForm = ref(null);
-const imagePreview = ref("");
+const fundraisingProjectForm = ref(null);
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
-const languages = [
-  "English",
-  "Spanish",
-  "French",
-  "German",
-  "Chinese",
-  "Japanese",
-];
-
-const book = ref({
-  title: "",
-  author: "",
-  publisher: "",
-  isbn: "",
-  publicationDate: "",
-  page: 0,
-  language: "",
+const fundraisingProject = ref({
+  projectName: "",
+  description: "",
+  startDate: "",
+  endDate: "",
+  goalAmount: 0,
+  status: "",
+  organizerId: "",
   imgUrl: "",
 });
 
 const rules = {
-  title: [getTextRequiredRule("Please enter the title")],
-  author: [getTextRequiredRule("Please enter the author")],
+  projectName: [getTextRequiredRule("Please enter the project name")],
   description: [getTextRequiredRule("Please enter the description")],
-  publisher: [getTextRequiredRule("Please enter the publisher")],
-  isbn: [
-    getTextRequiredRule("Please enter the ISBN"),
-    {
-      pattern: /^\d{10}(\d{3})?$/,
-      message: "Please enter a valid ISBN",
-      trigger: "blur",
-    },
-  ],
-  publicationDate: [
-    getTextRequiredRule("Please select the publication date", "change"),
-  ],
-  page: [
-    getTextRequiredRule("Please enter the page count"),
-    {
-      pattern: /^[1-9]\d*$/, // Positive integers greater than zero
-      message: "Page count must greater than zero",
-      trigger: "blur",
-    },
-  ],
-  language: [getTextRequiredRule("Please select the language", "change")],
-  imgUrl: [
-    getTextRequiredRule("Please enter the image url"),
-    { type: "url", message: "Please enter a valid URL", trigger: "blur" },
-  ],
+  startDate: [getTextRequiredRule("Please select the start date")],
+  endDate: [getTextRequiredRule("Please select the end date")],
+  goalAmount: [getTextRequiredRule("Please enter the goal amount")],
+  status: [getTextRequiredRule("Please select the status", "change")],
+  organizerId: [getTextRequiredRule("Please select the organizer")],
 };
 
 const previewImage = () =>
-  commonEditAddFunction.previewImage(imagePreview, book.value.imgUrl);
+  commonEditAddFunction.previewImage(
+    files,
+    fundraisingProject.value.imgUrl,
+    ossEndpoint
+  );
 
-const submitForm = () =>
-  commonEditAddFunction.submitForm(bookForm, book, id, isEdit, router, route);
+const submitForm = () => {
+  // Check and format startDate if it exists
+  const startDate = fundraisingProject.value.startDate;
+  if (startDate) {
+    fundraisingProject.value.startDate = moment(startDate).format("YYYY-MM-DD");
+  }
+
+  // Check and format endDate if it exists
+  const endDate = fundraisingProject.value.endDate;
+  if (endDate) {
+    fundraisingProject.value.endDate = moment(endDate).format("YYYY-MM-DD");
+  }
+
+  commonEditAddFunction.submitForm(
+    fundraisingProjectForm,
+    fundraisingProject,
+    id,
+    isEdit,
+    router,
+    route,
+    files,
+    "multipart/form-data"
+  );
+};
+
+// Fetch fundraisingProject data based on id
+const fetchItems = () => {
+  get(
+    `/api/${getRouteNameForApi(route.name)}/${id.value}`,
+    (data) => {
+      fundraisingProject.value = data;
+
+      // Update the image preview
+      if (fundraisingProject.value.imgUrl) {
+        previewImage(fundraisingProject.value.imgUrl);
+      }
+    },
+    (error) => {
+      ElMessage.error(error);
+    }
+  );
+};
+
+// The pagination funciton is not implemented yet
+const organizers = ref([]);
+const loading = ref(false);
+const page = ref(1);
+const itemsPerPage = ref(30);
+
+const params = {
+  current: page.value,
+  size: itemsPerPage.value,
+  // filter: search.value,
+};
+
+// Fetch user selection data
+const fetchOrganizerSelections = () => {
+  get(
+    `/api/${getRouteNameForApi(route.name)}/getOrganizerSelections`,
+    (data) => {
+      if (data.records && data.records.length > 0) {
+        organizers.value = [...organizers.value, ...data.records];
+      } else {
+        // Handle the end of the list (no more items to load)
+      }
+      loading.value = false;
+    },
+    (message) => {
+      ElMessage.warning(message);
+      loading.value = false;
+    },
+    params
+  );
+};
 
 onMounted(() => {
   id.value = route.params.id;
   isEdit.value = Boolean(id.value);
 
   if (isEdit.value) {
-    // Fetch book data based on id
-    get(
-      `/api/${getRouteNameForApi(route.name)}/${id.value}`,
-      (data) => {
-        book.value = data;
-        previewImage(); // Update the image preview
-      },
-      (error) => {
-        ElMessage.error(error);
-      }
-    );
+    fetchItems();
   }
+
+  fetchOrganizerSelections();
 });
+
+// Below are for Image upload
+const dialogImageUrl = ref("");
+const dialogImageVisible = ref(false);
+const disabled = ref(false);
+const files = ref([]);
+
+const handlePictureChange = (file, fileList) => {
+  // Ensure only the last selected file is in the list
+  files.value = [fileList.at(-1)];
+};
+
+const handlePictureRemove = (file) => {
+  files.value.splice(files.value.indexOf(file), 1);
+};
+
+const handlePictureCardPreview = (file) => {
+  dialogImageUrl.value = file.url;
+  dialogImageVisible.value = true;
+};
 </script>
 
 <style scoped>

@@ -40,7 +40,6 @@
               filterable
               placeholder="Select the related user"
               :loading="loading"
-              @search-change="searchUser"
             >
               <el-option
                 v-for="user in users"
@@ -68,10 +67,8 @@
             <el-select
               v-model="post.bookId"
               filterable
-              remote
-              :remote-method="searchBook"
-              :loading="loading"
               placeholder="Select the related book"
+              :loading="loading"
             >
               <el-option
                 v-for="book in books"
@@ -180,10 +177,20 @@ const submitForm = () => {
   commonEditAddFunction.submitForm(postForm, post, id, isEdit, router, route);
 };
 
-// The pagination funciton is not implemented yet
-const searchUser = ref("");
-const searchBook = ref("");
+// Fetch post data from backend
+const fetchItems = () => {
+  get(
+    `/api/${getRouteNameForApi(route.name)}/${id.value}`,
+    (data) => {
+      post.value = data;
+    },
+    (error) => {
+      ElMessage.error(error);
+    }
+  );
+};
 
+// The pagination funciton is not implemented yet
 const books = ref([]);
 const users = ref([]);
 
@@ -195,23 +202,6 @@ const params = {
   current: page.value,
   size: itemsPerPage.value,
   // filter: search.value,
-};
-
-// Fetch items (books) from backend
-const fetchItems = () => {
-  if (loading.value) return; // Prevent duplicate calls
-  loading.value = true;
-
-  // Fetch post data based on id
-  get(
-    `/api/${getRouteNameForApi(route.name)}/${id.value}`,
-    (data) => {
-      post.value = data;
-    },
-    (error) => {
-      ElMessage.error(error);
-    }
-  );
 };
 
 // Fetch user selection data

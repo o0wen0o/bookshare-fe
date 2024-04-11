@@ -126,7 +126,7 @@ import {
   getTextRequiredRule,
 } from "@/assets/js/admin/common_edit_add.js";
 import * as commonEditAddFunction from "@/assets/js/admin/common_edit_add.js";
-import moment from 'moment';
+import moment from "moment";
 
 const router = useRouter();
 const route = useRoute();
@@ -187,10 +187,9 @@ const previewImage = () =>
 
 const submitForm = () => {
   // Check and format publicationDate if it exists
-  if (book.value.publicationDate) {
-    book.value.publicationDate = moment(book.value.publicationDate).format(
-      "YYYY-MM-DD"
-    );
+  const publicationDate = book.value.publicationDate;
+  if (publicationDate) {
+    book.value.publicationDate = moment(publicationDate).format("YYYY-MM-DD");
   }
 
   commonEditAddFunction.submitForm(
