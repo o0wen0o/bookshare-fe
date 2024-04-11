@@ -44,6 +44,24 @@
           </div>
         </template>
 
+        <!-- Visiblity -->
+        <template #item.status="{ item }">
+          <div>
+            <v-chip
+              variant="tonal"
+              :color="
+                item.status === 'Accepted'
+                  ? 'success'
+                  : item.status === 'Rejected'
+                  ? 'red'
+                  : 'primary'
+              "
+            >
+              {{ item.status }}
+            </v-chip>
+          </div>
+        </template>
+
         <!-- Actions -->
         <template #item.actions="{ item }">
           <div class="action_buttons">
@@ -57,7 +75,7 @@
             <template v-if="item.status === 'Pending'">
               <v-btn
                 color="success"
-                prepend-icon="mdi-check"
+                prepend-icon="mdi-check-bold"
                 size="small"
                 @click="acceptBookSubmission(item)"
               >
@@ -65,7 +83,7 @@
               </v-btn>
               <v-btn
                 color="red"
-                prepend-icon="mdi-close"
+                prepend-icon="mdi-close-thick"
                 size="small"
                 @click="rejectBookSubmission(item)"
               >
