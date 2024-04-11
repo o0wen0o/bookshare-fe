@@ -2,7 +2,7 @@
   <div>
     <div class="page_header">
       <h1 class="page_title">
-        {{ isEdit ? "Edit" : "Add" }} {{ capitalizeRouteName($route.name) }}s
+        {{ isEdit ? "Edit" : "Add" }} {{ capitalizeRouteName(route.name) }}s
       </h1>
 
       <div class="page_actions">

@@ -2,7 +2,7 @@
   <div>
     <div class="page_header">
       <h1 class="page_title">
-        {{ isEdit ? "Edit" : "Add" }} {{ capitalizeRouteName($route.name) }}
+        {{ isEdit ? "Edit" : "Add" }} {{ capitalizeRouteName(route.name) }}
       </h1>
       <div class="page_actions">
         <router-link :to="{ path: `/${getRouteNameForApi(route.name)}` }">

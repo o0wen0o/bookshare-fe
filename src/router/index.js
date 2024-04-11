@@ -63,7 +63,7 @@ const router = createRouter({
                 { path: '/write-book-review/:id/edit', name: 'write-book-review-edit', component: () => import('@/views/user/profile/book-review/WriteBookReview.vue') },
 
                 // fundraising project detail page
-                { path: '/fundraising-project-detail/:id', name: 'fundraising-project-detail', component: () => import('@/views/user/fundraising-project/FundraisingProjectDetailView.vue') },
+                { path: '/fundraising-project-detail/:id', name: 'fundraising-project-detail', component: () => import('@/views/user/fundraising-project-detail/FundraisingProjectDetailView.vue') },
             ]
         }, {
             path: '/admin',

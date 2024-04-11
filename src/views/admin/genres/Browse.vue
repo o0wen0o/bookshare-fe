@@ -4,7 +4,7 @@
       <h1 class="page_title">{{ capitalizeRouteName(route.name) }}</h1>
 
       <div class="page_actions">
-        <router-link :to="`${$route.path}/create`">
+        <router-link :to="`${route.path}/create`">
           <v-btn color="primary" prepend-icon="mdi-plus">Add New</v-btn>
         </router-link>
 
