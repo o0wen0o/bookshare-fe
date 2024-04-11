@@ -35,6 +35,24 @@
           </el-form-item>
 
           <el-form-item label="User ID" prop="userId">
+            <el-select
+              v-model="post.userId"
+              filterable
+              placeholder="Select the related user"
+              :loading="loading"
+              @search-change="searchUser"
+            >
+              <el-option
+                v-for="user in users"
+                :key="user.id"
+                :label="user.username"
+                :value="user.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <!-- <el-form-item label="User ID" prop="userId">
             <v-autocomplete
               v-model="post.userId"
               label="Select the related user"
@@ -44,9 +62,28 @@
               :loading="loading"
               :search="searchUser"
             ></v-autocomplete>
-          </el-form-item>
+          </el-form-item> -->
 
           <el-form-item label="Book ID" prop="bookId">
+            <el-select
+              v-model="post.bookId"
+              filterable
+              remote
+              :remote-method="searchBook"
+              :loading="loading"
+              placeholder="Select the related book"
+            >
+              <el-option
+                v-for="book in books"
+                :key="book.id"
+                :label="book.title"
+                :value="book.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <!-- <el-form-item label="Book ID" prop="bookId">
             <v-autocomplete
               v-model="post.bookId"
               label="Select the related book"
@@ -56,7 +93,7 @@
               :loading="loading"
               :search="searchBook"
             ></v-autocomplete>
-          </el-form-item>
+          </el-form-item> -->
 
           <el-form-item>
             <el-button type="success" @click="submitForm">Save</el-button>
