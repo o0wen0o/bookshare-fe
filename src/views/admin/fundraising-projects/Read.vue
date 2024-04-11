@@ -42,12 +42,12 @@
 
                     <div class="form_group">
                       <strong>Start Date:</strong>
-                      {{ fundraisingProject.startDate }}
+                      {{ formatDate(fundraisingProject.startDate) }}
                     </div>
 
                     <div class="form_group">
                       <strong>End Date:</strong>
-                      {{ fundraisingProject.endDate }}
+                      {{ formatDate(fundraisingProject.endDate) }}
                     </div>
 
                     <div class="form_group">
@@ -77,12 +77,12 @@
 
                     <div class="form_group">
                       <strong>Updated Date:</strong>
-                      {{ fundraisingProject.updatedDate }}
+                      {{ formatDatetime(fundraisingProject.updatedDate) }}
                     </div>
 
                     <div class="form_group">
                       <strong>Created Date:</strong>
-                      {{ fundraisingProject.createdDate }}
+                      {{ formatDatetime(fundraisingProject.createdDate) }}
                     </div>
                   </v-card-text>
                 </div>
@@ -103,6 +103,8 @@ import { get } from "@/net/index.js";
 import {
   capitalizeRouteName,
   getRouteNameForApi,
+  formatDate,
+  formatDatetime,
 } from "@/assets/js/admin/common_read.js";
 
 const route = useRoute();

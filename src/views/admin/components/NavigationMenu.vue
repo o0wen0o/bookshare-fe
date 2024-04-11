@@ -90,7 +90,13 @@
           >
             Fundraising Projects
           </el-menu-item>
-          <el-menu-item index="4-3" @click="navigateTo('/donations')">
+          <el-menu-item
+            index="4-3"
+            @click="navigateTo('/fundraising-project-progress')"
+          >
+            Fundraising Project Progress
+          </el-menu-item>
+          <el-menu-item index="4-4" @click="navigateTo('/donations')">
             Donations
           </el-menu-item>
         </el-sub-menu>
@@ -127,7 +133,8 @@ const tabsToRoutes = {
   "3-1": "posts",
   "4-1": "fundraising-organizers",
   "4-2": "fundraising-projects",
-  "4-3": "donations",
+  "4-3": "fundraising-project-progress",
+  "4-4": "donations",
 };
 
 const updateTab = () => {

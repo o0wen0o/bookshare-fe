@@ -114,6 +114,11 @@ const router = createRouter({
                 { path: '/fundraising-projects/create', name: 'fundraising-projects-create', component: () => import('@/views/admin/fundraising-projects/EditAdd.vue') },
                 { path: '/fundraising-projects/:id/edit', name: 'fundraising-projects-edit', component: () => import('@/views/admin/fundraising-projects/EditAdd.vue') },
 
+                { path: '/fundraising-project-progress', name: 'fundraising-project-progress', component: () => import('@/views/admin/fundraising-project-progress/Browse.vue') },
+                { path: '/fundraising-project-progress/:id', name: 'fundraising-project-progress-read', component: () => import('@/views/admin/fundraising-project-progress/Read.vue') },
+                { path: '/fundraising-project-progress/create', name: 'fundraising-project-progress-create', component: () => import('@/views/admin/fundraising-project-progress/EditAdd.vue') },
+                { path: '/fundraising-project-progress/:id/edit', name: 'fundraising-project-progress-edit', component: () => import('@/views/admin/fundraising-project-progress/EditAdd.vue') },
+
                 { path: '/donations', name: 'donations', component: () => import('@/views/admin/donations/Browse.vue') },
                 { path: '/donations/:id', name: 'donations-read', component: () => import('@/views/admin/donations/Read.vue') },
             ]

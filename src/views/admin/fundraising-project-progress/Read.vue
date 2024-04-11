@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title">View {{ capitalizeRouteName(route.name) }}</h1>
+      <h1 class="page_title">View {{ capitalizeRouteName(route.name) }}s</h1>
       <div class="page_actions">
         <router-link :to="{ path: `/${getRouteNameForApi(route.name)}` }">
           <v-btn color="warning" prepend-icon="mdi-menu">Return to list</v-btn>
@@ -21,25 +21,49 @@
               <v-col cols="12">
                 <div class="details">
                   <v-card-text>
+                    <div class="form_group" v-if="hasValidImageUrl">
+                      <strong>Image:</strong>
+                      <v-img
+                        :src="ossEndpoint + fundraisingProjectProgress.imgUrl"
+                      ></v-img>
+                    </div>
+                    <div class="form_group" v-else>
+                      <strong>Image:</strong>
+                      No image
+                    </div>
+
                     <div class="form_group">
                       <strong>ID:</strong>
-                      {{ fundraisingOrganizer.id }}
+                      {{ fundraisingProjectProgress.id }}
                     </div>
+
                     <div class="form_group">
-                      <strong>Username:</strong>
-                      {{ fundraisingOrganizer.username }}
+                      <strong>Title:</strong>
+                      {{ fundraisingProjectProgress.title }}
                     </div>
+
                     <div class="form_group">
-                      <strong>Email:</strong>
-                      {{ fundraisingOrganizer.email }}
+                      <strong>Description:</strong>
+                      {{ fundraisingProjectProgress.description }}
                     </div>
+
                     <div class="form_group">
-                      <strong>Phone Number:</strong>
-                      {{ fundraisingOrganizer.phoneNumber }}
+                      <strong>Updated Date:</strong>
+                      {{
+                        formatDatetime(fundraisingProjectProgress.updatedDate)
+                      }}
                     </div>
+
                     <div class="form_group">
                       <strong>Created Date:</strong>
-                      {{ formatDatetime(fundraisingOrganizer.createdDate) }}
+                      {{
+                        formatDatetime(fundraisingProjectProgress.createdDate)
+                      }}
+                    </div>
+
+                    <div class="form_group">
+                      <strong>Fundraising Project ID:</strong>
+                      {{ fundraisingProjectProgress.fundraisingProjectId }}
                     </div>
                   </v-card-text>
                 </div>
@@ -53,7 +77,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { get } from "@/net/index.js";
@@ -66,23 +90,33 @@ import {
 const route = useRoute();
 const id = ref(null);
 const tab = ref(null);
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 
-const fundraisingOrganizer = ref({
+const hasValidImageUrl = computed(() => {
+  return (
+    fundraisingProjectProgress.value.imgUrl &&
+    fundraisingProjectProgress.value.imgUrl !== "null"
+  );
+});
+
+const fundraisingProjectProgress = ref({
   id: "",
-  username: "",
-  email: "",
-  phoneNumber: "",
+  title: "",
+  description: "",
+  imgUrl: "",
+  updatedDate: "",
   createdDate: "",
+  fundraisingProjectId: "",
 });
 
 onMounted(() => {
   id.value = route.params.id;
 
-  // Fetch fundraising organizer data based on id
+  // Fetch fundraising project progress data based on id
   get(
     `/api/${getRouteNameForApi(route.name)}/${id.value}`,
     (data) => {
-      fundraisingOrganizer.value = data;
+      fundraisingProjectProgress.value = data;
     },
     (error) => {
       ElMessage.error(error);
@@ -95,8 +129,7 @@ onMounted(() => {
 @import "@/assets/css/admin/common_read.css";
 
 .v-img {
-  height: 300px;
-  margin-top: 50px;
+  width: 300px;
 }
 
 .v-card-subtitle {
