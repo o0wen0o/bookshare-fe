@@ -113,7 +113,6 @@ const itemsPerPageOptions = ref([
 const headers = ref([
   { title: "ID", value: "id" },
   { title: "Project Name", value: "projectName" },
-  { title: "Description", value: "description" },
   { title: "Start Date", value: "startDate" },
   { title: "End Date", value: "endDate" },
   { title: "Goal Amount", value: "goalAmount" },

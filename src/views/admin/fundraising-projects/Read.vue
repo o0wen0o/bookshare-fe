@@ -36,11 +36,6 @@
                     </div>
 
                     <div class="form_group">
-                      <strong>Description:</strong>
-                      {{ fundraisingProject.description }}
-                    </div>
-
-                    <div class="form_group">
                       <strong>Start Date:</strong>
                       {{ formatDate(fundraisingProject.startDate) }}
                     </div>
@@ -84,6 +79,15 @@
                       <strong>Created Date:</strong>
                       {{ formatDatetime(fundraisingProject.createdDate) }}
                     </div>
+
+                    <div class="form_group">
+                      <strong>Description:</strong>
+                      <div
+                        v-html="
+                          DOMPurify.sanitize(fundraisingProject.description)
+                        "
+                      ></div>
+                    </div>
                   </v-card-text>
                 </div>
               </v-col>
@@ -106,6 +110,7 @@ import {
   formatDate,
   formatDatetime,
 } from "@/assets/js/admin/common_read.js";
+import DOMPurify from "dompurify"; // Sanitize HTML prevent XSS attacks
 
 const route = useRoute();
 const id = ref(null);
