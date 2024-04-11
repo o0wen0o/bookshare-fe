@@ -22,14 +22,15 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+import { ElMessage } from "element-plus";
 import { get } from "@/net/index.js";
 
 const router = useRouter();
-const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 const store = useStore();
-const bookId = computed(() => store.state.bookId || {});
+const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
+const bookId = computed(() => store.state.bookId || {}); // Get the current book id from the store
 
 const books = ref([
   {

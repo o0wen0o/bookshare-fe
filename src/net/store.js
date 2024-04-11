@@ -12,8 +12,9 @@ const store = createStore({
     state() {
         return {
             user: null, // This will hold our user data
-            menuCollapsed: true, // navigation menu
-            bookId: null, // ID of the book in book detail page
+            menuCollapsed: true, // Control menu collapse, use in header of admin panel
+            bookId: null, // ID of the book in book detail page, use in recommended book component
+            fundraisingProjectId: null, // ID of the fundraising project in fundraising project detail page, use in project progress component
         };
     },
     mutations: {
@@ -26,6 +27,9 @@ const store = createStore({
         setBookId(state, id) {
             state.bookId = id;
         },
+        setProjectId(state, id) {
+            state.fundraisingProjectId = id;
+        },
     },
     actions: {
         loginUser({ commit }, userData) {
@@ -37,10 +41,14 @@ const store = createStore({
         setBookId({ commit }, id) {
             commit('setBookId', id);
         },
+        setProjectId({ commit }, id) {
+            commit('setProjectId', id);
+        },
     },
     getters: {
         userRoles: (state) => state.user ? state.user.roles : [],
         currentBookId: (state) => state.bookId,
+        currentProjectId: (state) => state.fundraisingProjectId,
     },
 });
 
