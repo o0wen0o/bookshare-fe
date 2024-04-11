@@ -2,8 +2,8 @@
   <div>
     <v-card class="page_header" elevation="3">
       <v-row align="center" justify="center" style="padding: 15px 30px">
+        <!-- Logo Section -->
         <v-col cols="1" style="padding: 0">
-          <!-- Logo Section -->
           <v-img
             :src="logo"
             alt="Logo"
@@ -101,18 +101,22 @@ const avatar = ossEndpoint + userData.value.avatar;
 const logo = ossEndpoint + "BookShare_logo_transparent.png";
 const search = ref("");
 
-function profileInfo() {
-  router.push("/profile-detail");
-}
-
 function performSearch() {
   router.push({ name: route.name, query: { search: search.value } });
+}
+
+function profileInfo() {
+  router.push("/profile-detail");
 }
 
 function logoutAccount() {
   logout(() => {
     router.push("/login");
   });
+}
+
+function navigateTo(route) {
+  router.push({ name: route });
 }
 
 // Computes the currentTab value based on the current route.
@@ -134,10 +138,6 @@ const updateTab = () => {
 // Call updateTab initially and whenever the route changes.
 updateTab();
 watch(() => route.name, updateTab);
-
-function navigateTo(route) {
-  router.push({ name: route });
-}
 </script>
 
 <style scoped>

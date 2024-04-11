@@ -8,7 +8,7 @@
       </div>
 
       <el-menu
-        default-active="1"
+        :default-active="currentTab"
         class="navigation_menu"
         :collapse="menuCollapsed ? isCollapsed : menuCollapsed"
         @mouseenter="menuCollapsed ? (isCollapsed = false) : false"
@@ -100,11 +100,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { UserFilled, Management, Comment, List } from "@element-plus/icons-vue";
 
+const route = useRoute();
 const router = useRouter();
 const store = useStore();
 const menuCollapsed = computed(() => store.state.menuCollapsed); // control by header
@@ -113,6 +114,32 @@ const isCollapsed = ref(true); // use for current file
 function navigateTo(route) {
   router.push(route);
 }
+
+// Computes the currentTab value based on the current route.
+// This function finds the tab number (1, 2, 3) that corresponds to the current route name.
+const currentTab = ref(null);
+const tabsToRoutes = {
+  "1-1": "users",
+  "1-2": "roles",
+  "2-1": "books",
+  "2-2": "genres",
+  "2-3": "book-submissions",
+  "3-1": "posts",
+  "4-1": "fundraising-organizers",
+  "4-2": "fundraising-projects",
+  "4-3": "donations",
+};
+
+const updateTab = () => {
+  const tab = Object.keys(tabsToRoutes).find(
+    (key) => tabsToRoutes[key] === route.name
+  );
+  currentTab.value = tab ? tab : "1-1"; // Defaults to the first tab if no match is found.
+};
+
+// Call updateTab initially and whenever the route changes.
+updateTab();
+watch(() => route.name, updateTab);
 </script>
 
 <style scoped>
