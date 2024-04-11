@@ -89,7 +89,7 @@ import { Delete, Plus, ZoomIn } from "@element-plus/icons-vue";
 import { get, put } from "@/net/index.js";
 import {
   getTextRequiredRule,
-  validateNumber,
+  validatePhoneNumber,
 } from "@/assets/js/admin/common_edit_add.js";
 
 const route = useRoute();
@@ -115,7 +115,7 @@ const rules = {
   username: [getTextRequiredRule("Please enter the username")],
   phoneNumber: [
     getTextRequiredRule("Please enter the phone number"),
-    { validator: validateNumber, trigger: "blur" },
+    { validator: validatePhoneNumber, trigger: "blur" },
   ],
 };
 

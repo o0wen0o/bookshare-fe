@@ -28,7 +28,7 @@ const getTextRequiredRule = (message, triggers = ['blur']) => {
     };
 }
 
-const validateNumber = (rule, value, callback) => {
+const validatePhoneNumber = (rule, value, callback) => {
     const phoneNumberRegex = /^[\d-]+$/;
     if (!phoneNumberRegex.test(value)) {
         callback(new Error('Please enter a valid phone number'));
@@ -100,7 +100,7 @@ export {
     capitalizeRouteName,
     getRouteNameForApi,
     getTextRequiredRule,
-    validateNumber,
+    validatePhoneNumber,
     previewImage,
     submitForm
 };

@@ -147,7 +147,7 @@ import {
   capitalizeRouteName,
   getRouteNameForApi,
   getTextRequiredRule,
-  validateNumber,
+  validatePhoneNumber,
 } from "@/assets/js/admin/common_edit_add.js";
 import * as commonEditAddFunction from "@/assets/js/admin/common_edit_add.js";
 
@@ -186,7 +186,7 @@ const rules = {
   password: [getPasswordRules()],
   phoneNumber: [
     getTextRequiredRule("Please enter the phone number"),
-    { validator: validateNumber, trigger: "blur" },
+    { validator: validatePhoneNumber, trigger: "blur" },
   ],
 };
 
