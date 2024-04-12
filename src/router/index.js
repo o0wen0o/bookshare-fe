@@ -64,6 +64,8 @@ const router = createRouter({
 
                 // fundraising project detail page
                 { path: '/fundraising-project-detail/:id', name: 'fundraising-project-detail', component: () => import('@/views/user/fundraising-project-detail/FundraisingProjectDetailView.vue') },
+
+                { path: '/stripe-payment', name: 'stripe-payment', component: () => import('@/views/user/fundraising-project-detail/StripePayment.vue') },
             ]
         }, {
             path: '/admin',

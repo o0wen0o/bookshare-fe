@@ -7,7 +7,7 @@
 
     <v-container>
       <!-- Fundraising Project Info -->
-      <div>
+      <div class="fundraising-project-info">
         <v-card-title>{{ fundraisingProject.projectName }}</v-card-title>
         <v-card-text>
           <p><strong>Start Date:</strong> {{ fundraisingProject.startDate }}</p>
@@ -41,7 +41,7 @@
             class="donate-button"
             @mouseover="isHovering = true"
             @mouseleave="isHovering = false"
-            @click="donate()"
+            @click="showDonationDialog = true"
           >
             Donate
           </v-btn>
@@ -70,26 +70,65 @@
         </v-window-item>
       </v-window>
     </v-container>
+
+    <!-- Donation Dialog -->
+    <v-dialog v-model="showDonationDialog" max-width="500">
+      <v-card max-width="500" prepend-icon="mdi-alert-circle" title="Donate">
+        <v-card-text>
+          <p class="mt-2 mb-2">Enter the amount you want to donate:</p>
+          <v-text-field
+            v-model="amount"
+            label="Donation Amount (USD)"
+            type="number"
+            min="1"
+            required
+          ></v-text-field>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              class="text-none"
+              rounded="xl"
+              @click="showDonationDialog = false"
+            >
+              Cancel
+            </v-btn>
+
+            <v-btn
+              class="text-none"
+              color="green darken-1"
+              rounded="xl"
+              variant="flat"
+              @click="submitDonation"
+            >
+              Donate
+            </v-btn>
+          </v-card-actions>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { useStore } from "vuex";
-import { useRoute } from "vue-router";
-import { get, post } from "@/net/index.js";
+import { useRoute, useRouter } from "vue-router";
+import { get } from "@/net/index.js";
 import { ElMessage } from "element-plus";
 import DOMPurify from "dompurify"; // Sanitize HTML prevent XSS attacks
 import FundraisingProjectProgress from "./FundraisingProjectProgress.vue";
 
 const route = useRoute();
+const router = useRouter();
 const fundraisingProjectId = ref(null);
 const isHovering = ref(false); // Control the donate button
 const tab = ref(null);
 
 const store = useStore();
-const userData = computed(() => store.state.user || {});
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
+const showDonationDialog = ref(false);
+const amount = ref("");
 
 const fundraisingProject = ref({
   projectName: "",
@@ -117,25 +156,21 @@ const fetchItems = () => {
   );
 };
 
-const donate = () => {
-  console.log("donate");
-  // post(
-  //   `/api/fundraising-project-detail/donate/${fundraisingProjectId.value}`,
-  //   {},
-  //   (data) => {
-  //     ElMessage.success(data);
-  //   },
-  //   (error) => {
-  //     ElMessage.error(error);
-  //   }
-  // );
-};
-
 onMounted(() => {
   fundraisingProjectId.value = route.params.id;
   store.dispatch("setProjectId", fundraisingProjectId); // Store fundraisingProjectId in Vuex store
   fetchItems();
 });
+
+const submitDonation = () => {
+  if (amount.value && amount.value > 0) {
+    // Proceed to payment
+    showDonationDialog.value = false;
+    router.push({ name: "stripe-payment", query: { amount: amount.value } });
+  } else {
+    ElMessage.warning("Please enter a valid donation amount.");
+  }
+};
 </script>
 
 <style>
@@ -148,8 +183,8 @@ onMounted(() => {
   );
 }
 
-.v-card-text > *,
-.v-card-text div > * {
+.fundraising-project-info .v-card-text > *,
+.fundraising-project-info .v-card-text div > * {
   margin-bottom: 0.5rem;
 }
 
