@@ -6,6 +6,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import { fileURLToPath, URL } from 'node:url';
 import dns from 'dns';
 import vuetify from 'vite-plugin-vuetify';
+import mkcert from 'vite-plugin-mkcert'; // for https
 
 dns.setDefaultResultOrder('verbatim');
 
@@ -38,6 +39,7 @@ export default defineConfig({
                 ElementPlusResolver()
             ],
         }),
+        mkcert()
     ],
     define: {
         __VUE_OPTIONS_API__: true,
