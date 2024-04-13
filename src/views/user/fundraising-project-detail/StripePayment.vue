@@ -14,7 +14,7 @@
       @click="handlePayment"
       v-if="clientSecret"
     >
-      Pay RM {{ parseFloat(amount).toFixed(2) }}
+      Pay ${{ parseFloat(amount).toFixed(2) }}
     </v-btn>
   </v-container>
 </template>
@@ -71,6 +71,7 @@ const initiatePayment = async () => {
   const data = {
     amount: amount.value,
     userId: userData.value.id,
+    fundraisingProjectId: fundraisingProjectId.value,
   };
 
   post(
@@ -106,7 +107,8 @@ const handlePayment = async () => {
         return_url: fullReturnUrl,
       },
     })
-    .then((result) => {
+    .then(function (result) {
+      // This callback function doesn't work!
       if (result.error) {
         ElMessage.error(result.error.message);
       } else {
@@ -114,7 +116,7 @@ const handlePayment = async () => {
           result.paymentIntent &&
           result.paymentIntent.status === "succeeded"
         ) {
-          ElMessage.success("Payment succeeded!");
+          ElMessage.success("Payment successful!");
         }
       }
     });

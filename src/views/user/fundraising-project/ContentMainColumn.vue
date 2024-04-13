@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { get } from "@/net/index.js";
@@ -103,6 +103,21 @@ watch(
     fetchItems();
   }
 );
+
+onMounted(() => {
+  // After the payment, it will redirect to this page
+  if (
+    route.query.redirect_status &&
+    route.query.redirect_status === "succeeded"
+  ) {
+    ElMessage.success("Payment successful!");
+  } else if (
+    route.query.redirect_status &&
+    route.query.redirect_status === "failed"
+  ) {
+    ElMessage.error("Payment failed!");
+  }
+});
 </script>
 
 <style scoped>
