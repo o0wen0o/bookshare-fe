@@ -1,10 +1,10 @@
 <template>
   <v-infinite-scroll side="end" @load="load">
+    <h3 class="ml-3">Comments</h3>
+    
     <div class="item_container" v-for="comment in comments" :key="comment.id">
       <v-row>
         <v-col cols="12">
-          <h3 class="mb-5">Comments</h3>
-
           <!-- comment Section -->
           <div class="comment_container">
             <!-- comment User Info -->

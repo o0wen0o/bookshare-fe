@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page_header">
-      <h1 class="page_title">View Book</h1>
+      <h1 class="page_title">View {{ capitalizeRouteName(route.name) }}</h1>
       <div class="page_actions">
         <router-link :to="{ path: `/${getRouteNameForApi(route.name)}` }">
           <v-btn color="warning" prepend-icon="mdi-menu">Return to list</v-btn>
@@ -76,7 +76,10 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { get } from "@/net/index.js";
-import { getRouteNameForApi } from "@/assets/js/admin/common_read.js";
+import {
+  capitalizeRouteName,
+  getRouteNameForApi,
+} from "@/assets/js/admin/common_read.js";
 
 const route = useRoute();
 const id = ref(null);
@@ -119,7 +122,6 @@ onMounted(() => {
 
 .v-img {
   height: 300px;
-  margin-top: 50px;
 }
 
 .v-card-subtitle {

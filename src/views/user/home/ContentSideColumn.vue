@@ -1,4 +1,5 @@
 <template>
+  <!-- This Content Side Column will act on home, community, and fundraising project views -->
   <div>
     <!-- Actions List -->
     <actions-list />

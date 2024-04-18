@@ -175,7 +175,7 @@ const rules = {
       trigger: ["blur", "change"],
     },
     {
-      min: 5,
+      min: 3,
       max: 20,
       message: "Username must be longer than 5 characters",
       trigger: ["blur", "change"],

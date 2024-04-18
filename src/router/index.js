@@ -16,7 +16,7 @@ const router = createRouter({
             children: [
                 { path: '/login', name: 'user-auth-login', component: () => import('@/views/user-auth/LoginPage.vue') },
                 { path: '/register', name: 'user-auth-register', component: () => import('@/views/user-auth/RegisterPage.vue') },
-                { path: '/forget', name: 'user-auth-forget', component: () => import('@/views/user-auth/ForgetPage.vue') }
+                { path: '/forget', name: 'user-auth-forget', component: () => import('@/views/user-auth/ForgotPasswordPage.vue') }
             ]
         }, {
             path: '/',
