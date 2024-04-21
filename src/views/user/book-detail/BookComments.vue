@@ -118,7 +118,7 @@
                 flat
                 hide-details
                 v-model="comment.newreply"
-                @keyup.enter="addreply(comment)"
+                @keyup.enter="addReply(comment)"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -237,7 +237,7 @@ const toggleLike = async (item) => {
   );
 };
 
-const addreply = (comment) => {
+const addReply = (comment) => {
   if (comment.newreply.trim()) {
     const newreply = {
       id: 0, // should get from backend

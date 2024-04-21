@@ -34,6 +34,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { ElMessage } from "element-plus";
 import { formatDatetime } from "@/assets/js/admin/common_read.js";
 import { get } from "@/net/index.js";
 import * as commonBrowseFunction from "@/assets/js/admin/common_browse.js";

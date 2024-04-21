@@ -78,7 +78,7 @@
           <p class="mt-2 mb-2">Enter the amount you want to donate:</p>
           <v-text-field
             v-model="amount"
-            label="Donation Amount (USD)"
+            label="Donation Amount (MYR)"
             type="number"
             min="1"
             required
@@ -156,12 +156,6 @@ const fetchItems = () => {
   );
 };
 
-onMounted(() => {
-  fundraisingProjectId.value = route.params.id;
-  store.dispatch("setProjectId", fundraisingProjectId); // Store fundraisingProjectId in Vuex store
-  fetchItems();
-});
-
 const submitDonation = () => {
   if (amount.value && amount.value > 0) {
     // Proceed to payment
@@ -171,6 +165,12 @@ const submitDonation = () => {
     ElMessage.warning("Please enter a valid donation amount.");
   }
 };
+
+onMounted(() => {
+  fundraisingProjectId.value = route.params.id;
+  store.dispatch("setProjectId", fundraisingProjectId); // Store fundraisingProjectId in Vuex store
+  fetchItems();
+});
 </script>
 
 <style>

@@ -136,7 +136,6 @@ const submitForm = () => {
 
       const successCallback = () => {
         ElMessage.success("Updated successfully");
-
         fetchItems(true);
       };
 

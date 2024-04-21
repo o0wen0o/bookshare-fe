@@ -98,7 +98,6 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { Delete, Plus, ZoomIn } from "@element-plus/icons-vue";
@@ -106,7 +105,6 @@ import { post } from "@/net/index.js";
 import { getTextRequiredRule } from "@/assets/js/admin/common_edit_add.js";
 import moment from "moment";
 
-const router = useRouter();
 const store = useStore();
 const userData = computed(() => store.state.user || {});
 const bookForm = ref(null);

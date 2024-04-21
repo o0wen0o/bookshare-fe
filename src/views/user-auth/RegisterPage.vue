@@ -229,28 +229,6 @@ const onValidate = (prop, isValid) => {
   if (prop === "email") isEmailValid.value = isValid;
 };
 
-const register = () => {
-  formRef.value.validate((isValid) => {
-    if (isValid) {
-      post(
-        "/api/auth/register",
-        {
-          username: form.username,
-          password: form.password,
-          email: form.email,
-          code: form.code,
-        },
-        () => {
-          ElMessage.success("Registration successful, welcome to join us!");
-          router.push("/user-auth");
-        }
-      );
-    } else {
-      ElMessage.warning("Please fill in the registration form completely");
-    }
-  });
-};
-
 const validateEmail = () => {
   coldTime.value = 60;
   get(
@@ -273,6 +251,28 @@ const validateEmail = () => {
       coldTime.value = 0;
     }
   );
+};
+
+const register = () => {
+  formRef.value.validate((isValid) => {
+    if (isValid) {
+      post(
+        "/api/auth/register",
+        {
+          username: form.username,
+          password: form.password,
+          email: form.email,
+          code: form.code,
+        },
+        () => {
+          ElMessage.success("Registration successful, welcome to join us!");
+          router.push("/user-auth");
+        }
+      );
+    } else {
+      ElMessage.warning("Please fill in the registration form completely");
+    }
+  });
 };
 </script>
 

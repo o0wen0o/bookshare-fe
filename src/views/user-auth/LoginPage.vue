@@ -87,7 +87,8 @@ import { login } from "@/net/index.js";
 const router = useRouter();
 const store = useStore();
 const formRef = ref();
-const form = reactive({
+
+const form = ref({
   email: "",
   password: "",
   remember: false,
@@ -111,23 +112,28 @@ const rules = {
 function userLogin() {
   formRef.value.validate((isValid) => {
     if (isValid) {
-      login(form.email, form.password, form.remember, (data) => {
-        // Store user data in Vuex
-        store.dispatch("loginUser", {
-          id: data.id,
-          username: data.username,
-          email: data.email,
-          avatar: data.avatar,
-          roles: data.roles,
-        });
+      login(
+        form.value.email,
+        form.value.password,
+        form.value.remember,
+        (data) => {
+          // Store user data in Vuex
+          store.dispatch("loginUser", {
+            id: data.id,
+            username: data.username,
+            email: data.email,
+            avatar: data.avatar,
+            roles: data.roles,
+          });
 
-        // Check if the user has an admin role
-        if (data.roles && data.roles.includes("Admin")) {
-          router.push("/users");
-        } else {
-          router.push("/");
+          // Check if the user has an admin role
+          if (data.roles && data.roles.includes("Admin")) {
+            router.push("/users");
+          } else {
+            router.push("/");
+          }
         }
-      });
+      );
     }
   });
 }
