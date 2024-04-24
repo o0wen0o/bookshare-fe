@@ -1,7 +1,20 @@
 <template>
   <v-infinite-scroll side="end" @load="load">
     <h3 class="ml-3">Comments</h3>
-    
+
+    <!-- comment Input -->
+    <v-col cols="12">
+      <v-text-field
+        label="Write a comment..."
+        solo
+        dense
+        flat
+        hide-details
+        v-model="newComment"
+        @keyup.enter="addCommment()"
+      ></v-text-field>
+    </v-col>
+
     <div class="item_container" v-for="comment in comments" :key="comment.id">
       <v-row>
         <v-col cols="12">
@@ -64,6 +77,7 @@
 
           <!-- replies Section -->
           <v-row v-if="comment.showReplies">
+            <!-- reply Item -->
             <v-col cols="12" v-for="reply in comment.replies" :key="reply.id">
               <div class="reply_container">
                 <v-row>
@@ -110,6 +124,7 @@
               </div>
             </v-col>
 
+            <!-- reply Input -->
             <v-col cols="12">
               <v-text-field
                 label="Write a reply..."
@@ -146,6 +161,7 @@ const router = useRouter();
 const page = ref(1);
 const itemsPerPage = ref(10);
 const comments = ref([]);
+const newComment = ref("");
 
 const ossEndpoint = import.meta.env.VITE_ALIYUN_OSS_ENDPOINT;
 const store = useStore();
@@ -235,6 +251,39 @@ const toggleLike = async (item) => {
       ElMessage.warning(message);
     }
   );
+};
+
+const addCommment = () => {
+  if (newComment.value.trim()) {
+    const comment = {
+      id: 0, // should get from backend
+      username: userData.value.username,
+      avatar: userData.value.avatar,
+      parentId: 0,
+      text: newComment.value,
+      createdDate: moment().format("YYYY-MM-DD HH:mm:ss"),
+      likes: 0, // Initialize likes for the new comment
+      thumbed: false,
+      userId: userData.value.id,
+      bookId: bookId.value,
+    };
+
+    const url = `/api/book-detail/createBookComment`;
+    post(
+      url,
+      comment,
+      (data) => {
+        comment.id = data;
+        comment.createdDate = formatCreatedDate(comment.createdDate);
+
+        comments.value.unshift(comment);
+        newComment.value = "";
+      },
+      (message) => {
+        ElMessage.warning(message);
+      }
+    );
+  }
 };
 
 const addReply = (comment) => {
