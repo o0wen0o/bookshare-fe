@@ -85,7 +85,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="success" @click="submitForm">Save</el-button>
+          <el-button type="success" @click="submitForm">Submit</el-button>
         </el-form-item>
       </el-form>
 

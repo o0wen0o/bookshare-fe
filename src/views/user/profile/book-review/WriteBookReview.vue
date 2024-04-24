@@ -37,7 +37,12 @@
         ></el-form-item>
 
         <el-form-item>
-          <el-button type="success" @click="submitBookReview">Save</el-button>
+          <el-button
+            type="success"
+            :disabled="isSaveButtonDisabled"
+            @click="submitBookReview"
+            >Save</el-button
+          >
         </el-form-item>
       </el-form>
     </v-card-text>
@@ -70,7 +75,7 @@ const bookReviewForm = ref(null);
 const bookReview = ref({
   id: "",
   title: "",
-  text: "<p>Content of your new post...</p><p>&nbsp;</p>",
+  text: "<p>Content of your new book review...</p><p>&nbsp;</p>",
   bookId: "",
 });
 
@@ -98,10 +103,16 @@ const editorConfig = ref({
   },
 });
 
-const rules = {
-  bookId: [getTextRequiredRule("Please select the book")],
-  text: [getTextRequiredRule("Please enter the title")],
-};
+// Computed property to disable the Save button if content is empty or only contains empty tags
+const isSaveButtonDisabled = computed(() => {
+  const isSelectEmpty =
+    bookReview.value.bookId === null || bookReview.value.bookId === "";
+
+  const isContentEmpty =
+    bookReview.value.text.replace(/<[^>]*>/g, "").trim() === "";
+    
+  return isSelectEmpty || isContentEmpty;
+});
 
 function submitBookReview() {
   bookReviewForm.value.validate((valid) => {

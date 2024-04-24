@@ -175,7 +175,7 @@ const acceptBookSubmission = async (item) => {
     `/api${route.path}/acceptBookSubmission`,
     bookSubmissionId,
     () => {
-      ElMessage.success("Book submission approved successfully");
+      ElMessage.success("Book submission accepted successfully");
       fetchItems();
     },
     (message) => {

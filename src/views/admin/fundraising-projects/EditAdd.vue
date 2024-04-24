@@ -63,7 +63,10 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="Fundraising Organizer ID" prop="fundraisingOrganizerId">
+          <el-form-item
+            label="Fundraising Organizer"
+            prop="fundraisingOrganizerId"
+          >
             <el-select
               v-model="fundraisingProject.fundraisingOrganizerId"
               filterable
@@ -191,11 +194,30 @@ const editorConfig = ref({
   },
 });
 
+const validateDateRange = (rule, value, callback) => {
+  if (!value) {
+    return callback(new Error("The date is required"));
+  }
+  const startDate = moment(fundraisingProject.value.startDate);
+  const endDate = moment(fundraisingProject.value.endDate);
+
+  if (startDate && endDate && startDate.isAfter(endDate)) {
+    return callback(new Error("Start date cannot be after end date"));
+  }
+  callback();
+};
+
 const rules = {
   projectName: [getTextRequiredRule("Please enter the project name")],
   description: [getTextRequiredRule("Please enter the description")],
-  startDate: [getTextRequiredRule("Please select the start date")],
-  endDate: [getTextRequiredRule("Please select the end date")],
+  startDate: [
+    getTextRequiredRule("Please select the start date"),
+    { validator: validateDateRange, trigger: "change" },
+  ],
+  endDate: [
+    getTextRequiredRule("Please select the end date"),
+    { validator: validateDateRange, trigger: "change" },
+  ],
   goalAmount: [getTextRequiredRule("Please enter the goal amount")],
   status: [getTextRequiredRule("Please select the status", "change")],
   fundraisingOrganizerId: [getTextRequiredRule("Please select the organizer")],

@@ -162,7 +162,7 @@ const submitDonation = () => {
     showDonationDialog.value = false;
     router.push({ name: "stripe-payment", query: { amount: amount.value } });
   } else {
-    ElMessage.warning("Please enter a valid donation amount.");
+    ElMessage.warning("Donation amount must be greater than zero.");
   }
 };
 
