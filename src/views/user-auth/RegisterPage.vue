@@ -1,7 +1,7 @@
 <template>
   <div style="text-align: center; margin: 0 20px">
     <div style="margin-top: 100px">
-      <div style="font-size: 25px; font-weight: bold">Register new account</div>
+      <div style="font-size: 25px; font-weight: bold">Register New Account</div>
       <div style="font-size: 14px; color: grey">
         Welcome to register BookShare, please fill in the relevant information
         below

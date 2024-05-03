@@ -8,7 +8,7 @@
         <v-row align="center" class="book-item">
           <!-- Book Info -->
           <v-col cols="12">
-            <h4>Project Name: {{ donation.title }}</h4>
+            <h4>Project Name: {{ donation.fundraisingProjectName }}</h4>
             <p>Amount Donated: RM {{ donation.donationAmount }}.00</p>
             <p>Contribution Date: {{ donation.contributionDate }}</p>
           </v-col>
